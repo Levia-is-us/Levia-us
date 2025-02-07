@@ -13,7 +13,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 
-from metacognative.stream.stream import Stream
+from metacognitive.stream.stream import Stream
 import asyncio
 
 # test for local stream
@@ -46,8 +46,7 @@ async def test_websocket_receive():
     print("start receive")
     while True:
         try:
-            # Use websockets library instead of websocket-client for async support
-            async with websockets.connect("ws://localhost:3000") as ws:
+            async with websockets.connect("ws://localhost:8765") as ws:
                 try:
                     while True:
                         message = await ws.recv()
@@ -65,6 +64,5 @@ print("Starting sender and receiver...")
 
 async def main():
     await asyncio.gather(test_websocket_send(), test_websocket_receive())
-
-
+    
 asyncio.run(main())

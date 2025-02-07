@@ -1,11 +1,11 @@
 import os
 from datetime import datetime
-from metacognative.stream.stream_provider.base_stream import BaseStream
+from metacognitive.stream.stream_provider.base_stream import BaseStream
 
 
 class LogStream(BaseStream):
     def __init__(self):
-        self.logs_dir = os.path.join("metacognative", "stream", "logs")
+        self.logs_dir = os.path.join("metacognitive", "stream", "logs")
         os.makedirs(self.logs_dir, exist_ok=True)
 
     def output(self, log: str):

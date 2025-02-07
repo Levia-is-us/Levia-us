@@ -1,9 +1,9 @@
 # Import stream providers
-from metacognative.stream.stream_provider.base_stream import BaseStream
-from metacognative.stream.stream_provider.log_stream.log_stream import LogStream
-from metacognative.stream.stream_provider.http_stream.http_stream import HTTPStream
-from metacognative.stream.stream_provider.local_stream.local_stream import LocalStream
-from metacognative.stream.stream_provider.websocket_stream.websocket_stream import (
+from metacognitive.stream.stream_provider.base_stream import BaseStream
+from metacognitive.stream.stream_provider.log_stream.log_stream import LogStream
+from metacognitive.stream.stream_provider.http_stream.http_stream import HTTPStream
+from metacognitive.stream.stream_provider.local_stream.local_stream import LocalStream
+from metacognitive.stream.stream_provider.websocket_stream.websocket_stream import (
     WebsocketStream,
 )
 
@@ -23,11 +23,11 @@ class Stream:
         """
         self.streams = []
         if stream_type == "http":
-            self.add_stream(HTTPStream("http://localhost:8000/log"))
+            self.add_stream(HTTPStream("http://localhost:8000"))
         elif stream_type == "local":
             self.add_stream(LocalStream())
         elif stream_type == "websocket":
-            self.add_stream(WebsocketStream("ws://localhost:8765/log"))
+            self.add_stream(WebsocketStream("ws://localhost:8765"))
         else:
             raise ValueError(f"Invalid stream type: {stream_type}")
 

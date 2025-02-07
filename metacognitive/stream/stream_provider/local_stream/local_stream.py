@@ -1,4 +1,4 @@
-from metacognative.stream.stream_provider.base_stream import BaseStream
+from metacognitive.stream.stream_provider.base_stream import BaseStream
 
 
 class LocalStream(BaseStream):
