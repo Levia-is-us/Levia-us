@@ -44,7 +44,7 @@ wheels/
 
 #env
 .env
-/metacognative/stream/logs
+/metacognitive/stream/logs
 
 #other
 .history/
