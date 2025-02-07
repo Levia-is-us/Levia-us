@@ -50,4 +50,4 @@ Levia's architecture mirrors human cognitive processes. Its shared memory and ca
 
 Join us in building the future of execution focused agents/conductors! Together, we're creating a more intelligent, proactive and capable AI ecosystem.
 
-<p align="center">Built with ❤️ by the Levia Protocol Team</p>
+<p align="center">Built with ❤️ by the Levia Contributors</p>
