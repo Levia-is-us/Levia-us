@@ -2,8 +2,8 @@ import requests
 
 
 class GitBookAPI:
-    def __init__(self, gitboot_api_token):
-        self.api_token = gitboot_api_token
+    def __init__(self, gitbook_api_token):
+        self.api_token = gitbook_api_token
         self.base_url = "https://api.gitbook.com/v1"
         self.headers = {
             "Authorization": f"Bearer {self.api_token}",
