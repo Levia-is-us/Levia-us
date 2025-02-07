@@ -1,3 +1,11 @@
+<div align="left">
+<details open>
+<summary><h4>💡 Important</h4></summary>
+We're actively working on a new alpha version.
+Please try it out and let us know if you run into any issues!
+</details>
+</div>
+
 # Levia Protocol ([Levia.us](https://levia.us/))
 
 A Living Agent Ecosystem for Understanding and Action
