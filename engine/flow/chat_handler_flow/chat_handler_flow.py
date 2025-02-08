@@ -55,9 +55,4 @@ def handle_intent_summary(reply_info: dict, chat_messages: list, tool_caller) ->
     memories = retrieve_long_pass_memory(user_intent)
     high_score_memories = filter_high_score_memories(memories)
 
-    # if high_score_memories:
     return process_existing_memories(high_score_memories, user_intent, execution_records_str, chat_messages, tool_caller)
-    # else:
-    #     process_new_intent(summary, execution_records_str, messages_history, tool_caller)
-    
-    # store_long_pass_memory(summary, summary, {"execution_records": execution_records_str})
