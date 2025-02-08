@@ -12,6 +12,7 @@ from engine.flow.evaluator.evaluator_docgen_flow import extract_json_from_doc
 import json
 from engine.tool_framework.tool_caller import ToolCaller
 from engine.executor.tool_executor import verify_tool_execution
+from engine.executor.next_step_prompt import next_step_prompt
 
 def process_existing_memories(high_score_memories: list, summary: str, execution_records_str: list, messages_history: list, tool_caller: ToolCaller) -> str:
     """Process existing memories from database"""
@@ -73,58 +74,40 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
         for step in plan_steps:
             print(f"step: {step}")
             findTool = False
+            # Check if step is already completed in tools collection. If not, get tool from short pass memory
             memories = retrieve_short_pass_memory(step["Description"])
-            if memories:
-                for memory in memories["matches"]:
-                    if check_plan_sufficiency(step["Description"],memory["metadata"]["description"],  memory["metadata"]["data"]):
-                        tools.append(memory["metadata"]["data"])
-                        findTool = True
-                        break
-            if not findTool:
-                # print(f"system_messagev2: {system_messagev2}")
-                prompt = [{"role": "assistant", "content": system_messagev2}] + messages_history
-                prompt.append({"role": "user", "content": "current step: " + step["Name"]})
-                reply = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.7})
-                print(f"\033[92mAssistant: {reply}\033[0m")
-                if reply is not None:
-                    try:
-                        tool_response = eval(reply)
-                    except Exception as e:
-                        tool_response = extract_json_from_doc(reply)
-                
-                    tools.append(tool_response)
-                    findTool = True
-                
-            if not findTool:
-                print(f"\033[91mNo tool found for step: {step['Description']}\033[0m")
-                return
-            
-            for tool in tools:
-                tool_dict = extract_json_from_doc(tool)
-                print(f"tool_dict: {tool_dict}")
-                while True:
-                    next_step_prompt_content = next_step_prompt(tools, tool_dict)
-                    prompt = [{"role": "assistant", "content": next_step_prompt_content}] + messages_history
-                    reply = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.5})
+            # Use LLM to extract appropriate tool from memories. Exit if no tool found
+               
+        if not findTool:
+            print(f"\033[91mNo tool found for step: {step['Description']}\033[0m")
+            return
+        
+        for tool in tools:
+            tool_dict = extract_json_from_doc(tool)
+            print(f"tool_dict: {tool_dict}")
+            while True:
+                next_step_prompt_content = next_step_prompt(tools, tool_dict)
+                prompt = [{"role": "assistant", "content": next_step_prompt_content}] + messages_history
+                reply = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.5})
 
-                    replyJson = extract_json_from_doc(reply)
-                    print(f"\033[92mAssistant: {replyJson}\033[0m")
-                    if(replyJson["can_proceed"] == True):
-                        if "arguments" in replyJson["extracted_arguments"]:
-                            required_arguments = replyJson["extracted_arguments"]["arguments"]
-                        else:
-                            required_arguments = {}
-                        res = execute_tool(tool_caller, tool_dict["tool"], tool_dict["method"], required_arguments)
-                        verify_res = verify_tool_execution(tool_dict, res)
-                        if(verify_res == "success"):
-                            execution_records_str.append(tool)
-                            messages_history.append({"role": "assistant", "content":  tool_dict["tool"] + " result: " + str(res)})
-                            tool_result_records.append("toolName: " + tool_dict["tool"] + " result: " + str(res))
-                            print(f"\033[92mResult: {res}\033[0m")
-                            break
+                replyJson = extract_json_from_doc(reply)
+                print(f"\033[92mAssistant: {replyJson}\033[0m")
+                if(replyJson["can_proceed"] == True):
+                    if "arguments" in replyJson["extracted_arguments"]:
+                        required_arguments = replyJson["extracted_arguments"]["arguments"]
                     else:
-                        inputText = input("Please input required arguments to continue: ")
-                        messages_history.append({"role": "user", "content": inputText})
+                        required_arguments = {}
+                    res = execute_tool(tool_caller, tool_dict["tool"], tool_dict["method"], required_arguments)
+                    verify_res = verify_tool_execution(tool_dict, res)
+                    if(verify_res == "success"):
+                        execution_records_str.append(tool)
+                        messages_history.append({"role": "assistant", "content":  tool_dict["tool"] + " result: " + str(res)})
+                        tool_result_records.append("toolName: " + tool_dict["tool"] + " result: " + str(res))
+                        print(f"\033[92mResult: {res}\033[0m")
+                        break
+                else:
+                    inputText = input("Please input required arguments to continue: ")
+                    messages_history.append({"role": "user", "content": inputText})
         return tool_result_records
 
 def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
