@@ -4,7 +4,7 @@
 Levia is an Open Source AI Metacognition & Tooling infrastructure that enables agents to recursively self-learn and optimize execution pathways. The system is designed to execute tasks rather than just provide textual responses.
 
 ## Prerequisites
-- Python 3.11
+- Python >=3.11
 - Virtual environment tool (venv, conda, etc.)
 
 ## Installation
@@ -176,7 +176,6 @@ The repository comes with several pre-built tools:
 1. Website Scanner
 2. Web Search
 3. GitBook Documentation Generator
-4. Location Services
 
 ## Development
 To create a new tool:
@@ -188,12 +187,26 @@ To create a new tool:
 
 Example tool structure:
 ```
+import sys
+import os
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(project_root)
 from engine.tool_framework import simple_tool
 
 @simple_tool("Your Tool Description")
 def your_tool_method(param1, param2):
     # Tool implementation
     return result
+
+def main():
+    tool = your_tool_method()
+    runner = ToolRunner(tool)
+    runner.run()
+if __name__ == "__main__":
+    main()
+
 ```
 
 ## Testing
