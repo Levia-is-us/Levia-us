@@ -1,6 +1,6 @@
 from engine.planner.planner_prompt import plan_maker_prompt
 from engine.llm_provider.llm import chat_completion
-from engine.flow.evaluator.evaluator_docgen_flow import extract_json_from_doc
+from engine.utils.json_util import extract_json_from_str
 from engine.planner.checking_plan_prompt import check_plan_fittable_prompt
 import json
 
@@ -33,6 +33,6 @@ def check_plan_sufficiency(intent: str, plan_intent: str, execution_records: lis
     try:
         result = json.loads(result)
     except:
-        result = extract_json_from_doc(result)
+        result = extract_json_from_str(result)
     
     return result["solution_sufficient"]['result'] in [True, "true"]
