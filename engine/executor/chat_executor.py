@@ -14,7 +14,7 @@ from engine.tool_framework.tool_caller import ToolCaller
 from engine.executor.tool_executor import verify_tool_execution
 from engine.executor.next_step_prompt import next_step_prompt
 from engine.flow.tool_selector.tool_select import tool_select
-from engine.flow.tool_selector.step_tool_check import step_tool_check
+from engine.flow.tool_selector.step_necessity_validator import step_tool_check
 
 def process_existing_memories(high_score_memories: list, summary: str, execution_records_str: list, messages_history: list, tool_caller: ToolCaller) -> str:
     """Process existing memories from database"""
