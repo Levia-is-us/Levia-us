@@ -8,7 +8,7 @@ project_root = os.path.dirname(
 )
 sys.path.append(project_root)
 
-from tools.web_search.util import (
+from tools.web_search_tool.util import (
     aipolabs_search,
     extract_relevance_url,
     generate_search_keywords,
