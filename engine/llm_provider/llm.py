@@ -74,6 +74,7 @@ def chat_completion(messages, model=_default_model, config={}):
     where content is wrapped in a list of content objects with type and text fields.
     """
     models = _load_models()
+    model="gpt-35-turbo-16k"
 
     if models[model]["source"] == "openai" or models[model]["source"] == "azure-openai":
         return chat_completion_openai(messages, model=models[model], config=config)

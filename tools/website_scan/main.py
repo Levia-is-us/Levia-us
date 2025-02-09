@@ -8,7 +8,7 @@ sys.path.append(project_root)
 from engine.tool_framework.tool_runner import ToolRunner
 from engine.tool_framework import simple_tool
 
-from utils import (
+from tools.website_scan.utils import (
     get_all_content,
     get_all_links,
     remove_duplicate_links,

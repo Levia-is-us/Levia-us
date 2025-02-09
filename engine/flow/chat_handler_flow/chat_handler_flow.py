@@ -1,7 +1,7 @@
 from engine.flow.chat_handler_flow.intents_system_prompt import intents_system_prompt
 from engine.llm_provider.llm import chat_completion
 from memory.episodic_memory.episodic_memory import retrieve_long_pass_memory
-from engine.flow.evaluator.evaluator_docgen_flow import extract_json_from_doc
+from engine.utils.json_util import extract_json_from_str
 from engine.executor.chat_executor import process_existing_memories
 from engine.executor.chat_executor import filter_high_score_memories
 from engine.flow.chat_handler_flow.final_reply_prompt import final_reply_prompt
@@ -35,12 +35,12 @@ def get_initial_response(chat_messages: list) -> dict:
     """Get initial response from LLM"""
     prompt = intents_system_prompt(chat_messages)
     reply_info = chat_completion(prompt, model="gpt-35-turbo-16k", config={"temperature": 0})
-    return extract_json_from_doc(reply_info)
+    return extract_json_from_str(reply_info)
 
 
 def handle_final_reply(chat_messages: list) -> str:
     """Handle final reply type response"""
-    prompt = [{"role": "assistant", "content": final_reply_prompt}] + massage
+    prompt = [{"role": "assistant", "content": final_reply_prompt}] + chat_messages
     final_reply = chat_completion(prompt, model="gpt-35-turbo-16k", config={"temperature": 0.3})
     return final_reply
 

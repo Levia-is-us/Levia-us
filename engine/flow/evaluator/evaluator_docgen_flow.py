@@ -12,21 +12,6 @@ def evaluator_docgen_flow(code):
     )
     return result
 
-
-def extract_json_from_doc(doc):
-    try:
-        if "```json" in doc:
-            start = doc.find("```json") + len("```json")
-            end = doc.find("```", start)
-            doc = doc[start:end].strip()
-            return json.loads(doc)
-        else:
-            return eval(doc)
-    except:
-        return json.loads(doc)
-
-
-
 def extract_code_breakdown_from_doc(doc):
     start = doc.find("<code_breakdown>") + len("<code_breakdown>")
     end = doc.find("</code_breakdown>", start)

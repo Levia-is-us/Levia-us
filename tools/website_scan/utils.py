@@ -7,9 +7,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import json
-from links_filter_prompt import links_filter_prompt
-from links_summary_prompt import links_summary_prompt
-from chat_gpt import chat_gpt
+from tools.website_scan.links_filter_prompt import links_filter_prompt
+from tools.website_scan.links_summary_prompt import links_summary_prompt
+from tools.website_scan.chat_gpt import chat_gpt
 import re
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

@@ -3,6 +3,10 @@ import os
 
 from aipolabs import Aipolabs
 from aipolabs.types.functions import FunctionExecutionResult
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(project_root)
 
 from tools.web_search.util import (
     aipolabs_search,
@@ -10,10 +14,6 @@ from tools.web_search.util import (
     generate_search_keywords,
 )
 
-project_root = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
-sys.path.append(project_root)
 from engine.tool_framework.tool_runner import ToolRunner
 from engine.tool_framework import simple_tool
 
