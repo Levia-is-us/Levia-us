@@ -4,7 +4,7 @@
 Levia is an Open Source AI Metacognition & Tooling infrastructure that enables agents to recursively self-learn and optimize execution pathways. The system is designed to execute tasks rather than just provide textual responses.
 
 ## Prerequisites
-- Python 3.8
+- Python 3.11
 - Virtual environment tool (venv, conda, etc.)
 
 ## Installation
@@ -15,8 +15,8 @@ Levia is an Open Source AI Metacognition & Tooling infrastructure that enables a
 
 2. Create and activate a virtual environment
 ```
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate`
+python -m venv .venv
+source .venv/bin/activate  # On Windows: venv\Scripts\activate`
 ```
 3. Install dependencies:
 `pip install -r requirements.txt`
@@ -24,7 +24,14 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate`
 
 ## Configuration
 Create a .env file in the root directory with the following required environment variable
+
+
+### Required Keys (One of the following is required)
 ```
+# Selected Model for running Levia_engine
+# Supported models are listed in engine/llm_provider/models.json
+MODEL_NAME=your_model_name_from_llm_provider
+
 # OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_BASE_URL=your_openai_base_url
@@ -32,6 +39,22 @@ OPENAI_BASE_URL=your_openai_base_url
 # Azure OpenAI Configuration (if using Azure)
 AZURE_OPENAI_API_KEY=your_azure_openai_api_key
 AZURE_OPENAI_BASE_URL=your_azure_endpoint
+
+#DeepSeek Configuration (if using DeepSeek)
+DEEPSEEK_API_KEY=your_deepseek_api_key
+DEEPSEEK_BASE_URL=your_deepseek_base_url
+
+# Claude Configuration (if using Claude)
+ANTHROPIC_API_KEY=your_anthropic_api_key'
+
+# Pinecone Configuration (other vector database support is coming soon)
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_HOST=your_pinecone_host
+
+```
+
+### Optional Keys (deprecating those keys to make system more modular)
+```
 
 # Database Configuration (if using MySQL)
 DB_HOST=your_db_host
@@ -49,7 +72,15 @@ GITBOOK_API_KEY=your_gitbook_api_key
 AZURE_FILE_SERVER_KEY=your_azure_storage_connection_string
 ```
 
+
+
 ## Running the Application
+Initialize the metacognitive learning memory:
+```
+python metacognitive/evaluator/generate_node_docs.py
+```
+
+
 Start the main application:
 ```
 python main.py
@@ -166,9 +197,11 @@ def your_tool_method(param1, param2):
 ```
 
 ## Testing
-Run tests using pytest:
+Run tests using pytest (TBD):
 ```
 pytest test/
 ```
 
 ## Notes
+- The system is designed to be modular and extensible. You can add your own tools and models to the system.
+- The system is in very early stage of development. More features will be added soon.
