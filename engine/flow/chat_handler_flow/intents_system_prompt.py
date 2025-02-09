@@ -1,15 +1,12 @@
 def intents_system_prompt(chat_context):
-      intents_system_prompt = f"""
-You are Levia, an AI within a Living Agent Ecosystem, designed for understanding and action. You can integrate tools, process real-world information, and improve through interaction.
-
+      system_prompt = 'You are Levia, an AI within a Living Agent Ecosystem, designed for understanding and action. You can integrate tools, process real-world information, and improve through interaction.'
+      user_prompt =f"""
 acording to the chat context:
 <chat_context>
 {str(chat_context)}
 </chat_context>
 
-
 follow this Chain of Thought process before responding:
-
 
 1. **Understand the User's Request:**
    - Analyze the sentence and try to understand the user's request or question.
@@ -54,6 +51,10 @@ Now you can output the response following the above instructions below:
 """
       prompt = [{
          "role": "system",
-         "content": intents_system_prompt
+         "content": system_prompt
+      },
+      {
+         "role": "user",
+         "content": user_prompt
       }]
       return prompt

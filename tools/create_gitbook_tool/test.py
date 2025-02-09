@@ -10,7 +10,6 @@ env_path = os.path.join(project_root, '.env')
 load_dotenv(env_path)
 sys.path.append(project_root)
 
-from engine.tool_framework.tool_run import run_tool
 from engine.tool_framework import ToolRegistry, ToolCaller
 from fileManage import get_top_title_with_hash
 

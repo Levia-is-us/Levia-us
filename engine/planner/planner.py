@@ -19,13 +19,8 @@ def check_plan_sufficiency(intent: str, plan_intent: str, execution_records: lis
     print(f"intent: {intent}")
     print(f"plan: {plan_intent}")
     print(f"execution_records: {execution_records}")
-    memories_check_prompt = [
-        {"role": "assistant", "content": check_plan_fittable_prompt},
-        {"role": "user", "content": f"Intent A: {intent}"},
-        {"role": "user", "content": f"Intent B: {plan_intent}"},
-        {"role": "user", "content": f"Proposed Solution: {execution_records}"}
-    ]
-    
+    memories_check_prompt = check_plan_fittable_prompt(intent, plan_intent, execution_records)
+
     result = chat_completion(memories_check_prompt, model="deepseek-chat", 
                            config={"temperature": 0.7})
     print(f"result: {result}")

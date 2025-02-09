@@ -20,10 +20,15 @@ def get_initial_response(chat_messages: list) -> dict:
     reply_info = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0})
     return extract_json_from_str(reply_info)
 
+
 def main():
     chat_messages = input("Enter your message: ")
+    chat_messages = [{"role": "user", "content": "Enter your message: tell me the newest football news"},
+                     {"role": "user", "content": "who are you?"},
+                     ]
     result = get_initial_response(chat_messages=chat_messages)
     print(result)
+
 
 
 

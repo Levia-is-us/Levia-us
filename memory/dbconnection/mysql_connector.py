@@ -1,9 +1,10 @@
 import os
 import pymysql
 from dbutils.pooled_db import PooledDB
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 import logging
 from dotenv import load_dotenv
+
 
 class MySQLPool:
     _instance = None
