@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from engine.executor.check_tools_result_prompt import check_tools_result_prompt
 from engine.llm_provider.llm import chat_completion
-from engine.flow.evaluator.evaluator_docgen_flow import extract_json_from_doc
+from engine.utils.json_util import extract_json_from_str
 
 
 """ This LLM is used to verify the tool is executed successfully or not"""
@@ -22,7 +22,7 @@ def verify_tool_execution(execution_record: dict, result: dict) -> str:
         config={"temperature": 0.7}
     )
     
-    llm_confirmation = extract_json_from_doc(llm_confirmation)
+    llm_confirmation = extract_json_from_str(llm_confirmation)
     #todo: add error handling
     return llm_confirmation
 

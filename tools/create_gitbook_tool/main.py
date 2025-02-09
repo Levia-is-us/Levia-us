@@ -16,8 +16,8 @@ load_dotenv(env_path)
 
 from engine.tool_framework.tool_runner import ToolRunner
 from engine.tool_framework import simple_tool
-from gitbookapi import GitBookAPI
-from fileManage import file_manage, get_top_title_with_hash
+from tools.create_gitbook_tool.gitbookapi import GitBookAPI
+from tools.create_gitbook_tool.fileManage import file_manage, get_top_title_with_hash
 
 _gitbook = None
 _file_manage = None
