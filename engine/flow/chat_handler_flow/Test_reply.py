@@ -21,7 +21,7 @@ from engine.llm_provider.llm import chat_completion
 
 def get_initial_response(chat_messages: list) -> dict:
     """Get initial response from LLM"""
-    prompt = [{"role": "assistant", "content": final_reply_prompt}] + chat_messages
+    prompt = final_reply_prompt(chat_messages)
     reply_info = chat_completion(prompt, model="chatgpt-4o-latest", config={"temperature": 0.7})
     return reply_info
 
