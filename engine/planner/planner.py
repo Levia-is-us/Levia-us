@@ -6,7 +6,7 @@ import json
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-FAST_MODEL_NAME = os.getenv("FAST_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 
 def create_execution_plan(intent: str) -> str:

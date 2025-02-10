@@ -10,33 +10,23 @@ class MySQLPool:
     _instance = None
     
     def __new__(cls):
-        """
-        Singleton pattern to ensure only one pool instance
-        """
         if cls._instance is None:
             cls._instance = super(MySQLPool, cls).__new__(cls)
         return cls._instance
     
     def __init__(self):
-        """
-        Initialize MySQL connection pool with environment variables
-        """
         if not hasattr(self, 'pool'):
             self._load_config()
             self._create_pool()
 
     def _load_config(self):
-        """
-        Load database configuration from environment variables
-        """
-        # Get the project root directory
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         env_path = os.path.join(project_root, '.env')
-        
-        # Load environment variables from .env file
         load_dotenv(env_path)
         
-        # Load database configuration
+        self.environment = os.getenv('ENVIRONMENT', 'prod')
+        if self.environment == 'local':
+            return
         self.config = {
             'host': os.getenv('DB_HOST', 'localhost'),
             'port': int(os.getenv('DB_PORT', 3306)),
@@ -53,9 +43,10 @@ class MySQLPool:
             raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
     def _create_pool(self):
-        """
-        Create database connection pool
-        """
+        if self.environment == 'local':
+            logging.info("Running in local environment, database pool not created")
+            return
+            
         try:
             self.pool = PooledDB(
                 creator=pymysql,
@@ -75,13 +66,17 @@ class MySQLPool:
             logging.error(f"Failed to initialize MySQL connection pool: {e}")
             raise
 
+    def _check_environment(self, operation_name: str) -> bool:
+        """Check if database operations should be executed based on environment"""
+        if self.environment == 'local':
+            logging.info(f"Running in local environment, skipping {operation_name}")
+            return False
+        return True
+
     def execute(self, sql: str, params: Optional[tuple] = None) -> int:
-        """
-        Execute INSERT, UPDATE, DELETE operations
-        :param sql: SQL statement
-        :param params: SQL parameters
-        :return: Number of affected rows
-        """
+        if not self._check_environment("execute"):
+            return 0
+            
         conn = None
         cursor = None
         try:
@@ -105,12 +100,9 @@ class MySQLPool:
                 conn.close()
 
     def query_one(self, sql: str, params: Optional[tuple] = None) -> Optional[tuple]:
-        """
-        Query a single record
-        :param sql: SQL statement
-        :param params: SQL parameters
-        :return: Query result
-        """
+        if not self._check_environment("query_one"):
+            return None
+            
         conn = None
         cursor = None
         try:
@@ -131,12 +123,9 @@ class MySQLPool:
                 conn.close()
 
     def query_all(self, sql: str, params: Optional[tuple] = None) -> List[tuple]:
-        """
-        Query multiple records
-        :param sql: SQL statement
-        :param params: SQL parameters
-        :return: List of query results
-        """
+        if not self._check_environment("query_all"):
+            return []
+            
         conn = None
         cursor = None
         try:
@@ -157,12 +146,9 @@ class MySQLPool:
                 conn.close()
 
     def executemany(self, sql: str, params: List[tuple]) -> int:
-        """
-        Execute batch SQL operations
-        :param sql: SQL statement
-        :param params: List of SQL parameters
-        :return: Number of affected rows
-        """
+        if not self._check_environment("executemany"):
+            return 0
+            
         conn = None
         cursor = None
         try:
