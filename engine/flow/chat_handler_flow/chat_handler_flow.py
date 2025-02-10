@@ -7,10 +7,6 @@ from engine.flow.executor.chat_executor import filter_high_score_memories
 from engine.flow.chat_handler_flow.final_reply_prompt import final_reply_prompt
 import os
 
-
-
-
-
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 

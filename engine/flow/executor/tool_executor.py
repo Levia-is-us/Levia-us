@@ -5,7 +5,6 @@ from engine.utils.json_util import extract_json_from_str
 from engine.tool_framework.tool_caller import ToolCaller
 import os
 
-
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
@@ -66,6 +65,6 @@ def create_execution_record(
             "method": tool_method,
             "args": args,
             "result": result,
-            "status": status
+            "status": status,
         }
     )
