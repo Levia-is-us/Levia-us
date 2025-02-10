@@ -9,7 +9,7 @@
     "model": "o1-mini",
     "version": "2024-10-21",
     "type": "reasoning",
-    "source": "azure-openai"
+    "source": "openai"
   },
   {
     "model": "o3-mini",

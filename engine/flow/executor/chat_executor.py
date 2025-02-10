@@ -1,18 +1,18 @@
-# engine/planner/planner.py
-
-from engine.prompt_provider import system_message, system_messagev2
 from engine.llm_provider.llm import chat_completion
 from memory.episodic_memory.episodic_memory import retrieve_short_pass_memory
-from engine.executor.tool_executor import execute_tool
-from engine.planner.planner import create_execution_plan, check_plan_sufficiency
+from engine.flow.executor.tool_executor import execute_tool
+from engine.flow.planner.planner import create_execution_plan, check_plan_sufficiency
 from engine.utils.json_util import extract_json_from_str
 import json
+
 from engine.tool_framework.tool_caller import ToolCaller
-from engine.executor.tool_executor import verify_tool_execution
-from engine.executor.next_step_prompt import next_step_prompt
+from engine.flow.executor.tool_executor import verify_tool_execution
 from engine.flow.tool_selector.tool_select import tool_select
 from engine.flow.tool_selector.step_necessity_validator import step_tool_check
+from engine.flow.executor.next_step_prompt import next_step_prompt
 import os
+
+
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
@@ -59,37 +59,6 @@ def execute_existing_records(execution_records: list, tool_caller) -> dict:
             print(f"Error processing execution record: {str(e)}")
             raise e
 
-
-def process_new_intent(
-    summary: str, execution_records_str: list, messages_history: list, tool_caller
-) -> None:
-    """Process new intent without existing memories"""
-    memories = retrieve_short_pass_memory(summary)
-    messages_history.append({"role": "assistant", "content": system_message})
-    reply = chat_completion(
-        messages_history, model=QUALITY_MODEL_NAME, config={"temperature": 0.3}
-    )
-    print(f"\033[92mAssistant: {reply}\033[0m")
-
-    try:
-        tool_response = json.loads(reply)
-        if isinstance(tool_response, dict):
-            tool_name = tool_response.get("tool")
-            tool_method = tool_response.get("method")
-            tool_args = tool_response.get("arguments", {})
-
-            if tool_name and tool_method:
-                tool_record = {
-                    "tool": tool_name,
-                    "method": tool_method,
-                    "args": tool_args,
-                }
-                result, execution_record = execute_tool(
-                    tool_caller, tool_name, tool_method, tool_args
-                )
-                execution_records_str.append(execution_record)
-    except Exception as e:
-        print(f"\033[91mError processing tool response: {str(e)}\033[0m")
 
 
 def handle_new_tool_execution(
