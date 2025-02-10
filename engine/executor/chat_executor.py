@@ -15,7 +15,7 @@ from engine.flow.tool_selector.step_necessity_validator import step_tool_check
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-FAST_MODEL_NAME = os.getenv("FAST_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 def process_existing_memories(
     high_score_memories: list,

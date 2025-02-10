@@ -6,7 +6,7 @@ from aipolabs._exceptions import ServerError
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-FAST_MODEL_NAME = os.getenv("FAST_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 
 def generate_search_keywords(intent: str):
