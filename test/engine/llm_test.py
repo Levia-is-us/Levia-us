@@ -19,8 +19,8 @@ from engine.llm_provider.llm import chat_completion, create_chat_completion, cre
 # print(chat_completion([{"role": "user", "content": "Hello, how are you?"}]))
 
 # Test create_chat_completion
-# print(create_chat_completion("You are a helpful assistant", "Hello, how are you?"))
+print(create_chat_completion("You are a helpful assistant", "Hello, how are you?", model="o1-mini"))
 
 # Test create_embedding
-result = create_embedding("Hello, how are you?")
-print(result)
+# result = create_embedding("Hello, how are you?")
+# print(result)
