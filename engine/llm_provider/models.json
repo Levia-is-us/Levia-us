@@ -38,7 +38,7 @@
   {
     "model": "deepseek-reasoner",
     "version": "deepseek-reasoner",
-    "type": "chat",
+    "type": "reasoning",
     "source": "deepseek"
   },
   {
