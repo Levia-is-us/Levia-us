@@ -68,7 +68,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate`
 
 
 ## Configuration
-Create a .env file in the root directory with the following required environment variable
+Create a .env file in the root directory with the following required environment variables
 ```
 # OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key
@@ -104,7 +104,8 @@ The application will initialize with available tools from the tools/ directory a
 
 
 ## Core Features
-1. Tool Integration: The system automatically scans and loads tools from the tools/ directory. Reference:
+### Tool Integration
+The engine automatically scans and loads tools from the `tools/` directory. Here's how it works:
 ```
 def init_tools():
     """Initialize tool registry and caller"""
@@ -118,7 +119,8 @@ def init_tools():
     return ToolCaller(registry)
 ```
 
-2. Memory Management: The system includes short-term memory capabilities for maintaining context during conversations. Reference:
+### Memory Management
+The engine includes short-term memory capabilities for maintaining context during conversations:
 ```
 class ContextStore:
     def __init__(self, max_length=5):
@@ -157,7 +159,8 @@ class ContextStore:
         """
         self.history = []
 ```
-3. Stream Processing: Supports multiple output streams including HTTP, WebSocket, and local file logging. Reference:
+### Stream Processing
+The engine supports multiple output streams including HTTP, WebSocket, and local file logging:
 ```
 class Stream:
     """
@@ -186,17 +189,17 @@ class Stream:
         self.add_stream(LogStream())
 ```
 ## Available Tools
-The repository comes with several pre-built tools:
+The repository currently includes the following tools:
 1. Website Scanner
 2. Web Search
 3. GitBook Documentation Generator
 4. Location Services
 
-## Development
+## Development Guide
 To create a new tool:
-1. Create a new directory in the tools/ folder
-2. Create a main.py file with your tool implementation
-3. Use the @simple_tool decorator to register your tool
+1. Create a new directory in the `tools/` folder
+2. Create a `main.py` file with your tool implementation
+3. Use the `@simple_tool` decorator to register your tool
 4. Implement the required methods
 
 
