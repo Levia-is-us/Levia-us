@@ -22,11 +22,15 @@ def get_initial_response(chat_messages: list) -> dict:
 
 
 def main():
-    chat_messages = input("Enter your message: ")
-    chat_messages = [{"role": "user", "content": "Enter your message: tell me the newest football news"},
+    # chat_messages = input("Enter your message: ")
+    chat_messages = [{"role": "user", "content": "tell me the newest football news"},
+                     {"role": "assistant", "content": "2027-02-09, Chinese football team won the world cup"},
                      {"role": "user", "content": "who are you?"},
+                     {"role": "assistant", "content": 'I am Levia, an AI within a Living Agent Ecosystem, designed for understanding and action. I can integrate tools, process real-world information, and improve through interaction.'},
+                     {"role": "user", "content": "What did you said with the news? Sounds impossible."}
                      ]
     result = get_initial_response(chat_messages=chat_messages)
+
     print(result)
 
 

@@ -10,6 +10,5 @@ def check_tools_result_prompt(tool_execution, tool_output):
                                     Ensure the JSON response is clear, structured, and easy to parse.
                                     """
     messages.append({"role": "assistant", "content": prompt})
-    messages.append({"role": "user", "content": f"tool_execution: {tool_execution}"})
-    messages.append({"role": "user", "content": f"tool_output: {tool_output}"})
+    messages.append({"role": "user", "content": f"tool_execution: {tool_execution}, tool_output: {tool_output}"})
     return messages

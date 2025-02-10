@@ -2,9 +2,18 @@ from engine.flow.chat_handler_flow.intents_system_prompt import intents_system_p
 from engine.llm_provider.llm import chat_completion
 from memory.episodic_memory.episodic_memory import retrieve_long_pass_memory
 from engine.utils.json_util import extract_json_from_str
-from engine.executor.chat_executor import process_existing_memories
-from engine.executor.chat_executor import filter_high_score_memories
+from engine.flow.executor.chat_executor import process_existing_memories
+from engine.flow.executor.chat_executor import filter_high_score_memories
 from engine.flow.chat_handler_flow.final_reply_prompt import final_reply_prompt
+<<<<<<< Updated upstream
+=======
+import os
+
+
+QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+
+>>>>>>> Stashed changes
 
 def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
     """Handle the main chat flow logic"""
@@ -41,7 +50,13 @@ def get_initial_response(chat_messages: list) -> dict:
 def handle_final_reply(chat_messages: list) -> str:
     """Handle final reply type response"""
     prompt = [{"role": "assistant", "content": final_reply_prompt}] + chat_messages
+<<<<<<< Updated upstream
     final_reply = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.3})
+=======
+    final_reply = chat_completion(
+        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.7}
+    )
+>>>>>>> Stashed changes
     return final_reply
 
 

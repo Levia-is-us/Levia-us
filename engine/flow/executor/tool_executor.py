@@ -1,8 +1,16 @@
 from memory.dbconnection.mysql_connector import MySQLPool
-from engine.executor.check_tools_result_prompt import check_tools_result_prompt
+from engine.flow.executor.check_tools_result_prompt import check_tools_result_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 from engine.tool_framework.tool_caller import ToolCaller
+<<<<<<< Updated upstream:engine/executor/tool_executor.py
+=======
+import os
+
+
+QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+>>>>>>> Stashed changes:engine/flow/executor/tool_executor.py
 
 db_pool = MySQLPool()
 
@@ -55,6 +63,7 @@ def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: 
 def create_execution_record(tool_name: str, tool_method: str, 
                           args: dict, result: dict, status: str) -> str:
     """Create execution record string"""
+<<<<<<< Updated upstream:engine/executor/tool_executor.py
     return str({
         "tool": tool_name,
         "method": tool_method,
@@ -62,3 +71,14 @@ def create_execution_record(tool_name: str, tool_method: str,
         "result": result,
         "status": status
     })
+=======
+    return str(
+        {
+            "tool": tool_name,
+            "method": tool_method,
+            "args": args,
+            "result": result,
+            "status": status
+        }
+    )
+>>>>>>> Stashed changes:engine/flow/executor/tool_executor.py
