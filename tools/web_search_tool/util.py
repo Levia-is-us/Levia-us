@@ -3,6 +3,10 @@ from aipolabs import Aipolabs
 from engine.llm_provider.llm import chat_completion
 from aipolabs.types.functions import FunctionExecutionResult
 from aipolabs._exceptions import ServerError
+import os
+
+QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 
 def generate_search_keywords(intent: str):
@@ -55,7 +59,7 @@ def generate_search_keywords(intent: str):
                 {"role": "assistant", "content": prompt},
                 {"role": "user", "content": intent},
             ],
-            model="gpt-35-turbo-16k",
+            model=QUALITY_MODEL_NAME,
             config={"temperature": 0.7},
         )
         keywords = eval(output)
@@ -103,7 +107,7 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
                     "content": f"Intent: {intent}\nContent List: {content_list}",
                 },
             ],
-            model="gpt-35-turbo-16k",
+            model=QUALITY_MODEL_NAME,
             config={"temperature": 0.7},
         )
         urls = eval(output)

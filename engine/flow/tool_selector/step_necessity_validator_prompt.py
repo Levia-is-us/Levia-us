@@ -1,4 +1,4 @@
-def step_necessarity_check_prompt(plan, current_step, context, tools_and_outputs):
+def step_necessity_check_prompt(plan, current_step, context, tools_and_outputs):
     prompt = f"""
 You are an assistant executing a multi-step plan. Each step contains a description and rationale. Your task is to analyze whether the current step requires selecting a tool or can be skipped/merged based on the tools already chosen, their potential outputs, and the available context.
 

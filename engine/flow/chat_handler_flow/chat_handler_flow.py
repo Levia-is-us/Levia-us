@@ -5,17 +5,22 @@ from engine.utils.json_util import extract_json_from_str
 from engine.executor.chat_executor import process_existing_memories
 from engine.executor.chat_executor import filter_high_score_memories
 from engine.flow.chat_handler_flow.final_reply_prompt import final_reply_prompt
+import os
+
+QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+
 
 def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
     """Handle the main chat flow logic"""
     # Add user input to messages
     # chat_messages.append(messages)
     chat_messages.append({"role": "user", "content": user_input})
-    
+
     # Get initial response
     reply_info = get_initial_response(chat_messages)
     print(f"reply_info: {reply_info}")
-    
+
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         message_copy = chat_messages.copy()
@@ -30,30 +35,36 @@ def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
         return final_reply
 
 
-
 def get_initial_response(chat_messages: list) -> dict:
     """Get initial response from LLM"""
     prompt = intents_system_prompt(chat_messages)
-    reply_info = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0})
+    reply_info = chat_completion(
+        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}
+    )
     return extract_json_from_str(reply_info)
 
 
 def handle_final_reply(chat_messages: list) -> str:
     """Handle final reply type response"""
     prompt = [{"role": "assistant", "content": final_reply_prompt}] + chat_messages
-    final_reply = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.3})
+    final_reply = chat_completion(
+        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.3}
+    )
     return final_reply
-
-
-
 
 
 def handle_intent_summary(reply_info: dict, chat_messages: list, tool_caller) -> str:
     """Handle intent summary type response"""
     user_intent = reply_info["user_intent"]
     execution_records_str = []
-    
+
     memories = retrieve_long_pass_memory(user_intent)
     high_score_memories = filter_high_score_memories(memories)
 
-    return process_existing_memories(high_score_memories, user_intent, execution_records_str, chat_messages, tool_caller)
+    return process_existing_memories(
+        high_score_memories,
+        user_intent,
+        execution_records_str,
+        chat_messages,
+        tool_caller,
+    )
