@@ -20,7 +20,7 @@ class MySQLPool:
             self._create_pool()
 
     def _load_config(self):
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         env_path = os.path.join(project_root, '.env')
         load_dotenv(env_path)
         
