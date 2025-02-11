@@ -78,7 +78,7 @@ def chat_completion(messages, model=_default_model, config={}):
     if models[model]["source"] == "openai" or models[model]["source"] == "azure-openai":
         return chat_completion_openai(messages, model=models[model], config=config)
     elif models[model]["source"] == "deepseek":
-        return chat_completion_deepseek(messages, model=model, config=config)
+        return chat_completion_deepseek(messages, model=models[model], config=config)
     elif models[model]["source"] == "anthropic":
         # convert messages to anthropic format
         anthropic_messages = []

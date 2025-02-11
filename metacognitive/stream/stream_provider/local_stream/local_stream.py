@@ -7,6 +7,6 @@ class LocalStream(BaseStream):
 
     def output(self, log: str):
         try:
-            print(log)
+            print(f"\033[95m{log}\033[0m")
         except Exception as e:
             print(f"LocalStream write log error: {e}")

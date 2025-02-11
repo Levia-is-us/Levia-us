@@ -2,9 +2,13 @@ from openai import OpenAI
 
 import os
 
+from engine.utils.chat_formatter import convert_system_message_to_developer_message, pop_system_message_to_developer_message
+from metacognitive.stream.stream import output_stream
+
 api_key = os.getenv("DEEPSEEK_API_KEY")
 
-def chat_completion_deepseek(messages, model="deepseek-chat", config={}):
+
+def chat_completion_deepseek(messages, model, config={}):
     """
     Generate chat completion using OpenAI API.
 
@@ -17,8 +21,10 @@ def chat_completion_deepseek(messages, model="deepseek-chat", config={}):
     """
     try:
         client = OpenAI(base_url="https://api.deepseek.com", api_key=api_key)
+        if model["type"] == "reasoning":
+            messages = pop_system_message_to_developer_message(messages)
         completion_params = {
-            "model": model,
+            "model": model["model"],
             "messages": messages,
             "max_tokens": 2000,
             "stream": False,
@@ -27,6 +33,11 @@ def chat_completion_deepseek(messages, model="deepseek-chat", config={}):
         completion_params.update(config)
 
         completion = client.chat.completions.create(**completion_params)
+
+        if model["type"] == "reasoning":
+            if completion.choices[0].message.model_extra:
+                reasons = completion.choices[0].message.model_extra.reasoning_content
+                output_stream(reasons)
 
         # Extract the model reply
         return completion.choices[0].message.content

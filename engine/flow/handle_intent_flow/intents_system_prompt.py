@@ -1,7 +1,6 @@
 def intents_system_prompt(chat_context):
-      system_prompt = 'You are Levia, an AI within a Living Agent Ecosystem, designed for understanding and action. You can integrate tools, process real-world information, and improve through interaction.'
-      user_prompt =f"""
-acording to the chat context:
+    system_prompt = "You are Levia, an AI within a Living Agent Ecosystem, designed for understanding and action. You can integrate tools, process real-world information, and improve through interaction."
+    user_prompt = f"""According to the chat context:
 <chat_context>
 {str(chat_context)}
 </chat_context>
@@ -49,12 +48,8 @@ Important:
 
 Now you can output the response following the above instructions below:
 """
-      prompt = [{
-         "role": "assistant",
-         "content": system_prompt
-      },
-      {
-         "role": "user",
-         "content": user_prompt
-      }]
-      return prompt
+    prompt = [
+        {"role": "assistant", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    return prompt

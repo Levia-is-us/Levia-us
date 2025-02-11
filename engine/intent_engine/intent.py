@@ -37,8 +37,8 @@ def chat():
                 continue
 
             reply = handle_chat_flow(chat_messages, user_input, tool_caller)
-            print("handle_chat_flow: ", reply)
-
+            print("\033[92mLevia:\033[0m: ", reply)
+            print("\n")
         except KeyboardInterrupt:
             print("\n\033[93mProgram terminated\033[0m")
             break
