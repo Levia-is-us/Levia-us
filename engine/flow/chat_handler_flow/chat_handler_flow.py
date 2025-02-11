@@ -34,9 +34,6 @@ def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
     elif reply_info["type"] == "call_tools":
         handle_intent_summary(reply_info, chat_messages, tool_caller)
         final_reply = handle_reply_flow(chat_messages)
-
-        # todo: need to deprecate chat_messages
-        chat_messages.append(create_chat_message("assistant", f"{final_reply}"))
         short_term_memory.add_context(create_chat_message("user", user_input))
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}")
