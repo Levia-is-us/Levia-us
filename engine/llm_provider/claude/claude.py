@@ -20,7 +20,10 @@ def chat_completion_anthropic(messages, model="claude-3-5-sonnet-20241022", conf
     client = anthropic.Anthropic(
         api_key=api_key,
     )
-    message = client.messages.create(
-        model=model, max_tokens=1024, messages=messages, **config
-    )
+    default_config = {
+        "max_tokens": 1024,
+    }
+    config.update(default_config)
+
+    message = client.messages.create(model=model, messages=messages, **default_config)
     return message.content[0].text

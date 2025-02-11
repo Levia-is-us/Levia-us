@@ -20,19 +20,19 @@
   {
     "model": "claude-3-5-sonnet",
     "version": "claude-3-5-sonnet-20241022",
-    "type": "chat",
+    "type": "reasoning",
     "source": "anthropic"
   },
   {
     "model": "claude-3-5-haiku",
     "version": "claude-3-5-haiku-20241022",
-    "type": "chat",
+    "type": "reasoning",
     "source": "anthropic"
   },
   {
     "model": "claude-3-opus",
     "version": "claude-3-opus-20240229",
-    "type": "chat",
+    "type": "reasoning",
     "source": "anthropic"
   },
   {
