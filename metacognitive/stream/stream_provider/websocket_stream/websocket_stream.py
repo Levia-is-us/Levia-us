@@ -14,13 +14,20 @@ class WebsocketStream(BaseStream):
         asyncio.set_event_loop(self.loop)
         threading.Thread(target=self.start_server, daemon=True).start()
 
+    async def handler(self, websocket):
+        self.clients.add(websocket)
+        try:
+            await websocket.wait_closed()
+        finally:
+            self.clients.remove(websocket)
+
     def start_server(self):
         async def main():
             parsed_url = urlparse(self.ws_url)
-            host = parsed_url.hostname or "localhost" 
+            host = parsed_url.hostname or "localhost"
             port = parsed_url.port or 8765
 
-            async with websockets.serve(None, host, port) as server:
+            async with websockets.serve(self.handler, host, port) as server:
                 self.server = server
                 print(f"WebSocket server started at ws://{host}:{port}")
                 await server.serve_forever()
@@ -34,8 +41,13 @@ class WebsocketStream(BaseStream):
     def output(self, log: str):
         try:
             if self.server and self.clients:
+
                 async def broadcast():
-                    websockets.broadcast(self.clients, log)
+                    if self.server and self.clients:
+                        websockets.broadcast(self.clients, log)
+                    else:
+                        print("WebsocketStream server or clients not found")
+
                 asyncio.run_coroutine_threadsafe(broadcast(), self.loop)
         except Exception as e:
             print(f"WebsocketStream broadcast error: {e}")
