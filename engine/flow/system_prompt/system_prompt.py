@@ -18,4 +18,4 @@ def get_system_prompt_for_anthropic_reasoning():
 
 
 def get_system_prompt_for_deepseek_reasoning():
-    return create_chat_message("user", system_prompt)
+    return create_chat_message("assistant", system_prompt)
