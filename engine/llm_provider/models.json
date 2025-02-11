@@ -52,5 +52,17 @@
     "version": "2023-05-15",
     "type": "embeddings",
     "source": "azure-openai"
+  },
+  {
+    "model": "deepseek-r1",
+    "version": "deepseek-r1",
+    "type": "reasoning",
+    "source": "deepseek"
+  },
+  {
+    "model": "deepseek-v3",
+    "version": "deepseek-v3",
+    "type": "chat",
+    "source": "deepseek"
   }
 ]

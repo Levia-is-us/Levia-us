@@ -19,7 +19,7 @@ PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 def process_existing_memories(
     high_score_memories: list,
-    summary: str,
+    user_intent: str,
     execution_records_str: list,
     messages_history: list,
     tool_caller: ToolCaller,
@@ -30,15 +30,15 @@ def process_existing_memories(
         execution_records = [
             eval(record) for record in top_memory["metadata"]["execution_records"]
         ]
-        if check_plan_sufficiency(summary, top_memory["id"], execution_records):
+        if check_plan_sufficiency(user_intent, top_memory["id"], execution_records):
             res = execute_existing_records(execution_records, tool_caller)
             return str(res)
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
 
-    plan = create_execution_plan(summary)
+    plan = create_execution_plan(user_intent)
     tool_result_records = handle_new_tool_execution(
-        execution_records_str, summary, plan, tool_caller, messages_history
+        execution_records_str, user_intent, plan, tool_caller, messages_history
     )
     return str(tool_result_records)
 
@@ -65,7 +65,7 @@ def handle_new_tool_execution(
     execution_records_str, summary, plan, tool_caller, messages_history: list
 ) -> list:
     """Handle execution of new tools"""
-    plan_steps = eval(plan)
+    plan_steps = extract_json_from_str(plan)
     tools = []
     tool_result_records = []
     # if len(plan_steps) > 1:
@@ -82,6 +82,9 @@ def handle_new_tool_execution(
             # Use LLM to extract appropriate tool from memories. Exit if no tool found
             tool_select_result = tool_select(plan, step, messages_history, memories)
             tool_select_result = extract_json_from_str(tool_select_result)
+            if tool_select_result == []:
+                print(f"\033[91mNo tool found for step: {step['Description']}\033[0m")
+                return
             tool_name = tool_select_result["tool_name"]
             if memories and "matches" in memories:
                 for match in memories["matches"]:
