@@ -3,9 +3,9 @@ from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
 from engine.flow.chat_handler_flow.chat_handler_flow import handle_chat_flow
 
-
 def init_tools():
     """Initialize tool registry and caller"""
+
     registry = ToolRegistry()
     project_root = os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +20,7 @@ def chat():
     """Start interactive chat"""
     tool_caller = init_tools()
 
-    print("\033[93mWelcome to OpenAI Chat Program!\033[0m")
+    print("\033[93mWelcome to Levia Chat!\033[0m")
     print("Enter 'quit' to exit, 'clear' to reset current conversation")
 
     chat_messages = []

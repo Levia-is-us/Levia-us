@@ -17,3 +17,4 @@ webdriver_manager
 markdown
 azure.storage.blob
 aipolabs
+tiktoken
