@@ -1,4 +1,4 @@
-from engine.flow.planner.planner_prompt import plan_maker_prompt
+from engine.flow.planner.planner_prompt import get_plan_maker_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 from engine.flow.planner.checking_plan_prompt import check_plan_fittable_prompt
@@ -11,9 +11,9 @@ PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 def create_execution_plan(intent: str) -> str:
     """Create execution plan for given intent summary"""
+    plan_maker_prompt = get_plan_maker_prompt(intent)
     prompt = [
-        {"role": "assistant", "content": plan_maker_prompt},
-        {"role": "user", "content": intent},
+        {"role": "user", "content": plan_maker_prompt},
     ]
     plan = chat_completion(
         prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.3}
@@ -34,13 +34,10 @@ def check_plan_sufficiency(
     )
 
     result = chat_completion(
-        memories_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.7}
+        memories_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}
     )
+    result = extract_json_from_str(result)
     print(f"result: {result}")
     print(f"type of result: {type(result)}")
-    try:
-        result = json.loads(result)
-    except:
-        result = extract_json_from_str(result)
 
     return result["solution_sufficient"]["result"] in [True, "true"]

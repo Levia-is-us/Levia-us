@@ -23,6 +23,12 @@ def _load_models():
     return _models
 
 
+def get_model_by_name(model_name):
+    """Get model by name"""
+    models = _load_models()
+    return models.get(model_name, None)
+
+
 def create_chat_completion(system_prompt, prompt, model=_default_model, config={}):
     messages = [
         {"role": "assistant", "content": system_prompt},
@@ -78,12 +84,14 @@ def chat_completion(messages, model=_default_model, config={}):
     if models[model]["source"] == "openai" or models[model]["source"] == "azure-openai":
         return chat_completion_openai(messages, model=models[model], config=config)
     elif models[model]["source"] == "deepseek":
-        return chat_completion_deepseek(messages, model=model, config=config)
+        return chat_completion_deepseek(messages, model=models[model], config=config)
     elif models[model]["source"] == "anthropic":
         # convert messages to anthropic format
         anthropic_messages = []
         for message in messages:
             message_type = type(message["content"])
+            if message["role"] == "system":
+                message["role"] = "user"
             if message_type == str:
                 anthropic_messages.append(
                     {

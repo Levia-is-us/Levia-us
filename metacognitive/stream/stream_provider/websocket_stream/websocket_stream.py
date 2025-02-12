@@ -29,7 +29,6 @@ class WebsocketStream(BaseStream):
 
             async with websockets.serve(self.handler, host, port) as server:
                 self.server = server
-                print(f"WebSocket server started at ws://{host}:{port}")
                 await server.serve_forever()
 
         try:

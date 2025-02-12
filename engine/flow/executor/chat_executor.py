@@ -17,7 +17,7 @@ PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 def process_existing_memories(
     high_score_memories: list,
-    summary: str,
+    user_intent: str,
     execution_records_str: list,
     messages_history: list,
     tool_caller: ToolCaller,
@@ -28,16 +28,15 @@ def process_existing_memories(
         execution_records = [
             eval(record) for record in top_memory["metadata"]["execution_records"]
         ]
-        if check_plan_sufficiency(summary, top_memory["id"], execution_records):
+        if check_plan_sufficiency(user_intent, top_memory["id"], execution_records):
             res = execute_existing_records(execution_records, tool_caller)
             return str(res)
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
 
-    # create plan & tool execution context
-    plan = create_execution_plan(summary)
+    plan = create_execution_plan(user_intent)
     tool_result_records = handle_new_tool_execution(
-        execution_records_str, summary, plan, tool_caller, messages_history
+        execution_records_str, user_intent, plan, tool_caller, messages_history
     )
     return str(tool_result_records)
 
@@ -57,8 +56,6 @@ def execute_existing_records(execution_records: list, tool_caller) -> dict:
         except Exception as e:
             print(f"Error processing execution record: {str(e)}")
             raise e
-
-
 
 def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller, messages_history: list) -> list:
     """
@@ -214,7 +211,6 @@ def _handle_failed_execution(messages_history):
         return False
     messages_history.append({"role": "user", "content": user_input})
     return True
-
 
 def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
     """Filter and sort memories by score"""

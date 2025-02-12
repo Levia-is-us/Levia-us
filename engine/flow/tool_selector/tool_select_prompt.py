@@ -2,10 +2,7 @@ import json
 
 def tool_selector_prompt(plan, current_step, context, tools):
     tools = extract_tool_info(tools)
-    prompt = f"""
-You are tasked with helping the user select the most appropriate tool for their current step in the plan.
-
-
+    prompt = f"""You are tasked with helping the user select the most appropriate tool for their current step in the plan.
 
 1. **Clarify the User's Goal:**
    Review the entire plan and context, and ensure you understand the user’s objective. The goal is to complete all steps in the plan.

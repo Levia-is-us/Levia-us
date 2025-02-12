@@ -14,22 +14,23 @@ class Stream:
     Supports HTTP, local file, and WebSocket output streams.
     """
 
-    def __init__(self, stream_type="local"):
+    def __init__(self, stream_types=["local"]):
         """
         Initialize Stream with specified stream type.
-        
+
         Args:
             stream_type (str): Type of stream to initialize ("http", "local", or "websocket")
         """
         self.streams = []
-        if stream_type == "http":
-            self.add_stream(HTTPStream("http://localhost:8000"))
-        elif stream_type == "local":
-            self.add_stream(LocalStream())
-        elif stream_type == "websocket":
-            self.add_stream(WebsocketStream("ws://localhost:8765"))
-        else:
-            raise ValueError(f"Invalid stream type: {stream_type}")
+        for stream_type in stream_types:
+            if stream_type == "http":
+                self.add_stream(HTTPStream("http://localhost:8000"))
+            elif stream_type == "local":
+                self.add_stream(LocalStream())
+            elif stream_type == "websocket":
+                self.add_stream(WebsocketStream("ws://localhost:8765"))
+            else:
+                raise ValueError(f"Invalid stream type: {stream_type}")
 
         # Always add log stream as secondary output
         self.add_stream(LogStream())
@@ -37,7 +38,7 @@ class Stream:
     def add_stream(self, stream: BaseStream):
         """
         Add a new output stream.
-        
+
         Args:
             stream (BaseStream): Stream instance to add
         """
@@ -46,7 +47,7 @@ class Stream:
     def output(self, log: str):
         """
         Output log message to all registered streams.
-        
+
         Args:
             log (str): Message to output
         """
@@ -62,11 +63,11 @@ def output_stream(log: str):
     """
     Global function to output to stream singleton.
     Creates WebSocket stream instance if none exists.
-    
+
     Args:
         log (str): Message to output
     """
     global _stream
     if _stream is None:
-        _stream = Stream(stream_type="websocket")
+        _stream = Stream(stream_types=["websocket", "local"])
     _stream.output(log)

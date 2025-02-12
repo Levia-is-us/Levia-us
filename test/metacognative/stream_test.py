@@ -39,7 +39,8 @@ async def test_websocket_send():
         except Exception as e:
             print(f"Error sending log: {e}")
             await asyncio.sleep(3)  # Wait before retrying
-            
+
+
 async def test_websocket_receive():
     # Add delay to allow server to start first
     await asyncio.sleep(2)
@@ -57,12 +58,15 @@ async def test_websocket_receive():
             print(f"Websocket connection error: {e}")
             await asyncio.sleep(1)  # Wait before retrying
 
+
 # Initialize stream
-stream = Stream(stream_type="websocket")
+stream = Stream(stream_types=["websocket", "local"])
 # Run sender and receiver concurrently
 print("Starting sender and receiver...")
 
+
 async def main():
     await asyncio.gather(test_websocket_send(), test_websocket_receive())
-    
+
+
 asyncio.run(main())
