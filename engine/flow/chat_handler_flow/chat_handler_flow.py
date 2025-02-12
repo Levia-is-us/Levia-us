@@ -11,7 +11,7 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 
-def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
+def handle_chat_flow(chat_messages: list, user_input: str, tool_caller, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
     reply_info = get_initial_response(chat_messages)
@@ -29,7 +29,7 @@ def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
         chat_messages.append({"role": "assistant", "content": f"{final_reply}"})
         return final_reply
     elif reply_info["type"] == "input-intent":
-        handle_input_intent(reply_info, chat_messages, tool_caller)
+        handle_input_intent(reply_info, chat_messages, tool_caller, user_id)
 
 
 
@@ -53,6 +53,22 @@ def handle_final_reply(chat_messages: list) -> str:
 
 
 def handle_intent_summary(reply_info: dict, chat_messages: list, tool_caller) -> str:
+    """Handle intent summary type response"""
+    user_intent = reply_info["user_intent"]
+    execution_records_str = []
+
+    memories = retrieve_long_pass_memory(user_intent)
+    high_score_memories = filter_high_score_memories(memories)
+
+    return process_existing_memories(
+        high_score_memories,
+        user_intent,
+        execution_records_str,
+        chat_messages,
+        tool_caller,
+    )
+
+def handle_input_intent(reply_info: dict, chat_messages: list, tool_caller, user_id: str) -> str:
     """Handle intent summary type response"""
     user_intent = reply_info["user_intent"]
     execution_records_str = []

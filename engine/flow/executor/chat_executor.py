@@ -74,9 +74,7 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
     Returns:
         list: Records of tool execution results
     """
-    plan_steps = eval(plan)
-    tool_results = []
-    
+    plan_steps = eval(plan)    
     # Analyze each step and find appropriate tools
     for step in plan_steps:
         print(f"Processing step: {step}")
@@ -92,8 +90,10 @@ def execute_plan_steps(plan_steps, tool_caller, messages_history, execution_reco
     for step in plan_steps:
         if not step.get("tool_necessity", True):
             continue
+        if step.get("executed", True):
+            continue
             
-        tool_result = _execute_plan_step(
+        tool_result = _execute_plan_step_tool(
             step,
             tool_caller,
             messages_history,
@@ -142,7 +142,7 @@ def _find_tool_for_step(step, plan, messages_history):
                 return True
     return False
 
-def _execute_plan_step(step, tool_caller, messages_history, execution_records, plan_steps):
+def _execute_plan_step_tool(step, tool_caller, messages_history, execution_records, plan_steps):
     """
     Execute tool for a plan step
     
@@ -165,6 +165,7 @@ def _execute_plan_step(step, tool_caller, messages_history, execution_records, p
         
         if execution_result:
             execution_records.append(tool)
+            step["executed"] = True
             step["execution_tool_result"] = execution_result
             return f"toolName: {tool_config['tool']} result: {execution_result}"
             
