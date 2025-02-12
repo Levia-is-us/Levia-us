@@ -1,3 +1,4 @@
+import json
 from engine.utils.tokenizer import num_tokens_from_messages
 from memory.short_term_memory.short_term_memory_provider.base_context import (
     BaseContextStore,
@@ -12,6 +13,12 @@ class LocalContextStore(BaseContextStore):
         """
         self.max_length = max_length
         self.contexts = {}
+        # todo: load local json file, TBD
+        # with open(
+        #     "memory/short_term_memory/short_term_memory_provider/local_context_store/local_context_store.json",
+        #     "r",
+        # ) as f:
+        #     self.contexts = json.load(f)
 
     def get_context(self, user_key: str = "local"):
         """
@@ -32,15 +39,20 @@ class LocalContextStore(BaseContextStore):
         """
         if user_key not in self.contexts:
             self.contexts[user_key] = []
-            
+
         if isinstance(context, list):
             self.contexts[user_key].extend(context)
         else:
             self.contexts[user_key].append(context)
 
-
         # If history exceeds max length, remove oldest entry
         self.auto_delete_context(user_key)
+        # todo: write to a local json file
+        # with open(
+        #     "memory/short_term_memory/short_term_memory_provider/local_context_store/local_context_store.json",
+        #     "w",
+        # ) as f:
+        #     json.dump(self.contexts, f)
 
     def delete_context(self, context: str, user_key: str = "local"):
         """
@@ -63,4 +75,6 @@ class LocalContextStore(BaseContextStore):
             return
 
         while num_tokens_from_messages(context) > self.max_length:
-            context.pop(0)
+            context.pop(
+                1
+            )  # Pop the second element (index 1) instead of first element (index 0)
