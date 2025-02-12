@@ -11,7 +11,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(c
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from final_reply_prompt import final_reply_prompt
+from engine.flow.handle_reply_flow.final_reply_prompt import final_reply_prompt
 from engine.llm_provider.llm import chat_completion
 
 

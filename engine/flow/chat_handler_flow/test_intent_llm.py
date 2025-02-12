@@ -12,7 +12,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
-from engine.flow.chat_handler_flow.intents_system_prompt import intents_system_prompt
+from engine.flow.handle_intent_flow.intents_system_prompt import intents_system_prompt
 
 def get_initial_response(chat_messages: list) -> dict:
     """Get initial response from LLM"""
