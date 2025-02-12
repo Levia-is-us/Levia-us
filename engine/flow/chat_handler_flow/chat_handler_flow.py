@@ -13,10 +13,6 @@ PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
     """Handle the main chat flow logic"""
-    # Add user input to messages
-    # chat_messages.append(messages)
-    chat_messages.append({"role": "user", "content": user_input})
-
     # Get initial response
     reply_info = get_initial_response(chat_messages)
     print(f"reply_info: {reply_info}")
@@ -32,6 +28,9 @@ def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
         final_reply = handle_final_reply(chat_messages)
         chat_messages.append({"role": "assistant", "content": f"{final_reply}"})
         return final_reply
+    elif reply_info["type"] == "input-intent":
+        handle_input_intent(reply_info, chat_messages, tool_caller)
+
 
 
 def get_initial_response(chat_messages: list) -> dict:

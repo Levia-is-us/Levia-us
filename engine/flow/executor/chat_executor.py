@@ -85,14 +85,18 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
             return []
             
     # Execute tools for each plan step
+    return execute_plan_steps(plan_steps, tool_caller, messages_history, execution_records_str)
+
+def execute_plan_steps(plan_steps, tool_caller, messages_history, execution_records_str):
+    tool_results = []
     for step in plan_steps:
         if not step.get("tool_necessity", True):
             continue
             
         tool_result = _execute_plan_step(
-            step, 
-            tool_caller, 
-            messages_history, 
+            step,
+            tool_caller,
+            messages_history,
             execution_records_str,
             plan_steps
         )
