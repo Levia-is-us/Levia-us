@@ -18,3 +18,4 @@ markdown
 azure.storage.blob
 aipolabs
 tiktoken
+Flask

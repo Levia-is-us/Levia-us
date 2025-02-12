@@ -1,4 +1,5 @@
 import sys
+import time
 from urllib.parse import urljoin, urlparse
 import os
 from selenium import webdriver
@@ -12,13 +13,14 @@ from tools.website_scan_tool.links_summary_prompt import links_summary_prompt
 from tools.website_scan_tool.chat_gpt import chat_gpt
 import re
 from selenium.webdriver.support.ui import WebDriverWait
-
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
 
 project_root = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.path.abspath(__file__)
 )
-sys.path.append(project_root)
+env_path = os.path.join(project_root, ".env")
+load_dotenv(env_path)
 
 
 def remove_duplicate_links(links):
@@ -42,10 +44,12 @@ def is_absolute_url(url):
 
 
 def setup_driver():
+    visual = os.getenv("VISUAL")
     try:
         chrome_options = Options()
         chrome_options.add_argument("--start-maximized")
-        chrome_options.add_argument("--headless")
+        if visual != "T":
+            chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
@@ -55,7 +59,9 @@ def setup_driver():
             "profile.managed_default_content_settings.images": 2,
             "plugins.plugins_disabled": ["Adobe Flash Player"],
         }
-        chrome_options.add_experimental_option("prefs", prefs)
+        if visual != "T":
+            chrome_options.add_experimental_option("prefs", prefs)
+        
         chrome_options.add_argument("--log-level=3")
         chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
         path = ChromeDriverManager().install()
@@ -124,6 +130,7 @@ def get_Links(driver, url):
 
 
 def get_all_links(urls):
+    visual = os.getenv("VISUAL")
     links_data = []
     driver = setup_driver()
 
@@ -131,11 +138,35 @@ def get_all_links(urls):
         links = get_Links(driver, url)
         links_data.extend(links)
 
-    driver.quit()
+    smooth_scroll_to_bottom(driver)
+    
+    if visual != "T":
+        driver.quit()
     return links_data
 
+def smooth_scroll_to_bottom(driver, duration=2.0):
+    total_height = driver.execute_script("return document.body.scrollHeight")
+    
+    step_time = 0.01 
+    steps = int(duration / step_time)
+    
+    step_height = total_height / steps
+    
+    current_height = 0
+    
+    start_time = time.time()
+    for i in range(steps):
+        current_height += step_height
+        driver.execute_script(f"window.scrollTo(0, {current_height});")
+        time.sleep(step_time)
+        
+        if time.time() - start_time > duration:
+            break
+    
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 def get_all_content(links):
+    visual = os.getenv("VISUAL")
     results = []
     driver = setup_driver()
     for link in links:
@@ -144,6 +175,8 @@ def get_all_content(links):
         content = driver.find_element(By.TAG_NAME, "body").text
         link["content"] = content
         results.append(link)
-
+        if visual == "T":
+            smooth_scroll_to_bottom(driver)
+    
     driver.quit()
     return results
