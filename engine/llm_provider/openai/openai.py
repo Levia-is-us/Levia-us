@@ -1,6 +1,12 @@
 from openai import AzureOpenAI, OpenAI
 import os
 
+from engine.utils.chat_formatter import (
+    convert_system_message_to_developer_message,
+    pop_system_message_to_developer_message,
+)
+from metacognitive.stream.stream import output_stream
+
 api_key = os.getenv("OPENAI_API_KEY")
 host = os.getenv("OPENAI_BASE_URL")
 azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
@@ -38,7 +44,11 @@ def chat_completion_openai(
         else:
             client = OpenAI(api_key=api_key, base_url=host)
         # Remove default parameters that might conflict with config
-        completion_params = {}
+
+        if model["type"] == "reasoning":
+            # messages = convert_system_message_to_developer_message(messages)
+            messages = pop_system_message_to_developer_message(messages)
+
         completion_params = {
             "model": model["model"],
             "messages": messages,
@@ -47,7 +57,7 @@ def chat_completion_openai(
         }
         # Update with any additional config parameters
         completion_params.update(config)
-        
+
         if model["type"] == "reasoning":
             completion_params = {
                 "model": model["model"],
@@ -57,6 +67,11 @@ def chat_completion_openai(
             }
 
         completion = client.chat.completions.create(**completion_params)
+
+        if model["type"] == "reasoning":
+            if completion.choices[0].message.model_extra:
+                reasons = completion.choices[0].message.model_extra.reasoning_content
+                output_stream(reasons)
 
         # Extract the model reply
         return completion.choices[0].message.content

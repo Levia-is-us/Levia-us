@@ -1,10 +1,22 @@
+import threading
 from memory.short_term_memory.short_term_memory_provider.local_context_store.local_context_store import (
     LocalContextStore,
 )
 
 
 class ShortTermMemory:
-    def __init__(self, max_length: int = 1000):
+    _instance = None
+    _lock = threading.Lock()  # Ensuring thread safety
+
+    def __new__(cls, max_length: int = 1000):
+        with cls._lock:  # Thread-safe instantiation
+            if cls._instance is None:
+                cls._instance = super().__new__(cls)
+                cls._instance._initialize(max_length)
+        return cls._instance
+
+    def _initialize(self, max_length: int):
+        """Initialize the context store."""
         self.context_store = LocalContextStore(max_length)
 
     def get_context(self, user_key: str = "local"):
