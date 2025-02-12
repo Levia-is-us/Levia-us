@@ -14,7 +14,12 @@
 - Above the entry method, the following annotation must be added: `@simple_tool("Tool Overview")`.
 
 ## 4. Tool Registration
-- In the `main.py` file, the tool registration file should be imported, and the `main()` method should be called at the end to register the tool. Here is an example:
+- In the `main.py` file, the tool registration file should be imported, and the `main()` method should be called at the end to register the tool.
+
+## 5. Importing Tool Files
+- When importing files from within a tool's folder, you must use the full path, for example: from tools.your_folder.your_file import your_method
+
+## Example
 ```
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +28,7 @@ sys.path.append(project_root)
 
 from engine.tool_framework.tool_runner import ToolRunner
 from engine.tool_framework import simple_tool
+from tools.your_folder.your_file import your_method
 
 @simple_tool("Tool Overview")
 def your_tool_method():
@@ -39,12 +45,8 @@ if __name__ == "__main__":
     main()
 ```
 
-## 5. Importing Tool Files
-- When importing files from within a tool's folder, you must use the full path, for example: from tools.yourfolder_yourfile import yourmethod
-
 ## 6. Dependency Management
 - Each tool's folder must include a requirements.txt file. If necessary, you may configure a local environment within the tool folder and provide an example.
 
 ## 7. Third-Party API
 - If a tool calls a third-party API, only publicly available and trusted APIs are supported. Private APIs are not supported.
-
