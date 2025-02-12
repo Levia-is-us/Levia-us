@@ -1,6 +1,7 @@
 def check_plan_fittable_prompt(intent_a: str, intent_b: str, proposed_solution: str):
     system_prompt = "You are an expert in natural language understanding and semantic analysis."
     user_prompt = f"""
+
 Intent A/Requirement Description: {intent_a}
 Intent B and Proposed Solution: {intent_b}
 proposed solution: {proposed_solution}

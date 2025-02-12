@@ -15,6 +15,8 @@ def execute_tool(
     tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict
 ):
     """Execute tool and record results"""
+    print(f"\033[95mExecuting running_tool: {tool_name} with and args: {tool_args}\033[0m")
+
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 
     result = tool_caller.call_tool(

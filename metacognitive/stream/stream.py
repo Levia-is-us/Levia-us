@@ -24,7 +24,7 @@ class Stream:
         self.streams = []
         for stream_type in stream_types:
             if stream_type == "http":
-                self.add_stream(HTTPStream("http://localhost:8000"))
+                self.add_stream(HTTPStream(8081))
             elif stream_type == "local":
                 self.add_stream(LocalStream())
             elif stream_type == "websocket":
@@ -69,5 +69,5 @@ def output_stream(log: str):
     """
     global _stream
     if _stream is None:
-        _stream = Stream(stream_types=["websocket", "local"])
+        _stream = Stream(stream_types=["websocket", "local", "http"])
     _stream.output(log)

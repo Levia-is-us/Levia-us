@@ -43,7 +43,7 @@ class ToolCaller:
             timeout=300,  # Add timeout
         )
 
-        if stderr:
+        if stderr and not stdout:
             print(f"Tool stderr: {stderr}", file=sys.stderr)
             return None
 
