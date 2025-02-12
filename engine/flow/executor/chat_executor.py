@@ -33,7 +33,9 @@ def process_existing_memories(
             return str(res)
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
-
+        
+    print(f"\033[95mDo not have experence for {user_intent}\033[0m")
+    print(f"\033[95mCreating new execution plan\033[0m")
     plan = create_execution_plan(user_intent)
     tool_result_records = handle_new_tool_execution(
         execution_records_str, user_intent, plan, tool_caller, messages_history
@@ -71,18 +73,17 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
     Returns:
         list: Records of tool execution results
     """
-    plan_steps = eval(plan)
     tool_results = []
     
     # Analyze each step and find appropriate tools
-    for step in plan_steps:
+    for step in plan:
         print(f"Processing step: {step}")
-        if not _process_plan_step(step, plan, messages_history, plan_steps):
+        if not _process_plan_step(step, plan, messages_history, tool_results):
             print(f"\033[91mFailed to process step: {step['Description']}\033[0m")
             return []
             
     # Execute tools for each plan step
-    for step in plan_steps:
+    for step in plan:
         if not step.get("tool_necessity", True):
             continue
             
@@ -91,45 +92,44 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
             tool_caller, 
             messages_history, 
             execution_records_str,
-            plan_steps
+            tool_results
         )
         if tool_result:
             tool_results.append(tool_result)
             
     return tool_results
 
-def _process_plan_step(step, plan, messages_history, plan_steps):
+def _process_plan_step(step, plan, messages_history, done_steps = []):
     """
     Process a single plan step to determine tool necessity and find appropriate tool
     """
     # Check if step is necessary
-    necessity_check = _check_step_necessity(step, plan, messages_history, plan_steps)
+    necessity_check = _check_step_necessity(step, plan, messages_history, done_steps)
     if not necessity_check["steps_necessity"] == "Yes":
         step["tool_necessity"] = False
         return True
         
     # Find appropriate tool for the step
-    return _find_tool_for_step(step, plan, messages_history)
+    return _find_tool_for_step(step, plan, messages_history, done_steps)
     
-def _check_step_necessity(step, plan, messages_history, plan_steps):
+def _check_step_necessity(step, plan, messages_history, done_steps):
     """Check if a step is necessary to execute"""
-    result = step_tool_check(plan, step, messages_history, plan_steps)
+    result = step_tool_check(plan, step, messages_history, done_steps)
     return extract_json_from_str(result)
 
-def _find_tool_for_step(step, plan, messages_history):
+def _find_tool_for_step(step, plan, messages_history, done_steps):
     """Find appropriate tool for a step from memory"""
     memories = retrieve_short_pass_memory(step["Description"])
     if not memories:
         return False
-        
-    tool_selection = tool_select(plan, step, messages_history, memories)
-    tool_selection = extract_json_from_str(tool_selection)
-    tool_name = tool_selection["tool_name"]
     
+    print(f"Finding tool for step: {memories}")
+    tool_selected = tool_select(plan, step, messages_history, memories)
+
     # Search for tool in memories
     if "matches" in memories:
         for match in memories["matches"]:
-            if match["id"] == tool_name:
+            if match["id"] == tool_selected:
                 step["tool_necessity"] = True
                 step["execution_tool"] = match
                 return True

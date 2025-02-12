@@ -22,21 +22,26 @@ def handle_chat_flow(chat_messages: list, user_input: str, tool_caller) -> str:
     chat_messages = short_term_memory.get_context()
     reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
-    
+
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
-        short_term_memory.add_context(create_chat_message("user", user_input))
-        short_term_memory.add_context(create_chat_message("assistant", f"{response}"))
-
+        short_term_memory.add_context(
+            [
+                create_chat_message("user", user_input),
+                create_chat_message("assistant", f"{response}"),
+            ]
+        )
         return response
 
     elif reply_info["type"] == "call_tools":
         handle_intent_summary(reply_info, chat_messages, tool_caller)
         final_reply = handle_reply_flow(chat_messages)
-        short_term_memory.add_context(create_chat_message("user", user_input))
         short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}")
+            [
+                create_chat_message("user", user_input),
+                create_chat_message("assistant", f"{final_reply}"),
+            ]
         )
         return final_reply
 

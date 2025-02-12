@@ -16,15 +16,16 @@ sys.path.append(
 from metacognitive.stream.stream import Stream
 import asyncio
 
-# test for local stream
-stream = Stream(stream_type="local")
-stream.output("test")
-stream.output("test2")
-
-# # test for http stream
-# stream = Stream(stream_type="http")
+# # test for local stream
+# stream = Stream(stream_types=["local"])
 # stream.output("test")
 # stream.output("test2")
+
+# # test for http stream
+# stream = Stream(stream_types="http")
+# stream.output("test")
+# stream.output("test2")
+
 
 
 # # test for websocket stream
@@ -60,7 +61,7 @@ async def test_websocket_receive():
 
 
 # Initialize stream
-stream = Stream(stream_types=["websocket", "local"])
+stream = Stream(stream_types=["websocket", "local", "http"])
 # Run sender and receiver concurrently
 print("Starting sender and receiver...")
 

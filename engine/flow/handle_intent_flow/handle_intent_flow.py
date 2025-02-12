@@ -15,5 +15,5 @@ def handle_intent_flow(chat_messages: list, input_message: str) -> dict:
         messages, model=QUALITY_MODEL_NAME, config={"temperature": 0}
     )
     result = extract_json_from_str(reply_info)
-    print(f"result: {result}")
+    # print(f"result: {result}")
     return result
