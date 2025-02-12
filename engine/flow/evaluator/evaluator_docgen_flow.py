@@ -14,9 +14,3 @@ def evaluator_docgen_flow(code):
         prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
     )
     return result
-
-
-def extract_code_breakdown_from_doc(doc):
-    start = doc.find("<code_breakdown>") + len("<code_breakdown>")
-    end = doc.find("</code_breakdown>", start)
-    return doc[start:end].strip()

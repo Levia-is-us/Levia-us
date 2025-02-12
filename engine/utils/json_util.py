@@ -16,3 +16,10 @@ def extract_json_from_str(json_str):
             return json.loads(json_str)
     except:
         return eval(json_str)
+
+
+def extract_code_breakdown_from_doc(doc):
+    start = doc.find("<code_breakdown>") + len("<code_breakdown>")
+    end = doc.find("</code_breakdown>", start)
+    return doc[start:end].strip()
+

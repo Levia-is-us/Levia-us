@@ -57,7 +57,6 @@ def web_search(intent: str):
             return "No results found."
         return relevance_urls
 
-
 def main():
     tool = web_search()
     runner = ToolRunner(tool)
