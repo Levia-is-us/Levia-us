@@ -43,7 +43,7 @@ Output Example when step can be merged:
 }}
 </Output Example>
 
-
+Important: Do not include any other text or comments in your output.
 Please analyze the current step and provide output in JSON format based on the above requirements:
 """
     prompt = [

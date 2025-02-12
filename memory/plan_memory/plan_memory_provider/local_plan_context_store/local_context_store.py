@@ -1,11 +1,7 @@
 from typing import Dict, List, Optional
-from enum import Enum
 from memory.plan_memory.plan_memory_provider.base_context import BaseContextStore
-class PlanStatus(Enum):
-    NOT_STARTED = "not_started"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    FAILED = "failed"
+from memory.plan_memory.plan_memory_provider.plan_status import PlanStatus
+
 
 class PlanContextStore(BaseContextStore):
     def __init__(self):
@@ -50,7 +46,7 @@ class PlanContextStore(BaseContextStore):
         Returns:
             Current step or None if plan is completed
         """
-        plan = self.get_current_plan(user_key)
+        plan = self.get_current_plan_context(user_key)
         if not plan or plan["current_step_index"] >= len(plan["steps"]):
             return None
         return plan["steps"][plan["current_step_index"]]
@@ -67,7 +63,7 @@ class PlanContextStore(BaseContextStore):
         """
         Update status of a specific step
         """
-        plan = self.get_current_plan(user_key)
+        plan = self.get_current_plan_context(user_key)
         if not plan or step_index >= len(plan["steps"]):
             return
 
@@ -86,7 +82,7 @@ class PlanContextStore(BaseContextStore):
         Returns:
             True if there are more steps, False if plan is completed
         """
-        plan = self.get_current_plan(user_key)
+        plan = self.get_current_plan_context(user_key)
         if not plan:
             return False
 
@@ -98,13 +94,13 @@ class PlanContextStore(BaseContextStore):
 
     def add_execution_record_context(self, record: dict, user_key: str = "local") -> None:
         """Add execution record to plan"""
-        plan = self.get_current_plan(user_key)
+        plan = self.get_current_plan_context(user_key)
         if plan:
             plan["execution_records"].append(record)
 
     def set_plan_status_context(self, status: PlanStatus, user_key: str = "local") -> None:
         """Set plan status"""
-        plan = self.get_current_plan(user_key)
+        plan = self.get_current_plan_context(user_key)
         if plan:
             plan["status"] = status
 

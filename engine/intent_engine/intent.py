@@ -43,30 +43,15 @@ def init_short_term_memory():
         system_prompt = get_system_prompt()
 
     short_term_memory.add_context(system_prompt)
-
-
-def init_tools():
-    """Initialize tool registry and caller"""
-
-    registry = ToolRegistry()
-    project_root = os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    )
-    tools_dir = os.path.join(project_root, "tools")
-    print(f"Scanning tools from: {tools_dir}")
-    registry.scan_directory(tools_dir)
-    return ToolCaller(registry)
-
+    
 
 def terminal_chat():
     """Start interactive chat"""
-    tool_caller = init_tools()
     init_short_term_memory()
     init_stream()
     print("\033[93mWelcome to Levia Chat!\033[0m")
     print("Enter 'quit' to exit, 'clear' to reset current conversation")
 
-    chat_messages = []
     while True:
         try:
             # Get user input
@@ -79,7 +64,7 @@ def terminal_chat():
             if not user_input:
                 continue
 
-            reply = handle_chat_flow(chat_messages, user_input, tool_caller)
+            reply = handle_chat_flow(user_input, "local-dev")
             print("\033[92mLevia:\033[0m: ", reply)
             print("\n")
         except KeyboardInterrupt:
@@ -91,8 +76,5 @@ def terminal_chat():
 
 def event_chat(input_message: str, user_id: str):
     print("\033[93mWelcome to Levia Chat!\033[0m")
-    tool_caller = init_tools()
-    short_term_memory = LocalContextStore()
     messages = short_term_memory.get_context(user_id)
-    short_term_memory.add_context({"role": "user", "content": input_message}, user_id)
-    reply = handle_chat_flow(messages, input_message, tool_caller, user_id)
+    reply = handle_chat_flow(input_message, user_id)
