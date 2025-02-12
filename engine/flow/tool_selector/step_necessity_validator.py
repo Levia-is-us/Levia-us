@@ -13,6 +13,6 @@ def step_tool_check(plan, current_step, context, tools_and_outputs):
         plan, current_step, context, tools_and_outputs
     )
     result = chat_completion(
-        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
+        prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
     )
     return result

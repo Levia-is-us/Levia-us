@@ -13,16 +13,16 @@ Based on the user's intent, create a single, coherent chain of tasks required to
 Do not provide multiple alternatives or choices; only generate one sequential chain of tasks.
 
 **Output Requirements:**
-Provide the result strictly in the following JSON format without any additional text:
+Provide the result create a list strictly in the following JSON format without any additional text:
 <output example>
 {[
-    {
-        "step 1": "intent for Step 1",
+    {   "step": "step 1",
+        "intent": "intent for Step 1",
         "Description": "A general overview of the objective to be achieved by this tool in the first part of the task.",
         "Reason": "Why we need to do this step?"
     },
-    {
-        "step 2": "intent for Step 2",
+    {   "step": "step 2",
+        "intent": "intent for Step 2",
         "Description": "A general overview of the objective to be achieved by this tool in the next part of the task.",
         "Reason": "Why we need to do this step?"
     },
