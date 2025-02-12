@@ -13,7 +13,7 @@ def tool_select(plan, current_step, context, tools):
         prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
     )
     result = extract_json_from_str(result)
-    print(f"Tool selection result: {result}")
+    # print(f"Tool selection result: {result}")
     tool_name = result.get("tool_name", "Tool not found")
 
     return tool_name
