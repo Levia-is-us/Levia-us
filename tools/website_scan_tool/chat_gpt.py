@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 
 project_root = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.path.abspath(__file__)
 )
 env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
@@ -11,9 +11,7 @@ load_dotenv(env_path)
 
 def chat_gpt(messages, config={}):
     api_key = os.getenv("OPENAI_API_KEY")
-    # api_key = os.getenv("DEEPSEEK_API_KEY")
     base_url = os.getenv("OPENAI_BASE_URL")
-    # base_url = "https://api.deepseek.com"
     client = AzureOpenAI(
         api_key=api_key, azure_endpoint=base_url, api_version="2024-05-01-preview"
     )
