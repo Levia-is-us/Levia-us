@@ -57,6 +57,7 @@ def process_existing_memories(
     handle_new_tool_execution(
         execution_records_str, user_intent, plan, messages_history, user_id
     )
+    print(f"\033[95mNew execution plan: {plan}\033[0m")
     return plan
 
 
@@ -192,46 +193,59 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
     if not tool_config:
         return None
     
+    tool_name = tool_config['method'] + "_tool"
+    
+    def execute_with_config():
+        reply_json = _check_required_extra_params(
+            tool_config,
+            messages_history, 
+            plan_steps,
+            step
+        )
+        
+        if not reply_json["can_proceed"]:
+            return {
+                "toolName": tool_name,
+                "result": f"Please input required arguments to continue: {reply_json['missing_required_arguments']}", 
+                "status": "need_input"
+            }
+            
+        execution_result = _execute_tool_with_args(tool_config, reply_json)
+        if execution_result["status"] == "failure":
+            return {
+                "toolName": tool_name,
+                "result": "execution failed",
+                "status": "failure"
+            }
+            
+        if execution_result:
+            execution_records.append(tool)
+            plan_context_memory.update_step_status_context(
+                step_index,
+                execution_result=execution_result,
+                executed=True,
+                user_key=user_id
+            )
+            return {
+                "toolName": tool_name,
+                "result": execution_result,
+                "status": "success"
+            }
+            
+        return None
+        
     if INTERACTION_MODE == "terminal":
         while True:
-            reply_json = _check_required_extra_params(
-                tool_config,
-                messages_history,
-                plan_steps,
-                step
-            )
-
-            if reply_json["can_proceed"]:
-                execution_result = _execute_tool_with_args(tool_config, reply_json)
-                if execution_result["status"] == "failure":
-                    return {"toolName": tool_config['method'] + "_tool" ,"result": "execution failed", "status": "failure"}
-                
-                if execution_result:
-                    execution_records.append(tool)
-                    # plan_context_memory.update_step_status_context(step_index, execution_result=execution_result, executed=True, user_key=user_id)
-                    return {"toolName": tool_config['method'] + "_tool" ,"result": execution_result, "status": "success"}
-                
-            elif not _handle_terminal_input(messages_history):
+            result = execute_with_config()
+            if result and result["status"] == "success":
+                return result
+            elif result and result["status"] == "need_input":
+                if not _handle_terminal_input(messages_history):
                     return None
+            else:
+                return result
     else:
-        reply_json = _check_required_extra_params(
-                tool_config,
-                messages_history,
-                plan_steps,
-                step
-            )
-
-        if reply_json["can_proceed"]:
-            execution_result = _execute_tool_with_args(tool_config, reply_json)
-            if execution_result["status"] == "failure":
-                return {"toolName": tool_config['method'] + "_tool", "result": "execution failed", "status": "failure"}
-            
-            if execution_result:
-                execution_records.append(tool)
-                plan_context_memory.update_step_status_context(step_index, execution_result=execution_result, executed=True, user_key=user_id)
-                return {"toolName": tool_config['method'] + "_tool", "result": execution_result, "status": "success"}
-        else:
-            return {"toolName": tool_config['method'] + "_tool" ,"result": f"Please input required arguments to continue: {reply_json['missing_required_arguments']}", "status": "failure"}
+        return execute_with_config()
 
 def _get_tool_config(tool):
     """Extract and parse tool configuration"""
