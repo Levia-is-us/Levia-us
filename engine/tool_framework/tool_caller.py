@@ -40,7 +40,7 @@ class ToolCaller:
         # Send input and get output with timeout
         stdout, stderr = process.communicate(
             json.dumps(input_data, ensure_ascii=False) + "\n",
-            timeout=300,  # Add timeout
+            timeout=600,  # Add timeout
         )
 
         if stderr and not stdout:
@@ -49,7 +49,7 @@ class ToolCaller:
 
         if not stdout:
             return None
-
+        
         try:
             result = json.loads(stdout.strip())
             return (
@@ -59,11 +59,11 @@ class ToolCaller:
             )
         except json.JSONDecodeError:
             print(f"Failed to parse tool output: {stdout!r}", file=sys.stderr)
-            return None
+            return {"status": "failure", "result": "Failed to parse tool output"}
         except subprocess.TimeoutExpired:
             process.kill()
             print("Tool execution timed out", file=sys.stderr)
-            return None
+            return {"status": "failure", "result": "Tool execution timed out"}
         except Exception as e:
             print(f"Error calling tool: {str(e)}", file=sys.stderr)
-            return None
+            return {"status": "failure", "result": str(e)}

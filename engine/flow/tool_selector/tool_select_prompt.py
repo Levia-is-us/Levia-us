@@ -50,7 +50,7 @@ def extract_tool_info(data):
         tool_info = {}
         tool_info['tool_name'] = match['id']
         metadata = json.loads(match['metadata']['data'])
-        tool_info['description'] = match['metadata']['description']
+        tool_info['description'] = match['metadata']['details']
         tool_info['input'] = metadata['inputs']
         tool_info['output'] = metadata['output']
         tools.append(tool_info)
