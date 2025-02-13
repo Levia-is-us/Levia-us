@@ -22,23 +22,23 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
 
-    chat_messages = short_term_memory.get_context()
+    chat_messages = short_term_memory.get_context(user_id)
     reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
-    short_term_memory.add_context(create_chat_message("user", user_input))
+    short_term_memory.add_context(create_chat_message("user", user_input), user_id)
 
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
         short_term_memory.add_context(
-            create_chat_message("assistant", f"{response}"),
+            create_chat_message("assistant", f"{response}"), user_id
         )
         return response
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         final_reply = handle_reply_flow(chat_messages)
         short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}"),
+            create_chat_message("assistant", f"{final_reply}"), user_id
         )
         return final_reply
     elif reply_info["type"] == "input-intent":
@@ -48,13 +48,11 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
 def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str):
     """Handle intent summary type response"""
     user_intent = reply_info["response"]
-    execution_records_str = []
-
     memories = retrieve_long_pass_memory(user_intent)
     high_score_memories = filter_memories_by_score(memories)
 
     return process_existing_memories(
-        high_score_memories, user_intent, execution_records_str, chat_messages, user_id
+        high_score_memories, user_intent, chat_messages, user_id
     )
 
 

@@ -18,4 +18,3 @@ markdown
 azure.storage.blob
 tiktoken
 Flask
-pyautogui
