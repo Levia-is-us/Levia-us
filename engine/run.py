@@ -5,7 +5,7 @@ from engine.intent_engine.intent_event import event_chat
 import os
 
 
-INTERACTION_MODE = os.environ["INTERACTION_MODE"]
+INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 planContext = PlanContextMemory()
 
 def run():
