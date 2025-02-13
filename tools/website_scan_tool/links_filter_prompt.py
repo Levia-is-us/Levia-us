@@ -1,5 +1,4 @@
-links_filter_prompt = """
-I need to extract URLs from a webpage based on specific criteria. The webpage contains several links, each with a URL and associated text. You need to determine whether each link matches my intent based on the URL and the accompanying text.
+links_filter_prompt = """I need to extract URLs from a webpage based on specific criteria. The webpage contains several links, each with a URL and associated text. You need to determine whether each link matches my intent based on the URL and the accompanying text.
 
 Consider the following input:
 <input>
