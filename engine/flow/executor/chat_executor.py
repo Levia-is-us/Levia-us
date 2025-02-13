@@ -35,7 +35,6 @@ INTERACTION_MODE = os.environ["INTERACTION_MODE"]
 def process_existing_memories(
     high_score_memories: list,
     user_intent: str,
-    execution_records_str: list,
     messages_history: list,
     user_id: str
 ):
@@ -55,7 +54,7 @@ def process_existing_memories(
     print(f"\033[95mCreating new execution plan\033[0m")
     plan = create_execution_plan(user_intent)
     handle_new_tool_execution(
-        execution_records_str, user_intent, plan, messages_history, user_id
+        plan, messages_history, user_id
     )
     print(f"\033[95mNew execution plan: {plan}\033[0m")
     return plan
@@ -77,7 +76,7 @@ def execute_existing_records(execution_records: list) -> dict:
             print(f"Error processing execution record: {str(e)}")
             raise e
 
-def handle_new_tool_execution(execution_records_str, summary, plan, messages_history: list, user_id: str):
+def handle_new_tool_execution(plan, messages_history: list, user_id: str):
     """
     Handle execution of new tools based on the plan
     
@@ -100,7 +99,7 @@ def handle_new_tool_execution(execution_records_str, summary, plan, messages_his
             return
             
     # Execute tools for each plan step
-    execute_plan_steps(plan, messages_history, execution_records_str, user_id)
+    execute_plan_steps(plan, user_id)
     
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
@@ -113,7 +112,7 @@ def _get_tools_from_plan_steps(plan_steps):
             tools.append(step['tool'])
     return tools
 
-def execute_plan_steps(plan_steps, messages_history, execution_records_str, user_id: str):
+def execute_plan_steps(plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         if not step.get("tool_necessity", True):
@@ -123,8 +122,6 @@ def execute_plan_steps(plan_steps, messages_history, execution_records_str, user
             
         tool_result = _execute_plan_step_tool(
             step,
-            messages_history,
-            execution_records_str,
             plan_steps,
             user_id,
             step_index
@@ -181,7 +178,7 @@ def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     step["tool_necessity"] = True
     return False
 
-def _execute_plan_step_tool(step, messages_history, execution_records, plan_steps, user_id: str, step_index: int):
+def _execute_plan_step_tool(step, plan_steps, user_id: str, step_index: int):
     """
     Execute tool for a plan step
     
@@ -196,6 +193,7 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
     tool_name = tool_config['method'] + "_tool"
     
     def execute_with_config():
+        messages_history = short_term_memory.get_context(user_id)
         reply_json = _check_required_extra_params(
             tool_config,
             messages_history, 
@@ -219,7 +217,6 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
             }
             
         if execution_result:
-            execution_records.append(tool)
             plan_context_memory.update_step_status_context(
                 step_index,
                 execution_result=execution_result,
@@ -240,7 +237,7 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
             if result and result["status"] == "success":
                 return result
             elif result and result["status"] == "need_input":
-                if not _handle_terminal_input(messages_history):
+                if not _handle_terminal_input(user_id):
                     return None
             else:
                 return result
@@ -279,12 +276,12 @@ def _execute_tool_with_args(tool_config, reply_json):
         return result
     return {"status": "failure"}
 
-def _handle_terminal_input(messages_history):
+def _handle_terminal_input(user_id: str):
     """Handle failed tool execution by requesting user input"""
     user_input = input("Please input required arguments to continue: ")
     if not user_input:
         return False
-    short_term_memory.add_context(create_chat_message("user", user_input))
+    short_term_memory.add_context(create_chat_message("user", user_input), user_id)
     return True
 
 def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
