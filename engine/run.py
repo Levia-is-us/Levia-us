@@ -1,7 +1,10 @@
 # from engine.intent_engine.intent import ChatClient
-from engine.intent_engine.intent import chat
+from engine.intent_engine.intent import terminal_chat
+from memory.plan_memory.plan_memory import PlanContextMemory
+
+planContext = PlanContextMemory()
 
 def run():
-    chat()
+    terminal_chat()
 
 __all__ = ['run']

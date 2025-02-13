@@ -11,7 +11,23 @@ from engine.flow.tool_selector.tool_select import tool_select
 from engine.flow.tool_selector.step_necessity_validator import step_tool_check
 from engine.flow.executor.next_step_prompt import next_step_prompt
 import os
+from memory.short_term_memory.short_term_memory import ShortTermMemory
+from engine.utils.chat_formatter import create_chat_message
+from engine.tool_framework.tool_caller import ToolCaller
+from engine.tool_framework.tool_registry import ToolRegistry
+from memory.plan_memory.plan_memory import PlanContextMemory
 
+registry = ToolRegistry()
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+print(f"registry project_root: {project_root}")
+tools_dir = os.path.join(project_root, "tools")
+registry.scan_directory(tools_dir)
+tool_caller_client = ToolCaller(registry)
+
+plan_context_memory = PlanContextMemory()
+short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
@@ -20,7 +36,7 @@ def process_existing_memories(
     user_intent: str,
     execution_records_str: list,
     messages_history: list,
-    tool_caller: ToolCaller,
+    user_id: str
 ) -> str:
     """Process existing memories from database"""
     top_memory = high_score_memories[0]
@@ -29,7 +45,7 @@ def process_existing_memories(
             eval(record) for record in top_memory["metadata"]["execution_records"]
         ]
         if check_plan_sufficiency(user_intent, top_memory["id"], execution_records):
-            res = execute_existing_records(execution_records, tool_caller)
+            res = execute_existing_records(execution_records)
             return str(res)
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
@@ -38,19 +54,19 @@ def process_existing_memories(
     print(f"\033[95mCreating new execution plan\033[0m")
     plan = create_execution_plan(user_intent)
     tool_result_records = handle_new_tool_execution(
-        execution_records_str, user_intent, plan, tool_caller, messages_history
+        execution_records_str, user_intent, plan, messages_history, user_id
     )
     return str(tool_result_records)
 
 
-def execute_existing_records(execution_records: list, tool_caller) -> dict:
+def execute_existing_records(execution_records: list) -> dict:
     """Execute existing tool records"""
     for record in execution_records:
         try:
             if isinstance(record, str):
                 record = extract_json_from_str(record)
             result, _ = execute_tool(
-                tool_caller, record["tool"], record["method"], record["args"]
+                tool_caller_client, record["tool"], record["method"], record["args"]
             )
             print(f"Executed tool: {record['tool']}.{record['method']}")
             print(f"Result: {result}")
@@ -59,7 +75,7 @@ def execute_existing_records(execution_records: list, tool_caller) -> dict:
             print(f"Error processing execution record: {str(e)}")
             raise e
 
-def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller, messages_history: list) -> list:
+def handle_new_tool_execution(execution_records_str, summary, plan, messages_history: list, user_id: str) -> list:
     """
     Handle execution of new tools based on the plan
     
@@ -67,75 +83,94 @@ def handle_new_tool_execution(execution_records_str, summary, plan, tool_caller,
         execution_records_str: List to store execution records
         summary: Summary of the execution plan
         plan: Plan containing steps to execute
-        tool_caller: Tool caller instance to execute tools
         messages_history: History of conversation messages
         
     Returns:
         list: Records of tool execution results
     """
-    tool_results = []
-    
+    # plan_steps = extract_json_from_str(plan)
+    plan_context_memory.create_plan_context(plan, user_id)  
     # Analyze each step and find appropriate tools
-    for step in plan:
+    for step_index, step in enumerate(plan):
         print(f"Processing step: {step}")
-        if not _process_plan_step(step, plan, messages_history, tool_results):
+        found_tools = _get_tools_from_plan_steps(plan)
+        if not _process_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
             print(f"\033[91mFailed to process step: {step['Description']}\033[0m")
             return []
             
     # Execute tools for each plan step
-    for step in plan:
+    return execute_plan_steps(plan, messages_history, execution_records_str, user_id)
+
+def _get_tools_from_plan_steps(plan_steps):
+    tools = []
+    for step in plan_steps:
+        if 'tool' in step and step['tool'] not in tools:
+            tools.append(step['tool'])
+    return tools
+
+def execute_plan_steps(plan_steps, messages_history, execution_records_str, user_id: str):
+    tool_results = []
+    for step_index, step in enumerate(plan_steps):
         if not step.get("tool_necessity", True):
             continue
+        if step.get("executed", False):
+            continue
             
-        tool_result = _execute_plan_step(
-            step, 
-            tool_caller, 
-            messages_history, 
+        tool_result = _execute_plan_step_tool(
+            step,
+            messages_history,
             execution_records_str,
-            tool_results
+            plan_steps,
+            user_id,
+            step_index
         )
         if tool_result:
             tool_results.append(tool_result)
             
     return tool_results
 
-def _process_plan_step(step, plan, messages_history, done_steps = []):
+def _process_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
     """
     Process a single plan step to determine tool necessity and find appropriate tool
     """
+    if found_tools is None:
+        found_tools = []
     # Check if step is necessary
-    necessity_check = _check_step_necessity(step, plan, messages_history, done_steps)
+    necessity_check = _check_step_necessity(step, plan, messages_history, found_tools)
     if not necessity_check["steps_necessity"] == "Yes":
         step["tool_necessity"] = False
+        # plan_context_memory.update_step_status_context(step_index, tool_necessity=False, user_key=user_id)
         return True
         
     # Find appropriate tool for the step
-    return _find_tool_for_step(step, plan, messages_history, done_steps)
+    return _find_tool_for_step(step, plan, messages_history, step_index, user_id)
     
 def _check_step_necessity(step, plan, messages_history, done_steps):
     """Check if a step is necessary to execute"""
     result = step_tool_check(plan, step, messages_history, done_steps)
     return extract_json_from_str(result)
 
-def _find_tool_for_step(step, plan, messages_history, done_steps):
+def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     """Find appropriate tool for a step from memory"""
     memories = retrieve_short_pass_memory(step["Description"])
     if not memories:
         return False
     
-    print(f"Finding tool for step: {memories}")
-    tool_selected = tool_select(plan, step, messages_history, memories)
+    # print(f"Finding tool for step: {memories}")
+    tool_name = tool_select(plan, step, messages_history, memories)
 
     # Search for tool in memories
     if "matches" in memories:
         for match in memories["matches"]:
-            if match["id"] == tool_selected:
+            if match["id"] == tool_name:
+                step["tool"] = match
                 step["tool_necessity"] = True
-                step["execution_tool"] = match
+                # plan_context_memory.update_step_status_context(step_index, tool_necessity=True, execution_tool=match, user_key=user_id)
                 return True
+    print(f"No tool found for step: {step}")
     return False
 
-def _execute_plan_step(step, tool_caller, messages_history, execution_records, plan_steps):
+def _execute_plan_step_tool(step, messages_history, execution_records, plan_steps, user_id: str, step_index: int):
     """
     Execute tool for a plan step
     
@@ -150,17 +185,19 @@ def _execute_plan_step(step, tool_caller, messages_history, execution_records, p
     while True:
         execution_result = _try_execute_tool(
             tool_config,
-            tool_caller,
             messages_history,
             plan_steps,
             step
         )
+
+        if(execution_result["status"] == "failure"):
+            return None
         
         if execution_result:
             execution_records.append(tool)
-            step["execution_tool_result"] = execution_result
+            plan_context_memory.update_step_status_context(step_index, execution_result=execution_result, executed=True, user_key=user_id)
             return f"toolName: {tool_config['tool']} result: {execution_result}"
-            
+        
         if not _handle_failed_execution(messages_history):
             return None
 
@@ -171,7 +208,7 @@ def _get_tool_config(tool):
         return extract_json_from_str(tool_dict)
     return tool_dict
 
-def _try_execute_tool(tool_config, tool_caller, messages_history, plan_steps, step):
+def _try_execute_tool(tool_config, messages_history, plan_steps, step):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "assistant", "content": next_step_content}]
@@ -181,14 +218,14 @@ def _try_execute_tool(tool_config, tool_caller, messages_history, plan_steps, st
     print(f"\033[92mAssistant: {reply_json}\033[0m")
     
     if reply_json["can_proceed"]:
-        return _execute_tool_with_args(tool_config, tool_caller, reply_json)
+        return _execute_tool_with_args(tool_config, reply_json)
     return None
 
-def _execute_tool_with_args(tool_config, tool_caller, reply_json):
+def _execute_tool_with_args(tool_config, reply_json):
     """Execute tool with provided arguments"""
     args = reply_json["extracted_arguments"].get("required_arguments", {})
     result = execute_tool(
-        tool_caller,
+        tool_caller_client,
         f"{tool_config['method']}_tool",
         tool_config['method'],
         args
@@ -197,14 +234,16 @@ def _execute_tool_with_args(tool_config, tool_caller, reply_json):
     
     if verify_tool_execution(tool_config, result) == "success":
         return result
-    return None
+    return {"status": "failure"}
 
 def _handle_failed_execution(messages_history):
     """Handle failed tool execution by requesting user input"""
     user_input = input("Please input required arguments to continue: ")
+    short_term_memory.add_context(create_chat_message("user", user_input))
+
     if not user_input:
         return False
-    messages_history.append({"role": "user", "content": user_input})
+    # short_term_memory.add_context(create_chat_message("assistant", user_input))
     return True
 
 def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
