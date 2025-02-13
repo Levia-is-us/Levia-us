@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import json
+from engine.llm_provider.llm import create_chat_completion
 from tools.website_scan_tool.links_filter_prompt import links_filter_prompt
 from tools.website_scan_tool.links_summary_prompt import links_summary_prompt
 from tools.website_scan_tool.chat_gpt import chat_gpt
@@ -81,6 +82,14 @@ def get_prompt_links(links, intent):
         {"role": "assistant", "content": links_filter_prompt},
         {"role": "user", "content": f"{links_json}"},
     ]
+    
+    create_chat_completion(
+        model="gpt-35-turbo-16k",
+        messages=prompt,
+        temperature=0.7,
+        max_tokens=2000,
+        stream=False
+    )
 
     result = chat_gpt(prompt, config={"temperature": 0.7})
     return json.loads(result)

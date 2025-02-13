@@ -31,6 +31,7 @@ class HTTPStream(BaseStream):
 
     def output(self, log: str):
         try:
-            print(f"Log received by server: {log}")
+            # print(f"Log received by server: {log}")
+            pass
         except Exception as e:
             print(f"HTTPStream log error: {e}")
