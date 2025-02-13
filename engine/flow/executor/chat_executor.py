@@ -30,6 +30,7 @@ plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+INTERACTION_MODE = os.environ["INTERACTION_MODE"]
 
 def process_existing_memories(
     high_score_memories: list,
@@ -37,7 +38,7 @@ def process_existing_memories(
     execution_records_str: list,
     messages_history: list,
     user_id: str
-) -> str:
+):
     """Process existing memories from database"""
     top_memory = high_score_memories[0]
     try:
@@ -50,13 +51,14 @@ def process_existing_memories(
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
         
-    print(f"\033[95mDo not have experence for {user_intent}\033[0m")
+    print(f"\033[95mDo not have experience for {user_intent}\033[0m")
     print(f"\033[95mCreating new execution plan\033[0m")
     plan = create_execution_plan(user_intent)
-    tool_result_records = handle_new_tool_execution(
+    handle_new_tool_execution(
         execution_records_str, user_intent, plan, messages_history, user_id
     )
-    return str(tool_result_records)
+    print(f"\033[95mNew execution plan: {plan}\033[0m")
+    return plan
 
 
 def execute_existing_records(execution_records: list) -> dict:
@@ -75,7 +77,7 @@ def execute_existing_records(execution_records: list) -> dict:
             print(f"Error processing execution record: {str(e)}")
             raise e
 
-def handle_new_tool_execution(execution_records_str, summary, plan, messages_history: list, user_id: str) -> list:
+def handle_new_tool_execution(execution_records_str, summary, plan, messages_history: list, user_id: str):
     """
     Handle execution of new tools based on the plan
     
@@ -88,18 +90,21 @@ def handle_new_tool_execution(execution_records_str, summary, plan, messages_his
     Returns:
         list: Records of tool execution results
     """
-    # plan_steps = extract_json_from_str(plan)
-    plan_context_memory.create_plan_context(plan, user_id)  
+    
     # Analyze each step and find appropriate tools
     for step_index, step in enumerate(plan):
         print(f"Processing step: {step}")
         found_tools = _get_tools_from_plan_steps(plan)
         if not _process_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            print(f"\033[91mFailed to process step: {step['Description']}\033[0m")
-            return []
+            # print(f"\033[91mFailed to process step: {step['Description']}\033[0m")
+            return
             
     # Execute tools for each plan step
-    return execute_plan_steps(plan, messages_history, execution_records_str, user_id)
+    execute_plan_steps(plan, messages_history, execution_records_str, user_id)
+    
+    all_steps_executed = all(step.get("executed", False) for step in plan)
+    if all_steps_executed:
+        plan_context_memory.create_plan_context(plan, user_id)
 
 def _get_tools_from_plan_steps(plan_steps):
     tools = []
@@ -109,7 +114,7 @@ def _get_tools_from_plan_steps(plan_steps):
     return tools
 
 def execute_plan_steps(plan_steps, messages_history, execution_records_str, user_id: str):
-    tool_results = []
+    # tool_results = []
     for step_index, step in enumerate(plan_steps):
         if not step.get("tool_necessity", True):
             continue
@@ -124,10 +129,14 @@ def execute_plan_steps(plan_steps, messages_history, execution_records_str, user
             user_id,
             step_index
         )
-        if tool_result:
-            tool_results.append(tool_result)
-            
-    return tool_results
+        if tool_result["status"] == "failure":
+            # step["executed"] = False
+            step["tool_executed_result"] = tool_result["result"]
+            break
+        else:
+            step["executed"] = True
+            step["tool_executed_result"] = tool_result["result"]
+    # return tool_results
 
 def _process_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
     """
@@ -163,11 +172,13 @@ def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     if "matches" in memories:
         for match in memories["matches"]:
             if match["id"] == tool_name:
+                del match["metadata"]["description"]
                 step["tool"] = match
                 step["tool_necessity"] = True
                 # plan_context_memory.update_step_status_context(step_index, tool_necessity=True, execution_tool=match, user_key=user_id)
                 return True
-    print(f"No tool found for step: {step}")
+    step["tool"] = "No tool found for current step"
+    step["tool_necessity"] = True
     return False
 
 def _execute_plan_step_tool(step, messages_history, execution_records, plan_steps, user_id: str, step_index: int):
@@ -181,25 +192,60 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
     tool_config = _get_tool_config(tool)
     if not tool_config:
         return None
-        
-    while True:
-        execution_result = _try_execute_tool(
+    
+    tool_name = tool_config['method'] + "_tool"
+    
+    def execute_with_config():
+        reply_json = _check_required_extra_params(
             tool_config,
-            messages_history,
+            messages_history, 
             plan_steps,
             step
         )
-
-        if(execution_result["status"] == "failure"):
-            return None
         
+        if not reply_json["can_proceed"]:
+            return {
+                "toolName": tool_name,
+                "result": f"Please input required arguments to continue: {reply_json['missing_required_arguments']}", 
+                "status": "need_input"
+            }
+            
+        execution_result = _execute_tool_with_args(tool_config, reply_json)
+        if execution_result["status"] == "failure":
+            return {
+                "toolName": tool_name,
+                "result": "execution failed",
+                "status": "failure"
+            }
+            
         if execution_result:
             execution_records.append(tool)
-            plan_context_memory.update_step_status_context(step_index, execution_result=execution_result, executed=True, user_key=user_id)
-            return f"toolName: {tool_config['tool']} result: {execution_result}"
+            plan_context_memory.update_step_status_context(
+                step_index,
+                execution_result=execution_result,
+                executed=True,
+                user_key=user_id
+            )
+            return {
+                "toolName": tool_name,
+                "result": execution_result,
+                "status": "success"
+            }
+            
+        return None
         
-        if not _handle_failed_execution(messages_history):
-            return None
+    if INTERACTION_MODE == "terminal":
+        while True:
+            result = execute_with_config()
+            if result and result["status"] == "success":
+                return result
+            elif result and result["status"] == "need_input":
+                if not _handle_terminal_input(messages_history):
+                    return None
+            else:
+                return result
+    else:
+        return execute_with_config()
 
 def _get_tool_config(tool):
     """Extract and parse tool configuration"""
@@ -208,7 +254,7 @@ def _get_tool_config(tool):
         return extract_json_from_str(tool_dict)
     return tool_dict
 
-def _try_execute_tool(tool_config, messages_history, plan_steps, step):
+def _check_required_extra_params(tool_config, messages_history, plan_steps, step):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "assistant", "content": next_step_content}]
@@ -216,15 +262,12 @@ def _try_execute_tool(tool_config, messages_history, plan_steps, step):
     reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.5})
     reply_json = extract_json_from_str(reply)
     print(f"\033[92mAssistant: {reply_json}\033[0m")
-    
-    if reply_json["can_proceed"]:
-        return _execute_tool_with_args(tool_config, reply_json)
-    return None
+    return reply_json
 
 def _execute_tool_with_args(tool_config, reply_json):
     """Execute tool with provided arguments"""
     args = reply_json["extracted_arguments"].get("required_arguments", {})
-    result = execute_tool(
+    result,_ = execute_tool(
         tool_caller_client,
         f"{tool_config['method']}_tool",
         tool_config['method'],
@@ -236,14 +279,12 @@ def _execute_tool_with_args(tool_config, reply_json):
         return result
     return {"status": "failure"}
 
-def _handle_failed_execution(messages_history):
+def _handle_terminal_input(messages_history):
     """Handle failed tool execution by requesting user input"""
     user_input = input("Please input required arguments to continue: ")
-    short_term_memory.add_context(create_chat_message("user", user_input))
-
     if not user_input:
         return False
-    # short_term_memory.add_context(create_chat_message("assistant", user_input))
+    short_term_memory.add_context(create_chat_message("user", user_input))
     return True
 
 def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
