@@ -192,7 +192,7 @@ def _execute_plan_step_tool(step, messages_history, execution_records, plan_step
     if not tool_config:
         return None
     
-    if INTERACTION_MODE == "terminall":
+    if INTERACTION_MODE == "terminal":
         while True:
             reply_json = _check_required_extra_params(
                 tool_config,
