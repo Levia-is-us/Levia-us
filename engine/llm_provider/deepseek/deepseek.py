@@ -37,49 +37,52 @@ def chat_completion_deepseek(messages, model, config={}):
         completion_params.update(config)
         completion = client.chat.completions.create(**completion_params)
         
-        full_response = ""
-        buffer = ""
-        for chunk in completion:
-            if chunk.choices[0].delta.content:
-                content = chunk.choices[0].delta.content
-                full_response += content
-                buffer += content
-                
-                if "<input_breakdown>" in buffer:
-                    start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
-                    end = buffer.find("</input_breakdown>")
-                    if end != -1:
-                        breakdown = buffer[start:end]
-                        # 按 " - " 分割并打印每一行
-                        for line in breakdown.split("\n"):
-                            if " - " in line:
-                                parts = line.split(" - ")
-                                for part in parts:
-                                    if part.strip():
-                                        output_stream(f" - {part.strip()} - \n")
-                        buffer = buffer[end+len("</input_breakdown>"):]
-                    else:
-                        buffer = buffer[start:]
-                elif " - " in buffer and model["type"] == "reasoning":
-                    sentences = buffer.split(" - ")
-                    for sentence in sentences[:-1]:
-                        if sentence.strip():
-                            output_stream(f" - {sentence.strip()} - \n")
-                    buffer = sentences[-1]
-        
-        if "<input_breakdown>" in buffer:
-            start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
-            end = buffer.find("</input_breakdown>")
-            if end != -1:
-                breakdown = buffer[start:end]
-                for line in breakdown.split("\n"):
-                    if " - " in line:
-                        parts = line.split(" - ")
-                        for part in parts:
-                            if part.strip():
-                                output_stream(f" - {part.strip()} - \n")
-        elif buffer and model["type"] == "reasoning":
-            output_stream(f" - {buffer.strip()} - \n")
+        if completion_params.get("stream", False):
+            full_response = ""
+            buffer = ""
+            for chunk in completion:
+                if chunk.choices[0].delta.content:
+                    content = chunk.choices[0].delta.content
+                    full_response += content
+                    buffer += content
+                    
+                    if "<input_breakdown>" in buffer:
+                        start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
+                        end = buffer.find("</input_breakdown>")
+                        if end != -1:
+                            breakdown = buffer[start:end]
+                            # 按 " - " 分割并打印每一行
+                            for line in breakdown.split("\n"):
+                                if " - " in line:
+                                    parts = line.split(" - ")
+                                    for part in parts:
+                                        if part.strip():
+                                            output_stream(f" - {part.strip()} - \n")
+                            buffer = buffer[end+len("</input_breakdown>"):]
+                        else:
+                            buffer = buffer[start:]
+                    elif " - " in buffer and model["type"] == "reasoning":
+                        sentences = buffer.split(" - ")
+                        for sentence in sentences[:-1]:
+                            if sentence.strip():
+                                output_stream(f" - {sentence.strip()} - \n")
+                        buffer = sentences[-1]
+            
+            if "<input_breakdown>" in buffer:
+                start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
+                end = buffer.find("</input_breakdown>")
+                if end != -1:
+                    breakdown = buffer[start:end]
+                    for line in breakdown.split("\n"):
+                        if " - " in line:
+                            parts = line.split(" - ")
+                            for part in parts:
+                                if part.strip():
+                                    output_stream(f" - {part.strip()} - \n")
+            elif buffer and model["type"] == "reasoning":
+                output_stream(f" - {buffer.strip()} - \n")
+        else:
+            full_response = completion.choices[0].message.content
 
         return full_response
     except Exception as e:
