@@ -1,17 +1,16 @@
 import sys
 import os
 
-from aipolabs import Aipolabs
-from aipolabs.types.functions import FunctionExecutionResult
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(project_root)
 
 from tools.web_search_tool.util import (
-    aipolabs_search,
     extract_relevance_url,
     generate_search_keywords,
+    search_non_visual,
+    search_visual,
 )
 
 from engine.tool_framework.tool_runner import ToolRunner
@@ -31,22 +30,12 @@ def web_search(intent: str):
     # Generate search keywords
     keywords = generate_search_keywords(intent)
 
-    # Initialize search engine
-    client = Aipolabs(api_key=os.environ.get("AIPOLABS_API_KEY"))
-
-    content_list = []
-    for keyword in keywords:
-        try:
-            # Search for each keyword
-            result: FunctionExecutionResult = aipolabs_search(client, keyword)
-            # Extract content from search results
-            contents = [
-                f'url: {result["url"]} content: {result["content"]}'
-                for result in result.data["results"]
-            ]
-            content_list.extend(contents)
-        except Exception as e:
-            print(f"Aipolabs search error: {str(e)}")
+    # Perform web search
+    is_visual = os.getenv("VISUAL")
+    if is_visual == "T":
+        content_list = search_visual(keywords)
+    else:
+        content_list = search_non_visual(keywords)
 
     if not content_list:
         return "No results found."
@@ -56,6 +45,7 @@ def web_search(intent: str):
         if not relevance_urls:
             return "No results found."
         return relevance_urls
+
 
 def main():
     tool = web_search()

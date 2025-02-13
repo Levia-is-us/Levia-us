@@ -30,10 +30,20 @@ def get_model_by_name(model_name):
 
 
 def create_chat_completion(system_prompt, prompt, model=_default_model, config={}):
-    messages = [
-        {"role": "assistant", "content": system_prompt},
-        {"role": "user", "content": prompt},
-    ]
+    model_obj = get_model_by_name(model)
+    messages = []
+    if model_obj["type"] == "reasoning":
+        messages = [
+            {"role": "assistant", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+    elif model_obj["type"] == "chat":
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+    
+    
     return chat_completion(messages, model, config)
 
 
