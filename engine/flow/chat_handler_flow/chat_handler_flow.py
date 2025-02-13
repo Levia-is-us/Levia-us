@@ -34,9 +34,8 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
             create_chat_message("assistant", f"{response}"),
         )
         return response
-
     elif reply_info["type"] == "call_tools":
-        handle_intent_summary(reply_info, chat_messages, user_id)
+        plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         final_reply = handle_reply_flow(chat_messages)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"),
@@ -46,7 +45,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         handle_input_intent(user_id)
 
 
-def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str) -> str:
+def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str):
     """Handle intent summary type response"""
     user_intent = reply_info["response"]
     execution_records_str = []

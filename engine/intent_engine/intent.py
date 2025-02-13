@@ -17,13 +17,13 @@ from metacognitive.stream.stream import output_stream
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+INTERACTION_MODE = os.environ["INTERACTION_MODE"]
 short_term_memory = ShortTermMemory()
 
 
 def init_stream():
     """Initialize stream"""
     return output_stream("Initialized metacognitive stream.\n")
-
 
 def init_short_term_memory():
     """Initialize short term memory"""
@@ -43,7 +43,12 @@ def init_short_term_memory():
         system_prompt = get_system_prompt()
 
     short_term_memory.add_context(system_prompt)
-    
+
+def chat():
+    if INTERACTION_MODE == "terminal":
+        terminal_chat()
+    else:
+        event_chat()
 
 def terminal_chat():
     """Start interactive chat"""
@@ -56,7 +61,6 @@ def terminal_chat():
         try:
             # Get user input
             user_input = input("\033[94mYou: \033[0m").strip()
-
             if user_input.lower() == "quit":
                 print("\033[93mGoodbye!\033[0m")
                 break
@@ -73,8 +77,10 @@ def terminal_chat():
         except Exception as e:
             print(f"\033[91mError occurred: {str(e)}\033[0m")
 
-
-def event_chat(input_message: str, user_id: str):
+def event_chat():
+    # TODO: user_id & input_message read from MQ
+    user_id = "local-dev"
+    input_message = ""
     print("\033[93mWelcome to Levia Chat!\033[0m")
     messages = short_term_memory.get_context(user_id)
     reply = handle_chat_flow(input_message, user_id)
