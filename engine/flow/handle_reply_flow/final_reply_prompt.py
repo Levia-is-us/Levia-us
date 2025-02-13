@@ -28,7 +28,7 @@ Read the following context:
 context: {str(context)}
 Find out the excuted plan and the engine_output from the context.
 
-Now, you need to generate the final reply based on the following information:
+you need to generate the information based on the following train of thought:
 - 1: User's latest request?
 - 2: Levia's identification information
 - 3: The context of the conversation

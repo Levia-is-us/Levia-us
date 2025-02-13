@@ -1,4 +1,4 @@
-from memory.dbconnection.mysql_connector import MySQLPool
+from memory.db_connection.mysql_connector import MySQLPool
 from engine.flow.executor.check_tools_result_prompt import check_tools_result_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
@@ -15,22 +15,30 @@ def execute_tool(
     tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict
 ):
     """Execute tool and record results"""
+    print(f"\033[95mExecuting running_tool: {tool_name} with and args: {tool_args}\033[0m")
+
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 
-    result = tool_caller.call_tool(
-        tool_name=tool_name, method=tool_method, kwargs=tool_args
-    )
+    try:
+        result = tool_caller.call_tool(
+            tool_name=tool_name, method=tool_method, kwargs=tool_args
+        )
 
-    status = verify_tool_execution(execution_record, result)
-    record_tool_execution(tool_name, tool_method, tool_args, result)
+        status = verify_tool_execution(execution_record, result)
+        record_tool_execution(tool_name, tool_method, tool_args, result)
 
-    return result, create_execution_record(
-        tool_name, tool_method, tool_args, result, status
-    )
+        return result, create_execution_record(
+            tool_name, tool_method, tool_args, result, status
+        )
+    except Exception as e:
+        print(f"\033[91mexecute_tool error: {str(e)}\033[0m")
+        return {"status": "failure", "result": str(e)}, None
 
 
 def verify_tool_execution(execution_record: dict, result: dict) -> str:
     """Verify tool execution result using LLM"""
+    if result["status"] == "failure":
+        return "failure"
     llm_check_prompt = check_tools_result_prompt(
         tool_execution=str(execution_record), tool_output=result
     )

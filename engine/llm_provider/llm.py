@@ -23,11 +23,27 @@ def _load_models():
     return _models
 
 
+def get_model_by_name(model_name):
+    """Get model by name"""
+    models = _load_models()
+    return models.get(model_name, None)
+
+
 def create_chat_completion(system_prompt, prompt, model=_default_model, config={}):
-    messages = [
-        {"role": "assistant", "content": system_prompt},
-        {"role": "user", "content": prompt},
-    ]
+    model_obj = get_model_by_name(model)
+    messages = []
+    if model_obj["type"] == "reasoning":
+        messages = [
+            {"role": "assistant", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+    elif model_obj["type"] == "chat":
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+    
+    
     return chat_completion(messages, model, config)
 
 
@@ -84,6 +100,8 @@ def chat_completion(messages, model=_default_model, config={}):
         anthropic_messages = []
         for message in messages:
             message_type = type(message["content"])
+            if message["role"] == "system":
+                message["role"] = "user"
             if message_type == str:
                 anthropic_messages.append(
                     {
