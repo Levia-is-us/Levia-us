@@ -55,7 +55,7 @@ Levia is an Open Source AI Metacognition & Tooling infrastructure that enables a
 ## Installation
 1. Clone the repository:
 ``` git clone https://github.com/your-username/levia-protocol.git
- cd levia-protocol
+ cd Levia-us
 ```
 
 2. Create and activate a virtual environment
