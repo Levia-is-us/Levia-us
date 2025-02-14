@@ -1,3 +1,5 @@
+import json
+import re
 import time
 import os
 from aipolabs import Aipolabs
@@ -66,7 +68,7 @@ def generate_search_keywords(intent: str) -> list:
                 {"role": "user", "content": intent},
             ],
             model=QUALITY_MODEL_NAME,
-            config={"temperature": 0.7},
+            config={"temperature": 0.5},
         )
         keywords = eval(output)
     except Exception as e:
@@ -75,34 +77,37 @@ def generate_search_keywords(intent: str) -> list:
     return keywords
 
 
-def extract_relevance_url(intent: str, content_list: str) -> list:
+def extract_relevance_url(intent: str, contents: str) -> list:
     """
     This function is used to generate the relevance URLs from the search results.
     Args:
         intent (str): The intent of the user.
-        content_list (str): The search results.
+        contents (str): The search results.
     Returns:
         The relevance URLs.
     """
     prompt = """
-    Given a user intent and a list of search results, select 1-3 most relevant URLs.
-    
+    Given a user intent and search results, select 1-3 most relevant URLs.
+
     Requirements:
     1. Analyze the relevance between each result and the user intent
     2. Consider content freshness and authority
     3. Select only the most relevant 1-3 URLs
     4. Ignore results that are:
-       - Spam or low quality content
-       - Duplicate information
-       - URLs from video/audio hosting sites (e.g. youtube.com, vimeo.com, soundcloud.com)
-    5. The output should be only the urls, no other text.
+        - Spam or low quality content
+        - Not directly related to the intent
+        - Duplicate information
+        - URLs from video/audio hosting sites (e.g. youtube.com, vimeo.com, soundcloud.com)
+    5. The output should be only the URL list, no other text ( eg. ["url1", "url2", "url3"])
 
     Input format:
     intent: <user intent>
-    content_list: <search results>
-    
+    contents: url: <url1> content:<content1>
+            url: <url2> content:<content2>
+            url: <url3> content:<content3>
+
     Output format:
-    [url1, url2, url3]
+    ["url1", "url2", "url3"]
     """
     try:
         output = chat_completion(
@@ -110,17 +115,35 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
                 {"role": "assistant", "content": prompt},
                 {
                     "role": "user",
-                    "content": f"Intent: {intent}\nContent List: {content_list}",
+                    "content": f"Intent: {intent}\nContents: {contents}",
                 },
             ],
             model=QUALITY_MODEL_NAME,
             config={"temperature": 0.7},
         )
-        urls = eval(output)
+        # Try to parse JSON directly from output
+        try:
+            # If output is a dictionary string containing JSON
+            result_dict = json.loads(output)
+            if isinstance(result_dict, dict) and "result" in result_dict:
+                return result_dict["result"]
+        except json.JSONDecodeError:
+            pass
+
+        # If direct parsing fails, try to extract URL list
+        match = re.search(r"(\[.*?\])", output.replace("\n", ""))
+        if match:
+            try:
+                urls = json.loads(match.group(1))
+                return urls
+            except json.JSONDecodeError:
+                print("Failed to parse URL list from matched pattern")
+                return []
+
+        return []
     except Exception as e:
         print(f"Extract relevance url error: {str(e)}")
-        urls = []
-    return urls
+        return []
 
 
 def aipolabs_search(client: Aipolabs, keyword: str) -> FunctionExecutionResult:
@@ -236,49 +259,104 @@ def scroll_to_bottom(driver, duration=5.0) -> None:
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 
-def handle_search_results(search_results: list) -> list:
+def safe_get_element(elements, index=0):
     """
-    Extract URLs and content from search results and return a list of formatted strings.
+    Safely get element from list with index checking.
 
     Args:
-        search_results: A list of search results, each containing a URL and content.
+        elements (list): List of web elements
+        index (int): Index to retrieve
 
     Returns:
-        A list of strings, each containing the URL and content of a search result.
+        WebElement or None if not found
+    """
+    return elements[index] if elements and len(elements) > index else None
+
+
+def extract_element_content(element, tag_name, attr=None):
+    """
+    Extract content from element with safety checks.
+
+    Args:
+        element: Parent web element
+        tag_name (str): HTML tag to find
+        attr (str): Attribute to extract, if None returns text
+
+    Returns:
+        str: Extracted content or empty string
+    """
+    elements = element.find_elements(By.TAG_NAME, tag_name)
+    found_elem = safe_get_element(elements)
+    if found_elem is None:
+        return ""
+
+    return (
+        found_elem.get_attribute(attr) if attr else found_elem.text.replace("\n", " ")
+    )
+
+
+def extract_search_result(element):
+    """
+    Extract URL and summary from a search result element.
+
+    Args:
+        element: Search result web element
+
+    Returns:
+        tuple: (url, summary)
+    """
+    url = extract_element_content(element, "a", "href")
+    summary = " ".join(
+        elem.text.replace("\n", " ")
+        for elem in element.find_elements(By.TAG_NAME, "span")
+        if elem.text
+    )
+    return url, summary
+
+
+def handle_search_results(search_results: list) -> list:
+    """
+    Extract URLs and content from search results and return formatted strings.
+
+    Args:
+        search_results: List of search result elements
+
+    Returns:
+        list: Formatted strings with URLs and content
     """
     content_list = []
+
     if len(search_results) > 3:
-        # Remove the second search result with no contens
+        # Remove the second search result with no contents
         search_results.remove(search_results[1])
-        # Extract URL and summary from the search results
-        url_elems = [elem.find_elements(By.TAG_NAME, "a")[0] for elem in search_results]
-        urls = [elem.get_attribute("href") for elem in url_elems]
-        summary_elems = [
-            elem.find_elements(By.TAG_NAME, "span")[0] for elem in search_results
-        ]
-        summaries = [elem.text for elem in summary_elems]
+
+        # Process remaining results
+        results = [extract_search_result(elem) for elem in search_results]
+        urls, summaries = zip(*[r for r in results if r[0]])  # Filter out empty URLs
+
     else:
-        # Extract URL and summary from the first search result
-        first_elem = search_results[0]
-        first_url_elem = first_elem.find_elements(By.TAG_NAME, "a")[0]
-        first_url = first_url_elem.get_attribute("href")
-        first_summary_elems = first_elem.find_elements(By.TAG_NAME, "span")
-        first_summary = " ".join(
-            [summary_elem.text for summary_elem in first_summary_elems]
-        )
-        # Extract remaining search results from other search results
+        # Process first result
+        first_url, first_summary = extract_search_result(search_results[0])
+
+        # Process remaining results
         other_results = search_results[1]
         child_divs = other_results.find_elements(By.CSS_SELECTOR, ":scope > div")
-        other_url_elems = [
-            elem.find_elements(By.TAG_NAME, "a")[0] for elem in child_divs
+        other_results = [extract_search_result(elem) for elem in child_divs]
+
+        # Combine results
+        urls = [first_url] + [url for url, _ in other_results if url]
+        summaries = [first_summary] + [
+            summary for _, summary in other_results if summary
         ]
-        other_summary_elems = [
-            elem.find_elements(By.TAG_NAME, "span")[0] for elem in child_divs
+
+    # Format results
+    content_list.extend(
+        [
+            f"url: {url} content: {summary}"
+            for url, summary in zip(urls, summaries)
+            if url and summary
         ]
-        urls = [first_url] + [elem.get_attribute("href") for elem in other_url_elems]
-        summaries = [first_summary] + [elem.text for elem in other_summary_elems]
-    # Extend the content list with the result details
-    content_list.extend([f"url: {u} content: {s}" for u, s in zip(urls, summaries)])
+    )
 
     return content_list
 
@@ -322,6 +400,7 @@ def search_visual(keywords: list) -> list:
                 search_results = search_rets.find_elements(
                     By.CSS_SELECTOR, ":scope > div"
                 )
+                # time.sleep(60000)
                 # Extract URLs and content from search results
                 contents = handle_search_results(search_results)
                 content_list.extend(contents)

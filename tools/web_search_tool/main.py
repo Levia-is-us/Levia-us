@@ -42,7 +42,8 @@ def web_search(intent: str):
         return "No results found."
     else:
         # Extract relevance URLs
-        relevance_urls = extract_relevance_url(intent, content_list)
+        contents = " ".join(content_list)
+        relevance_urls = extract_relevance_url(intent, contents)
         if not relevance_urls:
             return "No results found."
         return relevance_urls
