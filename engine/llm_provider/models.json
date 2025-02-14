@@ -3,6 +3,7 @@
     "model": "gpt-35-turbo-16k",
     "version": "2024-05-01-preview",
     "type": "chat",
+    "context_window_size": 16384,
     "source": "azure-openai"
   },
   {

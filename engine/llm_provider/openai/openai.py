@@ -5,6 +5,7 @@ from engine.utils.chat_formatter import (
     convert_system_message_to_developer_message,
     pop_system_message_to_developer_message,
 )
+from engine.utils.tokenizer import is_message_too_long
 from metacognitive.stream.stream import output_stream
 
 api_key = os.getenv("OPENAI_API_KEY")
@@ -34,6 +35,14 @@ def chat_completion_openai(
     - model reply message content
     """
     try:
+        # check request is too long
+        if model["context_window_size"] and is_message_too_long(
+            messages, model["context_window_size"], config.get("max_tokens", 800)
+        ):
+            raise Exception(
+                f"LLM model request message is too long, model: {model['model']}, context_window_size: {model['context_window_size']}, max_tokens: {config.get('max_tokens', 800)}"
+            )
+
         client = None
         if model["source"] == "azure-openai":
             client = AzureOpenAI(

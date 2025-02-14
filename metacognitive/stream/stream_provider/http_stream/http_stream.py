@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 
+from engine.task_manager.task_manager import TaskManager
 from metacognitive.stream.stream_provider.base_stream import BaseStream
 import threading
+
+task_manager = TaskManager()
 
 
 class HTTPStream(BaseStream):
