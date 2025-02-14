@@ -1,6 +1,7 @@
 # Git
 # .gitignore
 # .git/
+.vscode/
 
 # Virtual Environment
 .venv/
@@ -37,7 +38,7 @@ wheels/
 
 # IDE
 .idea/
-.vscode/
+
 *.swp
 *.swo
 .DS_Store 
@@ -48,3 +49,6 @@ wheels/
 
 #other
 .history/
+
+.python_packages
+local.settings.json
