@@ -1,3 +1,2 @@
-pyautogui
 aipolabs
 selenium

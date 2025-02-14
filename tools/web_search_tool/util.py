@@ -1,6 +1,5 @@
 import time
 import os
-import pyautogui
 from aipolabs import Aipolabs
 from aipolabs.types.functions import FunctionExecutionResult
 from aipolabs._exceptions import ServerError
@@ -94,8 +93,8 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
     3. Select only the most relevant 1-3 URLs
     4. Ignore results that are:
        - Spam or low quality content
-       - Not directly related to the intent
        - Duplicate information
+       - URLs from video/audio hosting sites (e.g. youtube.com, vimeo.com, soundcloud.com)
     5. The output should be only the urls, no other text.
 
     Input format:
@@ -194,7 +193,7 @@ def init_driver() -> webdriver.Chrome:
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36"
+        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
     )
     chrome_options.add_experimental_option(
         "excludeSwitches", ["enable-automation", "enable-logging"]
@@ -204,7 +203,12 @@ def init_driver() -> webdriver.Chrome:
     driver.execute_cdp_cmd(
         "Page.addScriptToEvaluateOnNewDocument",
         {
-            "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
+            "source": """
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.navigator.chrome = { runtime: {} };
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            """
         },
     )
     driver.maximize_window()
@@ -232,20 +236,51 @@ def scroll_to_bottom(driver, duration=5.0) -> None:
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 
-def human_like_google_search(keyword, type_interval=0.1) -> None:
+def handle_search_results(search_results: list) -> list:
     """
-    Perform a Google search with a delay between keystrokes to simulate human input
+    Extract URLs and content from search results and return a list of formatted strings.
 
     Args:
-        keyword: The search keyword
-        type_interval: The interval between keystrokes
+        search_results: A list of search results, each containing a URL and content.
 
     Returns:
-        None
+        A list of strings, each containing the URL and content of a search result.
     """
+    content_list = []
+    if len(search_results) > 3:
+        # Remove the second search result with no contens
+        search_results.remove(search_results[1])
+        # Extract URL and summary from the search results
+        url_elems = [elem.find_elements(By.TAG_NAME, "a")[0] for elem in search_results]
+        urls = [elem.get_attribute("href") for elem in url_elems]
+        summary_elems = [
+            elem.find_elements(By.TAG_NAME, "span")[0] for elem in search_results
+        ]
+        summaries = [elem.text for elem in summary_elems]
+    else:
+        # Extract URL and summary from the first search result
+        first_elem = search_results[0]
+        first_url_elem = first_elem.find_elements(By.TAG_NAME, "a")[0]
+        first_url = first_url_elem.get_attribute("href")
+        first_summary_elems = first_elem.find_elements(By.TAG_NAME, "span")
+        first_summary = " ".join(
+            [summary_elem.text for summary_elem in first_summary_elems]
+        )
+        # Extract remaining search results from other search results
+        other_results = search_results[1]
+        child_divs = other_results.find_elements(By.CSS_SELECTOR, ":scope > div")
+        other_url_elems = [
+            elem.find_elements(By.TAG_NAME, "a")[0] for elem in child_divs
+        ]
+        other_summary_elems = [
+            elem.find_elements(By.TAG_NAME, "span")[0] for elem in child_divs
+        ]
+        urls = [first_url] + [elem.get_attribute("href") for elem in other_url_elems]
+        summaries = [first_summary] + [elem.text for elem in other_summary_elems]
+    # Extend the content list with the result details
+    content_list.extend([f"url: {u} content: {s}" for u, s in zip(urls, summaries)])
 
-    # Type the keyword with a delay between keystrokes to simulate human input
-    pyautogui.typewrite(keyword, interval=type_interval)
+    return content_list
 
 
 def search_visual(keywords: list) -> list:
@@ -260,9 +295,10 @@ def search_visual(keywords: list) -> list:
     """
     # Initialize the Chrome WebDriver
     driver = init_driver()
+    # Set the explicit wait time
     wait = WebDriverWait(driver, 30)
-    content_list = []
 
+    content_list = []
     try:
         for keyword in keywords:
             try:
@@ -272,48 +308,23 @@ def search_visual(keywords: list) -> list:
                 search_box = wait.until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, "#APjFqb"))
                 )
-                # Simulate human-like typing of the search keyword
-                human_like_google_search(keyword)
+                # Type keyword in the search box
+                search_box.click()
+                search_box.send_keys(keyword)
                 search_box.send_keys(Keys.RETURN)
                 # Wait for the search results container to be visible
-                search_results = wait.until(
+                search_rets = wait.until(
                     EC.visibility_of_element_located((By.ID, "rso"))
-                )
-                # Retrieve individual search result elements
-                search_results = search_results.find_elements(
-                    By.CSS_SELECTOR, ":scope > div"
-                )
-                # Extract URL and summary from the first search result
-                first_elem = search_results[0]
-                first_url_elem = first_elem.find_elements(By.TAG_NAME, "a")[0]
-                first_url = first_url_elem.get_attribute("href")
-                first_summary_elems = first_elem.find_elements(By.TAG_NAME, "span")
-                first_summary = " ".join(
-                    [summary_elem.text for summary_elem in first_summary_elems]
                 )
                 # Scroll down to simulate user browsing behavior
                 scroll_to_bottom(driver)
-                # Extract remaining search results from subsequent elements
-                other_results = search_results[1]
-                child_divs = other_results.find_elements(
+                # Retrieve individual search result elements
+                search_results = search_rets.find_elements(
                     By.CSS_SELECTOR, ":scope > div"
                 )
-                other_url_elems = [
-                    elem.find_elements(By.TAG_NAME, "a")[0] for elem in child_divs
-                ]
-                other_summary_elems = [
-                    elem.find_elements(By.TAG_NAME, "span")[0] for elem in child_divs
-                ]
-                urls = [first_url] + [
-                    elem.get_attribute("href") for elem in other_url_elems
-                ]
-                summaries = [first_summary] + [
-                    elem.text for elem in other_summary_elems
-                ]
-                # Build and extend the content list with the result details
-                content_list.extend(
-                    [f"url: {u} content: {s}" for u, s in zip(urls, summaries)]
-                )
+                # Extract URLs and content from search results
+                contents = handle_search_results(search_results)
+                content_list.extend(contents)
             except Exception as err:
                 print(f"Extract google search output error for '{keyword}': {err}")
     finally:
