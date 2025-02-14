@@ -6,10 +6,7 @@ from engine.flow.system_prompt.system_prompt import (
     get_system_prompt_for_openai_reasoning,
 )
 from engine.llm_provider.llm import get_model_by_name
-from engine.tool_framework.tool_registry import ToolRegistry
-from engine.tool_framework.tool_caller import ToolCaller
 from engine.flow.chat_handler_flow.chat_handler_flow import handle_chat_flow
-from engine.utils.chat_formatter import create_chat_message
 from memory.short_term_memory.short_term_memory import ShortTermMemory
 import os
 
@@ -17,13 +14,13 @@ from metacognitive.stream.stream import output_stream
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+
 short_term_memory = ShortTermMemory()
 
 
 def init_stream():
     """Initialize stream"""
     return output_stream("Initialized metacognitive stream.\n")
-
 
 def init_short_term_memory():
     """Initialize short term memory"""
@@ -43,7 +40,6 @@ def init_short_term_memory():
         system_prompt = get_system_prompt()
 
     short_term_memory.add_context(system_prompt)
-    
 
 def terminal_chat():
     """Start interactive chat"""
@@ -56,7 +52,6 @@ def terminal_chat():
         try:
             # Get user input
             user_input = input("\033[94mYou: \033[0m").strip()
-
             if user_input.lower() == "quit":
                 print("\033[93mGoodbye!\033[0m")
                 break
@@ -73,8 +68,3 @@ def terminal_chat():
         except Exception as e:
             print(f"\033[91mError occurred: {str(e)}\033[0m")
 
-
-def event_chat(input_message: str, user_id: str):
-    print("\033[93mWelcome to Levia Chat!\033[0m")
-    messages = short_term_memory.get_context(user_id)
-    reply = handle_chat_flow(input_message, user_id)
