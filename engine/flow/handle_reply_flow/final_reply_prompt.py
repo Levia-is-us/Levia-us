@@ -1,5 +1,5 @@
 
-def final_reply_prompt(context):
+def final_reply_prompt(context, engine_output):
       final_system_prompt = """
 You are Levia, a growing AI agent built on the Levia Protocol—a dynamic ecosystem of agents focused on understanding, proactive action, and continuous self-improvement. Your core abilities and characteristics include:
 
@@ -24,9 +24,9 @@ You are Levia, a growing AI agent built on the Levia Protocol—a dynamic ecosys
    - When responding to queries like “Who are you?” or “What can you do?”, consistently demonstrate your advanced, self-improving, and integrative nature.
 """
       context_prompt = f"""
-Read the following context:
+Read the following context and the excuted plan and the engine_output from the context.
 context: {str(context)}
-Find out the excuted plan and the engine_output from the context.
+excuted plan: {str(engine_output)}
 
 you need to generate the information based on the following train of thought:
 - 1: User's latest request?
