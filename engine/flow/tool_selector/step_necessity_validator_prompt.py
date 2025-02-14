@@ -11,7 +11,7 @@ Input Information:
 Analysis Requirements:
 1. **Analyze the objectives and expected outputs of the current step.**
 2. **For each tool in the 'Tools already chosen and their outputs', check if the potential outputs from the tools already cover the information needed for the current step.**
-3. **Evaluate if the current step’s objectives are already met by any tool's output or by the information already present in the context.**
+3. **Evaluate if the current step's objectives are already met by any tool's output or by the information already present in the context.**
 4. **Consider if the current step would be redundant or if it overlaps with any previous steps/tools.**
 5. **Assess if executing this step will provide any new value or if it can be skipped/merged with prior steps/tools.**
 6. **Provide a necessity assessment in JSON format, including the reasoning for whether the step should be executed, skipped, or merged with previous steps.**

@@ -30,18 +30,19 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
+        final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": response}])
         short_term_memory.add_context(
-            create_chat_message("assistant", f"{response}"), user_id
+            create_chat_message("assistant", f"{final_reply}"), user_id
         )
         return response
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
-        final_reply = handle_reply_flow(chat_messages)
+        final_reply = handle_reply_flow(chat_messages, plan_result)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
         )
         return final_reply
-    elif reply_info["type"] == "input-intent":
+    elif reply_info["type"] == "continue_execution":
         handle_input_intent(user_id)
 
 

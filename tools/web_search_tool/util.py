@@ -10,10 +10,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from engine.llm_provider.llm import chat_completion
+from engine.llm_provider.llm import create_chat_completion
+from dotenv import load_dotenv
 
-QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+project_root = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(project_root, ".env")
+load_dotenv(env_path)
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+AIPOLABS_API_KEY = os.getenv("AIPOLABS_API_KEY")
+
 
 
 def generate_search_keywords(intent: str) -> list:
@@ -27,7 +32,7 @@ def generate_search_keywords(intent: str) -> list:
 
     # Generate search keywords through LLM
     prompt = """
-    You will be given a user’s input as a string. Your task is to extract the most appropriate search keywords based on the given input. The output should be a list of keywords, and you should generate as few keywords as possible while ensuring they are concise and accurately reflect the user's need. 
+    You will be given a user's input as a string. Your task is to extract the most appropriate search keywords based on the given input. The output should be a list of keywords, and you should generate as few keywords as possible while ensuring they are concise and accurately reflect the user's need. 
 
     The keywords may consist of multiple related terms, but avoid unnecessary or redundant words.
 
@@ -61,14 +66,13 @@ def generate_search_keywords(intent: str) -> list:
     """
 
     try:
-        output = chat_completion(
-            [
-                {"role": "assistant", "content": prompt},
-                {"role": "user", "content": intent},
-            ],
-            model=QUALITY_MODEL_NAME,
+        output = create_chat_completion(
+            system_prompt = prompt,
+            model=PERFORMANCE_MODEL_NAME,
+            prompt=intent,
             config={"temperature": 0.7},
         )
+
         keywords = eval(output)
     except Exception as e:
         print(f"Generate search keywords error: {str(e)}")
@@ -106,15 +110,10 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
     [url1, url2, url3]
     """
     try:
-        output = chat_completion(
-            [
-                {"role": "assistant", "content": prompt},
-                {
-                    "role": "user",
-                    "content": f"Intent: {intent}\nContent List: {content_list}",
-                },
-            ],
-            model=QUALITY_MODEL_NAME,
+        output = create_chat_completion(
+            system_prompt = prompt,
+            model=PERFORMANCE_MODEL_NAME,
+            prompt=f"Intent: {intent}\nContent List: {content_list}",
             config={"temperature": 0.7},
         )
         urls = eval(output)
@@ -169,7 +168,7 @@ def search_non_visual(keywords: list) -> list:
         A list of URLs and content that match the intent.
     """
     # Initialize search engine
-    client = Aipolabs(api_key=os.environ.get("AIPOLABS_API_KEY"))
+    client = Aipolabs(api_key=AIPOLABS_API_KEY)
 
     content_list = []
     for keyword in keywords:

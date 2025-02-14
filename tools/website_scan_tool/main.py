@@ -5,8 +5,7 @@ project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(project_root)
-from engine.tool_framework.tool_runner import ToolRunner
-from engine.tool_framework import simple_tool
+from engine.tool_framework import run_tool, BaseTool
 
 from tools.website_scan_tool.utils import (
     get_all_content,
@@ -18,21 +17,22 @@ from tools.website_scan_tool.utils import (
 
 
 
-@simple_tool("Website Scan Tool")
-def website_scan(urls: list, intent: str):
-    links = get_all_links(urls)
-    links = remove_duplicate_links(links)
-    links = get_prompt_links(links, intent)
-    links = get_all_content(links)
-    result = get_summary_links(links, intent)
-    return result
-
-
-def main():
-    tool = website_scan()
-    runner = ToolRunner(tool)
-    runner.run()
-
-
-if __name__ == "__main__":
-    main()
+@run_tool("Website Scan Tool")
+class WebsiteScanTool(BaseTool):
+    """Tool for scanning website content"""
+    
+    def website_scan(self, url_list: list, intent: str):
+        """
+        Scan websites and extract relevant information
+        Args:
+            url_list: List of URLs to scan
+            intent: The intent to guide the scanning
+        Returns:
+            Extracted information
+        """
+        links = get_all_links(url_list)
+        links = remove_duplicate_links(links)
+        links = get_prompt_links(links, intent)
+        links = get_all_content(links)
+        result = get_summary_links(links, intent)
+        return result

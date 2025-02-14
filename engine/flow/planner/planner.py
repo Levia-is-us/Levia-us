@@ -2,6 +2,7 @@ from engine.flow.planner.planner_prompt import get_plan_maker_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 from engine.flow.planner.checking_plan_prompt import check_plan_fittable_prompt
+from metacognitive.stream.stream import output_stream
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
@@ -18,12 +19,11 @@ def create_execution_plan(intent: str) -> str:
         prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0.5}
     )
     plan = extract_json_from_str(plan)
-    print(f"\033[95mplan:")
     for step in plan:
-        print(f"\033[95m{step['step']}: {step['intent']}\033[0m")
-        print(f"\033[95mStep Description: {step['Description']}\033[0m")
-        print(f"\033[95mStep Reason: {step['Reason']}\033[0m")
-        print(f"\033[95m--------------------------------\033[0m")
+        output_stream(f" - {step['step']}: {step['intent']} - \n")
+        output_stream(f" - Step Description: {step['Description']} - \n")
+        output_stream(f" - Step Reason: {step['Reason']} - \n")
+        output_stream(f"\033[95m--------------------------------\033[0m")
     return plan
 
 

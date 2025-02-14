@@ -4,8 +4,12 @@ import os
 import sys
 
 from dotenv import load_dotenv
-
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 env_path = os.path.join(project_root, '.env')
 load_dotenv(env_path)
 sys.path.append(project_root)
@@ -20,11 +24,12 @@ def main():
     registry = ToolRegistry()
     
     # Use absolute path
-    tools_dir = os.path.join(os.path.dirname(__file__), "./")
+    tools_dir = os.path.join(project_root, "tools")
     registry.scan_directory(tools_dir)  # Scan tools directory
 
     # Create ToolCaller instance
     caller = ToolCaller(registry)
+
 
     # List all available tools
     tools = registry.list_tools()
@@ -62,7 +67,7 @@ def main():
     }
 
     result = caller.call_tool(
-        "save_markdown_to_gitbook_tool", 
+        "SaveMarkdownToGitbook", 
         "save_markdown_to_gitbook", 
         params
     )
