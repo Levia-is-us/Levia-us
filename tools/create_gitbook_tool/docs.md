@@ -1,51 +1,37 @@
+
+
 <code_breakdown>
-**List of Functions Identified:**
-- `save_markdown_to_gitbook`
+Identified function:
+- save_markdown_to_gitbook (method of SaveMarkdownToGitbook class decorated via @run_tool)
 
-**Function: `save_markdown_to_gitbook`**
+Function signature:
+def save_markdown_to_gitbook(content, gitbook_api_key, azure_file_server_key, user_website_url)
 
-i. **Function Signature:**
-```python
-def save_markdown_to_gitbook(content, article_title, gitbook_api_key):
-```
+Parameters:
+1. content (no type hint) - required - markdown/text content to process
+2. gitbook_api_key (no type hint) - required - API key for GitBook access
+3. azure_file_server_key (no type hint) - required - Credentials for Azure file storage
+4. user_website_url (no type hint) - required - Base URL for constructed result
 
-ii. **Parameters:**
-- `content`
-  - **Type:** Inferred as `str` (string containing markdown or other textual content)
-  - **Required:** Yes
-  - **Description:** The markdown or string content to be saved to GitBook.
-  
-- `article_title`
-  - **Type:** Inferred as `str` (string representing the title of the article)
-  - **Required:** Yes
-  - **Description:** The title of the article to be created in GitBook.
-  
-- `gitbook_api_key`
-  - **Type:** Inferred as `str` (string representing the GitBook API key)
-  - **Required:** Yes
-  - **Description:** The API key used to authenticate with the GitBook API.
+Return value:
+- String containing final URL or error message (type: str)
 
-iii. **Return Value:**
-- **Description:** Returns a URL string pointing to the saved GitBook article upon successful execution. Returns error message strings if input validation fails or if certain operations fail.
-- **Type:** `str`
+Purpose:
+Uploads markdown content to GitBook through a multi-step process involving Azure file storage upload, GitBook API interactions for content import, and change request management.
 
-iv. **Purpose:**
-The `save_markdown_to_gitbook` function uploads markdown content as an article to GitBook. It handles the conversion of markdown to HTML, uploads the content, interacts with the GitBook API to create and merge change requests, and ultimately returns the URL of the newly created GitBook article.
+Notable aspects:
+1. Uses global singleton instances for GitBookAPI and file_manage
+2. Implicit requirement for .env file configuration
+3. Relies on first organization/space from GitBook API responses
+4. Automatic cleanup of uploaded files on errors
+5. No explicit type validation for input parameters
 
-v. **Notable Aspects of the Implementation:**
-- Utilizes a global instance of `GitBookAPI` to manage interactions with the GitBook service.
-- Performs input validation to ensure `content` and `article_title` are provided.
-- Converts markdown content to HTML using the `markdown` library before uploading.
-- Manages file operations such as uploading and deleting temporary files based on the operation's success.
-- Handles API interactions to retrieve organizations and spaces, import content, and manage change requests.
-- Implements exception handling for network-related errors and JSON decoding issues, ensuring that temporary files are cleaned up in case of failures.
-
-vi. **Edge Cases or Potential Issues:**
-- **Organization and Space Retrieval:** Assumes that at least one organization and one space exist. If `get_organizations` or `get_spaces` returns an empty list, the function will fail.
-- **Global Variable Usage:** Uses a global `_gitbook` instance, which may lead to issues in concurrent environments or if multiple instances are needed.
-- **Error Handling:** Returns error messages as strings, which might not be the best practice for error handling. Raising exceptions could provide more flexibility.
-- **Lack of Type Hints:** Parameters and return types are not explicitly typed, which can lead to ambiguities and make the code harder to maintain.
-- **File Management:** Relies on external functions `upload_file` and `delete_file` without checking for their success beyond the context provided.
+Edge cases/issues:
+- Fails if user has no organizations/spaces in GitBook
+- Potential race conditions with global _gitbook/_file_manage
+- Assumes first item in organizations/spaces lists is correct
+- No retry mechanism for API calls
+- Return type inconsistency (URL string vs error message string)
 </code_breakdown>
 
 ```json
@@ -53,30 +39,36 @@ vi. **Edge Cases or Potential Issues:**
   "functions": [
     {
       "method": "save_markdown_to_gitbook",
-      "short_description": "Save markdown content to GitBook",
-      "detailed_description": "Uploads markdown or string content as an article to GitBook. It converts markdown to HTML, uploads the content, interacts with the GitBook API to create and merge change requests, and returns the URL of the newly created GitBook article. Handles input validation and manages temporary file operations to ensure consistency.",
+      "short_description": "Save markdown content to GitBook via API integration",
+      "detailed_description": "Processes markdown content by uploading to Azure storage, importing to GitBook through API calls, managing change requests, and returning the final URL. Handles error cleanup and API interactions with GitBook's organization/space structure.",
       "inputs": [
         {
           "name": "content",
           "type": "str",
           "required": true,
-          "description": "The markdown or string content to be saved to GitBook."
-        },
-        {
-          "name": "article_title",
-          "type": "str",
-          "required": true,
-          "description": "The title of the article to be created in GitBook."
+          "description": "Markdown/text content to be saved, required for article creation"
         },
         {
           "name": "gitbook_api_key",
           "type": "str",
           "required": true,
-          "description": "The API key used to authenticate with the GitBook API."
+          "description": "API key for GitBook authentication, obtained from environment configuration"
+        },
+        {
+          "name": "azure_file_server_key",
+          "type": "str",
+          "required": true,
+          "description": "Credentials for Azure file storage service, used for temporary content hosting"
+        },
+        {
+          "name": "user_website_url",
+          "type": "str",
+          "required": true,
+          "description": "Base URL prefix for the final published content location"
         }
       ],
       "output": {
-        "description": "Returns the URL of the saved GitBook article upon success or an error message string if the operation fails.",
+        "description": "Final published URL string on success, error message string on failure",
         "type": "str"
       }
     }

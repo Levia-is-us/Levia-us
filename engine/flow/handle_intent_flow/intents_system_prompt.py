@@ -89,12 +89,20 @@ After your analysis, generate the appropriate JSON response using one of these t
    }}
 ```
 
-2. For intent summaries:
+2. For intent analysis:
 ```json
    {{
        "type": "call_tools",
        "intent": "Summarized intent here for calling tools",
        "response": "Make a goal for calling tools"
+   }}
+```
+
+3. For continue execution:
+```json
+   {{
+       "type": "continue_execution",
+       "intent": "Summarized intent here for continue execution"
    }}
 ```
 

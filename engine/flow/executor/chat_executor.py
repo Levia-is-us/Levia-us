@@ -16,6 +16,7 @@ from engine.utils.chat_formatter import create_chat_message
 from engine.tool_framework.tool_caller import ToolCaller
 from engine.tool_framework.tool_registry import ToolRegistry
 from memory.plan_memory.plan_memory import PlanContextMemory
+from metacognitive.stream.stream import output_stream
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
@@ -50,13 +51,12 @@ def process_existing_memories(
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
         
-    print(f"\033[95mDo not have experience for {user_intent}\033[0m")
-    print(f"\033[95mCreating new execution plan\033[0m")
+    output_stream(f" - Do not have experience for {user_intent} - \n")
+    output_stream(f" - Creating new execution plan ... - \n")
     plan = create_execution_plan(user_intent)
     handle_new_tool_execution(
         plan, messages_history, user_id
     )
-    print(f"\033[95mNew execution plan: {plan}\033[0m")
     return plan
 
 
@@ -92,10 +92,10 @@ def handle_new_tool_execution(plan, messages_history: list, user_id: str):
     
     # Analyze each step and find appropriate tools
     for step_index, step in enumerate(plan):
-        print(f"Processing step: {step}")
+        output_stream(f" - Processing step: {step} - \n")
         found_tools = _get_tools_from_plan_steps(plan)
         if not _process_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            # print(f"\033[91mFailed to process step: {step['Description']}\033[0m")
+            output_stream(f" - Failed to process step: {step['Description']} - \n")
             return
             
     # Execute tools for each plan step
@@ -261,11 +261,11 @@ def _get_tool_config(tool):
 def _check_required_extra_params(tool_config, messages_history, plan_steps, step):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
-    prompt = [{"role": "assistant", "content": next_step_content}]
+    prompt = [{"role": "user", "content": next_step_content}]
     
     reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.5})
     reply_json = extract_json_from_str(reply)
-    print(f"\033[92mAssistant: {reply_json}\033[0m")
+    output_stream(f" - {reply_json} - \n")
     return reply_json
 
 def _execute_tool_with_args(tool_config, reply_json):

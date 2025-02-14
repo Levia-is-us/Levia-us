@@ -1,7 +1,11 @@
 import os
 import sys
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(project_root)
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
 
@@ -9,12 +13,11 @@ def main():
     registry = ToolRegistry()
     
     # Use absolute path
-    tools_dir = os.path.join(os.path.dirname(__file__), "./")
+    tools_dir = os.path.join(project_root, "tools")
     registry.scan_directory(tools_dir)  # Scan tools directory
 
     # Create ToolCaller instance
     caller = ToolCaller(registry)
-    
     
     # List all available tools
     tools = registry.list_tools()
@@ -26,7 +29,7 @@ def main():
         for method, info in tool['methods'].items():
             print(f" - {method}{info['signature']}")
     
-    result = caller.call_tool(tool_name="list_abilities_tool", method="list_abilities", kwargs={})
+    result = caller.call_tool(tool_name="ListAbilitiesTool", method="list_abilities", kwargs={})
     
     if result:
         if 'error' in result:
@@ -38,3 +41,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
