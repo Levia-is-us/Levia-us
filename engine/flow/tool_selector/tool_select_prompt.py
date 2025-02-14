@@ -48,7 +48,7 @@ def extract_tool_info(data):
     tools = []
     for match in data['matches']:
         tool_info = {}
-        tool_info['tool_name'] = match['id']
+        tool_info['tool_name'] = match['metadata']['tool']
         metadata = json.loads(match['metadata']['data'])
         tool_info['description'] = match['metadata']['details']
         tool_info['input'] = metadata['inputs']

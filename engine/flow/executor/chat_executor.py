@@ -193,7 +193,7 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
     if not tool_config:
         return None
     
-    tool_name = tool_config['method'] + "_tool"
+    tool_name = tool_config['tool']
     
     def execute_with_config(messages_history):
         if INTERACTION_MODE == "terminal":
@@ -252,8 +252,10 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
 def _get_tool_config(tool):
     """Extract and parse tool configuration"""
     tool_dict = tool["metadata"]["data"]
+    tool_name =tool["metadata"]["tool"]
     if isinstance(tool_dict, str):
         return extract_json_from_str(tool_dict)
+    tool_dict["tool"] = tool_name
     return tool_dict
 
 def _check_required_extra_params(tool_config, messages_history, plan_steps, step):
@@ -271,7 +273,7 @@ def _execute_tool_with_args(tool_config, reply_json):
     args = reply_json["extracted_arguments"].get("required_arguments", {})
     result,_ = execute_tool(
         tool_caller_client,
-        f"{tool_config['method']}_tool",
+        tool_config['tool'],
         tool_config['method'],
         args
     )
