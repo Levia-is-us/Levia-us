@@ -30,7 +30,7 @@ plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
-INTERACTION_MODE = os.environ["INTERACTION_MODE"]
+INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
 
 def process_existing_memories(
