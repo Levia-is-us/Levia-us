@@ -9,19 +9,17 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import json
 from engine.llm_provider.llm import create_chat_completion
-from tools.website_scan_tool.links_filter_prompt import links_filter_prompt
+from tools.website_scan_tool.links_filter_prompt import get_links_filter_prompt
 from tools.website_scan_tool.links_summary_prompt import links_summary_prompt
-from tools.website_scan_tool.chat_gpt import chat_gpt
-import re
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
 
-project_root = os.path.dirname(
-    os.path.abspath(__file__)
-)
+project_root = os.path.dirname(os.path.abspath(__file__))
 env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+
 
 
 def remove_duplicate_links(links):
@@ -62,7 +60,7 @@ def setup_driver():
         }
         if visual != "T":
             chrome_options.add_experimental_option("prefs", prefs)
-        
+
         chrome_options.add_argument("--log-level=3")
         chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
         path = ChromeDriverManager().install()
@@ -78,31 +76,24 @@ def setup_driver():
 
 def get_prompt_links(links, intent):
     links_json = json.dumps({"links": links, "intent": intent})
-    prompt = [
-        {"role": "assistant", "content": links_filter_prompt},
-        {"role": "user", "content": f"{links_json}"},
-    ]
-    
-    create_chat_completion(
-        model="gpt-35-turbo-16k",
-        messages=prompt,
-        temperature=0.7,
-        max_tokens=2000,
-        stream=False
-    )
 
-    result = chat_gpt(prompt, config={"temperature": 0.7})
+    result = create_chat_completion(
+        system_prompt="You are a helpful assistant that filters links based on intent",
+        model=PERFORMANCE_MODEL_NAME,
+        prompt=get_links_filter_prompt(links_json),
+        config={"temperature": 0, "max_tokens": 2000, "stream": False},
+    )
     return json.loads(result)
 
 
 def get_summary_links(links, intent):
     links_json = json.dumps({"links": links, "intent": intent})
-    prompt = [
-        {"role": "assistant", "content": links_summary_prompt},
-        {"role": "user", "content": f"{links_json}"},
-    ]
-
-    result = chat_gpt(prompt, config={"temperature": 0.7})
+    result = create_chat_completion(
+        system_prompt="You are an AI assistant specialized in summarizing web pages. I will provide a list of multiple pages, each with a URL and its extracted text. Your task is to analyze the intent of each page and generate a comprehensive summary that combines and needs to be fully explained the key points from all pages based on their intent. The output should be in Markdown format.",
+        model=PERFORMANCE_MODEL_NAME,
+        prompt=links_summary_prompt.format(input=links_json),
+        config={"temperature": 0.7, "stream": False},
+    )
 
     return result
 
@@ -147,32 +138,35 @@ def get_all_links(urls):
         links = get_Links(driver, url)
         links_data.extend(links)
 
-    smooth_scroll_to_bottom(driver)
-    
-    if visual != "T":
+    if visual == "T":
+        smooth_scroll_to_bottom(driver)
+    else:
         driver.quit()
+
     return links_data
+
 
 def smooth_scroll_to_bottom(driver, duration=2.0):
     total_height = driver.execute_script("return document.body.scrollHeight")
-    
-    step_time = 0.01 
+
+    step_time = 0.01
     steps = int(duration / step_time)
-    
+
     step_height = total_height / steps
-    
+
     current_height = 0
-    
+
     start_time = time.time()
     for i in range(steps):
         current_height += step_height
         driver.execute_script(f"window.scrollTo(0, {current_height});")
         time.sleep(step_time)
-        
+
         if time.time() - start_time > duration:
             break
-    
+
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
 
 def get_all_content(links):
     visual = os.getenv("VISUAL")
@@ -186,6 +180,6 @@ def get_all_content(links):
         results.append(link)
         if visual == "T":
             smooth_scroll_to_bottom(driver)
-    
+
     driver.quit()
     return results
