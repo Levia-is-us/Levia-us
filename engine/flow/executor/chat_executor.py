@@ -99,7 +99,7 @@ def handle_new_tool_execution(plan, messages_history: list, user_id: str):
             return
             
     # Execute tools for each plan step
-    execute_plan_steps(plan, user_id)
+    execute_plan_steps(messages_history, plan, user_id)
     
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
@@ -112,7 +112,7 @@ def _get_tools_from_plan_steps(plan_steps):
             tools.append(step['tool'])
     return tools
 
-def execute_plan_steps(plan_steps, user_id: str):
+def execute_plan_steps(messages_history, plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         if not step.get("tool_necessity", True):
@@ -121,18 +121,21 @@ def execute_plan_steps(plan_steps, user_id: str):
             continue
             
         tool_result = _execute_plan_step_tool(
+            messages_history,
             step,
             plan_steps,
             user_id,
             step_index
         )
+        step["tool_executed_result"] = tool_result["result"]
         if tool_result["status"] == "failure":
-            # step["executed"] = False
-            step["tool_executed_result"] = tool_result["result"]
+            step["executed"] = True
+            break
+        elif tool_result["status"] == "need_input":
+            step["executed"] = False
             break
         else:
             step["executed"] = True
-            step["tool_executed_result"] = tool_result["result"]
     # return tool_results
 
 def _process_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
@@ -178,7 +181,7 @@ def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     step["tool_necessity"] = True
     return False
 
-def _execute_plan_step_tool(step, plan_steps, user_id: str, step_index: int):
+def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, step_index: int):
     """
     Execute tool for a plan step
     
@@ -192,8 +195,10 @@ def _execute_plan_step_tool(step, plan_steps, user_id: str, step_index: int):
     
     tool_name = tool_config['method'] + "_tool"
     
-    def execute_with_config():
-        messages_history = short_term_memory.get_context(user_id)
+    def execute_with_config(messages_history):
+        if INTERACTION_MODE == "terminal":
+            messages_history = short_term_memory.get_context(user_id)
+
         reply_json = _check_required_extra_params(
             tool_config,
             messages_history, 
@@ -233,7 +238,7 @@ def _execute_plan_step_tool(step, plan_steps, user_id: str, step_index: int):
         
     if INTERACTION_MODE == "terminal":
         while True:
-            result = execute_with_config()
+            result = execute_with_config(messages_history)
             if result and result["status"] == "success":
                 return result
             elif result and result["status"] == "need_input":
@@ -242,7 +247,7 @@ def _execute_plan_step_tool(step, plan_steps, user_id: str, step_index: int):
             else:
                 return result
     else:
-        return execute_with_config()
+        return execute_with_config(messages_history)
 
 def _get_tool_config(tool):
     """Extract and parse tool configuration"""

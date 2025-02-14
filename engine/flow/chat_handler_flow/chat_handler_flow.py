@@ -61,5 +61,5 @@ def handle_input_intent(user_id: str) -> str:
     chat_messages = short_term_memory.get_context(user_id)
     plan_context = plan_context_memory.get_current_plan_context(user_id)
     execute_plan_steps(
-        plan_steps=plan_context, chat_messages=chat_messages, user_id=user_id
+        chat_messages=chat_messages, plan_steps=plan_context, user_id=user_id
     )
