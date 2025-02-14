@@ -235,7 +235,7 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
             }
             
         return None
-        
+    
     if INTERACTION_MODE == "terminal":
         while True:
             result = execute_with_config(messages_history)

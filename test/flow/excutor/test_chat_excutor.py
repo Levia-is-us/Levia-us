@@ -58,3 +58,29 @@ def test_event_handle_new_tool_execution_need_input(monkeypatch, plan, messages)
     messages.append({"role": "user", "content": "I want to search the latest news about AI"})
     handle_new_tool_execution(plan, messages, "user_id")
     print("executed input plan", plan)
+
+@pytest.mark.parametrize("plan,messages", [
+    (
+        [
+            {
+                'step': 'step 1', 
+                'intent': 'Mysql Query', 
+                'Description': 'Execute SQL query to retrieve data from database using specified parameters and conditions.',
+                'Reason': 'To fetch accurate and relevant data from the MySQL database for further processing and analysis.',
+            },
+            {
+                'step': 'step 2', 
+                'intent': 'Content Summarization', 
+                'Description': 'Summarize the filtered news articles into concise and digestible formats using a natural language processing engine.',
+                'Reason': 'To provide the user with quick and easy-to-understand summaries of the news.'
+            }
+        ],
+        [
+            {"role": "user", "content": "search the latest news about AI"},
+        ]
+    )
+])
+def test_handle_new_tool_execution_no_suitable_tool_found(plan, messages):
+    handle_new_tool_execution(plan, messages, "user_id")
+    print("executed need input plan", plan)
+    assert plan[0]["tool"] == "No tool found for current step"
