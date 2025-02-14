@@ -400,7 +400,6 @@ def search_visual(keywords: list) -> list:
                 search_results = search_rets.find_elements(
                     By.CSS_SELECTOR, ":scope > div"
                 )
-                # time.sleep(60000)
                 # Extract URLs and content from search results
                 contents = handle_search_results(search_results)
                 content_list.extend(contents)
