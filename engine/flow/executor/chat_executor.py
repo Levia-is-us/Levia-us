@@ -167,11 +167,10 @@ def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     
     # print(f"Finding tool for step: {memories}")
     tool_name = tool_select(plan, step, messages_history, memories)
-
     # Search for tool in memories
     if "matches" in memories:
         for match in memories["matches"]:
-            if match["id"] == tool_name:
+            if match["metadata"]["tool"] == tool_name:
                 del match["metadata"]["description"]
                 step["tool"] = match
                 step["tool_necessity"] = True
@@ -196,9 +195,6 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
     tool_name = tool_config['tool']
     
     def execute_with_config(messages_history):
-        if INTERACTION_MODE == "terminal":
-            messages_history = short_term_memory.get_context(user_id)
-
         reply_json = _check_required_extra_params(
             tool_config,
             messages_history, 
@@ -244,6 +240,7 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
             elif result and result["status"] == "need_input":
                 if not _handle_terminal_input(user_id):
                     return None
+                messages_history.append(short_term_memory.get_context(user_id))
             else:
                 return result
     else:
@@ -254,7 +251,7 @@ def _get_tool_config(tool):
     tool_dict = tool["metadata"]["data"]
     tool_name =tool["metadata"]["tool"]
     if isinstance(tool_dict, str):
-        return extract_json_from_str(tool_dict)
+        tool_dict = extract_json_from_str(tool_dict)
     tool_dict["tool"] = tool_name
     return tool_dict
 
