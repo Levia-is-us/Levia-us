@@ -7,6 +7,7 @@ import os
 
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
+from engine.flow.executor.short_chain_executor import short_chain_executor
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
@@ -54,6 +55,6 @@ def handle_input_intent(user_id: str) -> str:
     """Handle intent summary type response"""
     chat_messages = short_term_memory.get_context(user_id)
     plan_context = plan_context_memory.get_current_plan_context(user_id)
-    execute_plan_steps(
+    short_chain_executor(
         chat_messages=chat_messages, plan_steps=plan_context, user_id=user_id
     )
