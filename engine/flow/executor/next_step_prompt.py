@@ -1,5 +1,6 @@
 def next_step_prompt(plan, current_step, context):
-    prompt_template = f"""You are provided with a workflow consisting of multiple tools. Each tool has a name, method, required arguments, optional arguments, and an expected output. The workflow executes tools sequentially. The input for the workflow may consist of natural language, structured data, key-value pairs, or a mix of these formats. Your task is to evaluate whether the input and the outputs from previously executed tools provide sufficient information to proceed with each tool in the workflow.
+    prompt_template = f"""Help me to determine if the current step can proceed.
+Each tool has a name, method, required arguments, optional arguments, and an expected output. The workflow executes tools sequentially. The input for the workflow may consist of natural language, structured data, key-value pairs, or a mix of these formats. Your task is to evaluate whether the input and the outputs from previously executed tools provide sufficient information to proceed with each tool in the workflow.
 Here is the workflow: {str(plan)}
 next step is : {str(current_step)}
 context is: {str(context)}

@@ -37,6 +37,7 @@ Output your results in the following only JSON format for programmatic processin
 if you can't find the tool that can fulfill the current step, output empty dict:
 {{}}
 
+IMPORTANT:Do not output any other text or comments outside the JSON format.
 Now, give your output in the JSON format below:
 """
     prompt = [
@@ -48,7 +49,7 @@ def extract_tool_info(data):
     tools = []
     for match in data['matches']:
         tool_info = {}
-        tool_info['tool_name'] = match['id']
+        tool_info['tool_name'] = match['metadata']['tool']
         metadata = json.loads(match['metadata']['data'])
         tool_info['description'] = match['metadata']['details']
         tool_info['input'] = metadata['inputs']

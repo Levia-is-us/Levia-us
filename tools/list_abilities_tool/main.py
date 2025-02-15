@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from dotenv import load_dotenv
+import inspect
 
 
 project_root = os.path.dirname(
@@ -11,47 +12,32 @@ env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
 sys.path.append(project_root)
 
-from engine.tool_framework import simple_tool
-from engine.tool_framework.tool_runner import ToolRunner
-from engine.utils.json_util import extract_json_from_str
+from engine.tool_framework import run_tool, BaseTool
 
 
-@simple_tool("Tool for listing available abilities")
-def list_abilities():
-    tools_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    abilities = []
-
-    # Walk through all directories in tools folder
-    for root, dirs, files in os.walk(tools_dir):
-        if "docs.md" in files:
-            docs_path = os.path.join(root, "docs.md")
+@run_tool("List Abilities Tool")
+class ListAbilitiesTool(BaseTool):
+    """Tool for listing available abilities"""
+    
+    def list_abilities(self, **kwargs) -> dict: 
+        """List all available abilities"""
+        abilities = {}
+        for method_name, method in self.methods.items():
             try:
-                with open(docs_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    json_strs = extract_json_from_str(content)
-                    for json_str in json_strs["functions"]:
-                        abilities.append(
-                            {
-                                "method": json_str["method"],
-                                "description": json_str["short_description"],
-                            }
-                        )
-
-            except json.JSONDecodeError:
-                continue
-
-            except Exception as e:
-                print(f"Error processing {docs_path}: {str(e)}", file=sys.stderr)
-                continue
-
-    return abilities
-
-
-def main():
-    tool = list_abilities()
-    runner = ToolRunner(tool)
-    runner.run()
-
-
-if __name__ == "__main__":
-    main()
+                if hasattr(method, '__code__'):
+                    arg_count = method.__code__.co_argcount
+                    args = method.__code__.co_varnames[:arg_count]
+                    signature = f"({', '.join(args)})"
+                else:
+                    signature = "(...)"
+                    
+                abilities[method_name] = {
+                    "description": self.get_method_description(method_name),
+                    "signature": signature
+                }
+            except Exception:
+                abilities[method_name] = {
+                    "description": self.get_method_description(method_name),
+                    "signature": "(...)"
+                }
+        return abilities
