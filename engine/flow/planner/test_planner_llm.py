@@ -5,25 +5,20 @@ import os
 current_file_path = os.path.abspath(__file__)
 
 # Get project root path (3 levels up)
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+)
 
 # Add project root to Python path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
     
-from planner_prompt import plan_maker_prompt
-from engine.llm_provider.llm import chat_completion
+from engine.flow.planner.planner import create_execution_plan
+
+QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
+PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 
 
-
-def create_execution_plan(intent: str) -> str:
-    """Create execution plan for given intent summary"""
-    prompt = [
-        {"role": "assistant", "content": plan_maker_prompt},
-        {"role": "user", "content": intent}
-    ]
-    plan = chat_completion(prompt, model="deepseek-chat", config={"temperature": 0.3})
-    return plan
 
 if __name__ == "__main__":
     """put your intent here"""

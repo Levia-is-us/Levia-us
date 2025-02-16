@@ -117,15 +117,13 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
             prompt=f"Intent: {intent}\nContent List: {content_list}",
             config={"temperature": 0.7},
         )
-        if isinstance(output, list):
-            return output
-        if isinstance(output, str):
-            urls = ast.literal_eval(output)
-            return urls
+        if output == []:
+            urls = "No results found."
+        else:
+            urls = eval(output)
     except Exception as e:
         print(f"Extract relevance url error: {str(e)}")
-        print(f"output: {output}")
-        urls = []
+        raise Exception("No output from the model")
     return urls
 
 

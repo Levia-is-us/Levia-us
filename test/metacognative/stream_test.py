@@ -66,8 +66,8 @@ stream = Stream(stream_types=["websocket", "local", "http"])
 print("Starting sender and receiver...")
 
 
-async def main():
-    await asyncio.gather(test_websocket_send(), test_websocket_receive())
+# async def main():
+#     await asyncio.gather(test_websocket_send(), test_websocket_receive())
 
 
-asyncio.run(main())
+# asyncio.run(main())
