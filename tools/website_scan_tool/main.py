@@ -28,7 +28,10 @@ def website_scan(urls: list, intent: str):
         summary = get_summary_links(links_with_content, intent)
         return summary
     except Exception as e:
-        return
+        if(str(e) == "website connection timeout"):
+            return "website connection timeout"
+        else:
+            raise Exception(e)
 
 
 def main():

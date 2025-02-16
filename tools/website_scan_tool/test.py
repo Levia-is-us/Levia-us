@@ -28,8 +28,8 @@ def main():
         tool_name="website_scan_tool",
         method="website_scan",
         kwargs={
-            "urls": ["https://leviaprotocol.gitbook.io/leviaprotocol"],
-            "intent": "What is Levia,and how it works?",
+            "urls": ['https://www.today.com/trending', 'https://apnews.com/hub/trending-news', 'https://www.bbc.com/news/world'],
+            "intent": "Extract full article content from source URLs",
         },
     )
 

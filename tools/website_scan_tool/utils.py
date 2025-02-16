@@ -85,7 +85,7 @@ def get_prompt_links(links, intent):
             config={"temperature": 0, "max_tokens": 2000, "stream": False},
         )
     except Exception as e:
-        return
+        raise Exception(e)
 
     return json.loads(result)
 
@@ -101,7 +101,7 @@ def get_summary_links(links, intent):
     )
 
     except Exception as e:
-        return
+        raise Exception(e)
     return result
 
 def get_Links(driver, url):
@@ -115,7 +115,7 @@ def get_Links(driver, url):
        path = urlparse(url).path
        link_data = [{"url": url, "text": "core page"}]
     except Exception as e:
-        return link_data
+        return [{"url": url, "text": "core page"}]
 
     for link in links:
         try:
@@ -194,4 +194,6 @@ def get_all_content(links):
             continue
 
     driver.quit()
+    if(len(results) == 0):
+       raise Exception("website connection timeout")
     return results
