@@ -17,7 +17,7 @@ from engine.tool_framework import run_tool, BaseTool
 
 
 @run_tool("Web Search Tool")
-class (BaseTool):
+class WebSearchTool(BaseTool):
     """Tool for searching web content"""
     
     def web_search(self, intent: str):

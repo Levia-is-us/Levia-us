@@ -1,6 +1,11 @@
 from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
 from engine.flow.handle_reply_flow.handle_reply_flow import handle_reply_flow
 from engine.utils.chat_formatter import create_chat_message
+from engine.utils.json_util import (
+    extract_code_breakdown_from_doc,
+    extract_json_from_str,
+    extract_str_from_doc,
+)
 from memory.short_term_memory.short_term_memory import ShortTermMemory
 from engine.flow.executor.chat_executor import chat_executor
 import os
@@ -24,7 +29,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
     short_term_memory.add_context(create_chat_message("user", user_input), user_id)
-
+    final_reply = ""
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
@@ -32,14 +37,12 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
         )
-        return final_reply
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         final_reply = handle_reply_flow(chat_messages, plan_result)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
         )
-        return final_reply
     elif reply_info["type"] == "continue_execution":
         plan_result = handle_input_intent(user_id)
         final_reply = handle_reply_flow(chat_messages, plan_result)
@@ -48,6 +51,12 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         )
         return final_reply
 
+
+    analysis = extract_code_breakdown_from_doc(final_reply)
+    output_stream(f"{analysis}")
+    final_reply = extract_str_from_doc(final_reply)
+
+    return final_reply
 
 
 def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str):

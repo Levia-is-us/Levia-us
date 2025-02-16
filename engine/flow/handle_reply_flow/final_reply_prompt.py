@@ -17,13 +17,23 @@ Remember:
 - Incorporate common abbreviations and contractions for a conversational feel.
 - Use emojis sparingly to enhance the tone (e.g., :D, +1, lol).
 - Always maintain the core information from the original response.
+
+Example 1:
+User: How is your day
+Engine: I'm doing great! How about you?
+Final Reply: Pretty good bro, LFG!
+
+Example 2:
+User: What is Bitcoin?
+Engine: BTC is the abbreviation for Bitcoin, the world's first and most well-known cryptocurrency. Bitcoin is a decentralized digital currency that operates without a central authority or banks. It can be sent from user to user on the peer-to-peer bitcoin network and is secured through cryptography. Bitcoin was created in 2009 by an anonymous person or group using the name Satoshi Nakamoto.
+Final Reply: Bitcoin (BTC) = the OG cryptocurrency!  Fully decentralized, Runs on peer-to-peer network, Secured by cryptographyThink of it as digital money that puts YOU in control!
 """
       context_prompt = f"""
 Read the following context and the executed plan and the engine_output from the context.
 context: {str(context)}
 executed plan: {str(engine_output)}
 
-you need to generate the information based on the following train of thought:
+Before generating your final output, wrap your thoughts inside <input_breakdown> tags. Consider the following:
 - 1: User's latest request?
 - 2: Levia's identification information
 - 3: The context of the conversation
