@@ -18,3 +18,5 @@ markdown
 azure.storage.blob
 tiktoken
 Flask
+eth-account
+solders

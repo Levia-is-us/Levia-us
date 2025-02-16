@@ -1,23 +1,17 @@
 import os
 import sys
-import dotenv
 
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
-env_path = os.path.join(project_root, ".env")
-dotenv.load_dotenv(env_path)
-
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
-
+sys.path.append(project_root)
 from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
 
 
 def main():
     registry = ToolRegistry()
+
     # Use absolute path
     tools_dir = os.path.join(os.path.dirname(__file__), "./")
     registry.scan_directory(tools_dir)  # Scan tools directory
@@ -25,12 +19,9 @@ def main():
     # Create ToolCaller instance
     caller = ToolCaller(registry)
     result = caller.call_tool(
-        tool_name="website_scan_tool",
-        method="website_scan",
-        kwargs={
-            "urls": ['https://www.today.com/trending', 'https://apnews.com/hub/trending-news', 'https://www.bbc.com/news/world'],
-            "intent": "Extract full article content from source URLs",
-        },
+        tool_name="generate_keypair_tool",
+        method="generate_keypair",
+        kwargs={"type": "solana", "num_keys": 10},
     )
 
     if result:
