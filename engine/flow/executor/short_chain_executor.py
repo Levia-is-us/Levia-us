@@ -33,7 +33,7 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
 INTERACTION_MODE = os.environ["INTERACTION_MODE"]
 
-def short_chain_executor(
+def execute_intent_chain(
     user_intent: str,
     messages_history: list,
     user_id: str
@@ -41,12 +41,12 @@ def short_chain_executor(
     output_stream(f" - Do not have experience for {user_intent} - \n")
     output_stream(f" - Creating new execution plan ... - \n")
     plan = create_execution_plan(user_intent)
-    handle_new_tool_execution(
+    process_tool_execution_plan(
         plan, messages_history, user_id
     )
     return plan
 
-def handle_new_tool_execution(plan, messages_history: list, user_id: str):
+def process_tool_execution_plan(plan, messages_history: list, user_id: str):
     """
     Handle execution of new tools based on the plan
     
@@ -63,26 +63,26 @@ def handle_new_tool_execution(plan, messages_history: list, user_id: str):
     # Analyze each step and find appropriate tools
     for step_index, step in enumerate(plan):
         output_stream(f" - Processing step: {step} - \n")
-        found_tools = _get_tools_from_plan_steps(plan)
-        if not _process_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
+        found_tools = extract_tools_from_plan(plan)
+        if not validate_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
             output_stream(f" - Failed to process step: {step['Description']} - \n")
             return
             
     # Execute tools for each plan step
-    execute_plan_steps(messages_history, plan, user_id)
+    process_plan_execution(messages_history, plan, user_id)
     
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
         plan_context_memory.create_plan_context(plan, user_id)
 
-def _get_tools_from_plan_steps(plan_steps):
+def extract_tools_from_plan(plan_steps):
     tools = []
     for step in plan_steps:
         if 'tool' in step and step['tool'] not in tools:
             tools.append(step['tool'])
     return tools
 
-def execute_plan_steps(messages_history, plan_steps, user_id: str):
+def process_plan_execution(messages_history, plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         if not step.get("tool_necessity", True):
@@ -90,7 +90,7 @@ def execute_plan_steps(messages_history, plan_steps, user_id: str):
         if step.get("executed", False):
             continue
             
-        tool_result = _execute_plan_step_tool(
+        tool_result = execute_step_tool(
             messages_history,
             step,
             plan_steps,
@@ -108,28 +108,28 @@ def execute_plan_steps(messages_history, plan_steps, user_id: str):
             step["executed"] = True
     # return tool_results
 
-def _process_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
+def validate_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
     """
     Process a single plan step to determine tool necessity and find appropriate tool
     """
     if found_tools is None:
         found_tools = []
     # Check if step is necessary
-    necessity_check = _check_step_necessity(step, plan, messages_history, found_tools)
+    necessity_check = validate_step_necessity(step, plan, messages_history, found_tools)
     if not necessity_check["steps_necessity"] == "Yes":
         step["tool_necessity"] = False
         # plan_context_memory.update_step_status_context(step_index, tool_necessity=False, user_key=user_id)
         return True
         
     # Find appropriate tool for the step
-    return _find_tool_for_step(step, plan, messages_history, step_index, user_id)
+    return resolve_tool_for_step(step, plan, messages_history, step_index, user_id)
     
-def _check_step_necessity(step, plan, messages_history, done_steps):
+def validate_step_necessity(step, plan, messages_history, done_steps):
     """Check if a step is necessary to execute"""
     result = step_tool_check(plan, step, messages_history, done_steps)
     return extract_json_from_str(result)
 
-def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
+def resolve_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     """Find appropriate tool for a step from memory"""
     memories = retrieve_short_pass_memory(step["Description"])
     if not memories:
@@ -150,7 +150,7 @@ def _find_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     step["tool_necessity"] = True
     return False
 
-def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, step_index: int):
+def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_index: int):
     """
     Execute tool for a plan step
     
@@ -158,14 +158,14 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
         str: Tool execution record if successful, None otherwise
     """
     tool = step["tool"]
-    tool_config = _get_tool_config(tool)
+    tool_config = parse_tool_config(tool)
     if not tool_config:
         return None
     
     tool_name = tool_config['tool']
     
     def execute_with_config(messages_history):
-        reply_json = _check_required_extra_params(
+        reply_json = validate_tool_parameters(
             tool_config,
             messages_history, 
             plan_steps,
@@ -179,7 +179,7 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
                 "status": "need_input"
             }
             
-        execution_result = _execute_tool_with_args(tool_config, reply_json)
+        execution_result = execute_tool_operation(tool_config, reply_json)
         if execution_result["status"] == "failure":
             return {
                 "toolName": tool_name,
@@ -202,21 +202,9 @@ def _execute_plan_step_tool(messages_history,step, plan_steps, user_id: str, ste
             
         return None
     
-    if INTERACTION_MODE == "terminal":
-        while True:
-            result = execute_with_config(messages_history)
-            if result and result["status"] == "success":
-                return result
-            elif result and result["status"] == "need_input":
-                if not _handle_terminal_input(user_id):
-                    return None
-                messages_history.append(short_term_memory.get_context(user_id))
-            else:
-                return result
-    else:
-        return execute_with_config(messages_history)
+    return execute_with_config(messages_history)
 
-def _get_tool_config(tool):
+def parse_tool_config(tool):
     """Extract and parse tool configuration"""
     tool_dict = tool["metadata"]["data"]
     tool_name =tool["metadata"]["tool"]
@@ -225,7 +213,7 @@ def _get_tool_config(tool):
     tool_dict["tool"] = tool_name
     return tool_dict
 
-def _check_required_extra_params(tool_config, messages_history, plan_steps, step):
+def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
@@ -235,7 +223,7 @@ def _check_required_extra_params(tool_config, messages_history, plan_steps, step
     output_stream(f" - {reply_json} - \n")
     return reply_json
 
-def _execute_tool_with_args(tool_config, reply_json):
+def execute_tool_operation(tool_config, reply_json):
     """Execute tool with provided arguments"""
     args = reply_json["extracted_arguments"].get("required_arguments", {})
     result,_ = execute_tool(
@@ -250,21 +238,10 @@ def _execute_tool_with_args(tool_config, reply_json):
         return result
     return {"status": "failure"}
 
-def _handle_terminal_input(user_id: str):
+def handle_user_input(user_id: str):
     """Handle failed tool execution by requesting user input"""
     user_input = input("Please input required arguments to continue: ")
     if not user_input:
         return False
     short_term_memory.add_context(create_chat_message("user", user_input), user_id)
     return True
-
-def filter_high_score_memories(memories: dict, threshold: float = 0) -> list:
-    """Filter and sort memories by score"""
-    if not memories or "matches" not in memories:
-        return []
-
-    high_score_matches = [
-        match for match in memories["matches"] if match.get("score", 0) >= threshold
-    ]
-
-    return sorted(high_score_matches, key=lambda x: x.get("score", 0), reverse=True)
