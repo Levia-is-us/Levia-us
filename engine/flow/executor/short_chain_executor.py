@@ -32,7 +32,8 @@ short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
-def short_chain_executor(
+
+def execute_intent_chain(
     user_intent: str,
     messages_history: list,
     user_id: str
@@ -64,7 +65,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str):
         output_stream(f" - Processing step: {step} - \n")
         found_tools = extract_tools_from_plan(plan)
         if not validate_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            output_stream(f" - Failed to process step: {step['Description']} - \n")
+            output_stream(f" - Failed to process step: {step['description']} - \n")
             return
             
     # Execute tools for each plan step
@@ -130,7 +131,7 @@ def validate_step_necessity(step, plan, messages_history, done_steps):
 
 def resolve_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     """Find appropriate tool for a step from memory"""
-    memories = retrieve_short_pass_memory(step["Description"])
+    memories = retrieve_short_pass_memory(step["description"])
     if not memories:
         return False
     
