@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 project_root = os.path.dirname(os.path.abspath(__file__))
 env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 
@@ -79,7 +79,7 @@ def get_prompt_links(links, intent):
 
     result = create_chat_completion(
         system_prompt="You are a helpful assistant that filters links based on intent",
-        model=PERFORMANCE_MODEL_NAME,
+        model=CHAT_MODEL_NAME,
         prompt=get_links_filter_prompt(links_json),
         config={"temperature": 0, "max_tokens": 2000, "stream": False},
     )
@@ -90,7 +90,7 @@ def get_summary_links(links, intent):
     links_json = json.dumps({"links": links, "intent": intent})
     result = create_chat_completion(
         system_prompt="You are an AI assistant specialized in summarizing web pages. I will provide a list of multiple pages, each with a URL and its extracted text. Your task is to analyze the intent of each page and generate a comprehensive summary that combines and needs to be fully explained the key points from all pages based on their intent. The output should be in Markdown format.",
-        model=PERFORMANCE_MODEL_NAME,
+        model=CHAT_MODEL_NAME,
         prompt=links_summary_prompt.format(input=links_json),
         config={"temperature": 0.7, "stream": False},
     )

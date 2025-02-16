@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 project_root = os.path.dirname(os.path.abspath(__file__))
 env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 AIPOLABS_API_KEY = os.getenv("AIPOLABS_API_KEY")
 
 
@@ -68,7 +68,7 @@ def generate_search_keywords(intent: str) -> list:
     try:
         output = create_chat_completion(
             system_prompt = prompt,
-            model=PERFORMANCE_MODEL_NAME,
+            model=CHAT_MODEL_NAME,
             prompt=intent,
             config={"temperature": 0.7},
         )
@@ -107,12 +107,12 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
     content_list: <search results>
     
     Output format:
-    [url1, url2, url3]
+    ['url1', 'url2', 'url3']
     """
     try:
         output = create_chat_completion(
             system_prompt = prompt,
-            model=PERFORMANCE_MODEL_NAME,
+            model=CHAT_MODEL_NAME,
             prompt=f"Intent: {intent}\nContent List: {content_list}",
             config={"temperature": 0.7},
         )

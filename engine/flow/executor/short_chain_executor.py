@@ -30,9 +30,8 @@ tool_caller_client = ToolCaller(registry)
 plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
-INTERACTION_MODE = os.environ["INTERACTION_MODE"]
-
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 def short_chain_executor(
     user_intent: str,
     messages_history: list,

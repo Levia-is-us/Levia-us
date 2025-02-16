@@ -32,8 +32,8 @@ tool_caller_client = ToolCaller(registry)
 plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
-INTERACTION_MODE = os.environ["INTERACTION_MODE"]
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
 def chat_executor(user_id: str, user_intent: str, chat_messages: list):
     # task_in_process,res = long_chain_executor(user_id, user_intent, chat_messages)

@@ -10,7 +10,7 @@ from memory.plan_memory.plan_memory import PlanContextMemory
 from engine.flow.executor.short_chain_executor import short_chain_executor
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 short_term_memory = ShortTermMemory()
 plan_context_memory = PlanContextMemory()
@@ -32,7 +32,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
         )
-        return response
+        return final_reply
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         final_reply = handle_reply_flow(chat_messages, plan_result)

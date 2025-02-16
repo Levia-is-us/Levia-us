@@ -4,7 +4,7 @@ import os
 from engine.llm_provider.llm import chat_completion
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def handle_reply_flow(chat_messages: list, engine_output: list) -> str:
