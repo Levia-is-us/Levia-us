@@ -41,7 +41,7 @@ IMPORTANT:Do not output any other text or comments outside the JSON format.
 Now, give your output in the JSON format below:
 """
     prompt = [
-        {"role": "system", "content": prompt}
+        {"role": "user", "content": prompt}
     ]
     return prompt
 
