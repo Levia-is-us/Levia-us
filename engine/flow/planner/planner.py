@@ -21,8 +21,8 @@ def create_execution_plan(intent: str) -> str:
     plan = extract_json_from_str(plan)
     for step in plan:
         output_stream(f" - {step['step']}: {step['intent']} - \n")
-        output_stream(f" - Step Description: {step['Description']} - \n")
-        output_stream(f" - Step Reason: {step['Reason']} - \n")
+        output_stream(f" - Step Description: {step['description']} - \n")
+        output_stream(f" - Step Reason: {step['reason']} - \n")
         output_stream(f"\033[95m--------------------------------\033[0m")
     return plan
 
@@ -31,9 +31,6 @@ def check_plan_sufficiency(
     intent: str, plan_intent: str, execution_records: list
 ) -> bool:
     """Check if existing plan is sufficient for current intent"""
-    # print(f"intent: {intent}")
-    # print(f"plan: {plan_intent}")
-    # print(f"execution_records: {execution_records}")
     memories_check_prompt = check_plan_fittable_prompt(
         intent, plan_intent, execution_records
     )
@@ -42,7 +39,4 @@ def check_plan_sufficiency(
         memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}
     )
     result = extract_json_from_str(result)
-    # print(f"result: {result}")
-    # print(f"type of result: {type(result)}")
-
     return result["solution_sufficient"]["result"] in [True, "true"]

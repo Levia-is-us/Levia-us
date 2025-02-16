@@ -23,6 +23,8 @@ def execute_tool(
         result = tool_caller.call_tool(
             tool_name=tool_name, method=tool_method, kwargs=tool_args
         )
+        # if isinstance(result, dict):
+        #     return {"status": "failure", "result": "tool execution result is invalid"}, None
 
         status = verify_tool_execution(execution_record, result)
         record_tool_execution(tool_name, tool_method, tool_args, result)
@@ -37,8 +39,8 @@ def execute_tool(
 
 def verify_tool_execution(execution_record: dict, result: dict) -> str:
     """Verify tool execution result using LLM"""
-    if result["status"] == "failure":
-        return "failure"
+    # if result["status"] == "failure":
+    #     return "failure"
     llm_check_prompt = check_tools_result_prompt(
         tool_execution=str(execution_record), tool_output=result
     )
