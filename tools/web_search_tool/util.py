@@ -91,7 +91,7 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
         The relevance URLs.
     """
     prompt = """
-    Given a user intent and a list of search results, select 1-3 most relevant URLs.
+    Given a user intent and a list of search results, select the most relevant URLs. If it is necessary, you can select at most 3 URLs, but as few as possible.
     
     Requirements:
     1. Analyze the relevance between each result and the user intent
@@ -108,7 +108,7 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
     content_list: <search results>
     
     Output format:
-    ["url1", "url2", "url3"]
+    ["url1", "url2", ...]
     """
     try:
         output = create_chat_completion(

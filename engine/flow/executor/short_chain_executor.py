@@ -180,7 +180,7 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             }
             
         execution_result = execute_tool_operation(tool_config, reply_json)
-        if execution_result["status"] == "failure":
+        if execution_result == {"status": "failure"}:
             return {
                 "toolName": tool_name,
                 "result": "execution failed",
@@ -218,14 +218,19 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.5})
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0})
     reply_json = extract_json_from_str(reply)
+    print(f" - {reply_json} - \n")
     output_stream(f" - {reply_json} - \n")
     return reply_json
 
 def execute_tool_operation(tool_config, reply_json):
     """Execute tool with provided arguments"""
-    args = reply_json["extracted_arguments"].get("required_arguments", {})
+    args = {}
+    required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
+    for arg_name, arg_info in required_args.items():
+        args[arg_name] = arg_info.get("value", {})
+
     result,_ = execute_tool(
         tool_caller_client,
         tool_config['tool'],

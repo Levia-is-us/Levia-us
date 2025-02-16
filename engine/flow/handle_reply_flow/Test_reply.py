@@ -16,24 +16,24 @@ from engine.llm_provider.llm import chat_completion
 
 
 
+def final_reply_flow(chat_messages: list, engine_output: list) -> str:
+    """Handle final reply type response"""
+    prompt = final_reply_prompt(chat_messages, engine_output)
+    final_reply = chat_completion(
+        prompt, model="claude-3-5-sonnet", config={"temperature": 0.7}
+    )
 
-
-
-def get_initial_response(chat_messages: list) -> dict:
-    """Get initial response from LLM"""
-    prompt = final_reply_prompt(chat_messages)
-    reply_info = chat_completion(prompt, model="chatgpt-4o-latest", config={"temperature": 0.7})
-    return reply_info
+    return final_reply
 
 
 def main():
     #chat_messages = input("Enter your message: ")
     # result = get_initial_response([{"role": "user", "content": chat_messages}])
     chat_messages = [
-        {"role": "user", "content": "hello"},
-        {"role": "assistant", "content": "{'type': 'direct_answer', 'response': 'Hello! How can I assist you today?'}"}
+        {"role": "user", "content": "Do you think the price of Levia will go up in the future?"}
         ]
-    result = get_initial_response(chat_messages)
+    engine_output = []
+    result = final_reply_flow(chat_messages, engine_output)
     print(result)
 
 
