@@ -20,7 +20,7 @@ def final_reply_flow(chat_messages: list, engine_output: list) -> str:
     """Handle final reply type response"""
     prompt = final_reply_prompt(chat_messages, engine_output)
     final_reply = chat_completion(
-        prompt, model="claude-3-5-sonnet", config={"temperature": 0.7}
+        prompt, model="deepseek-chat", config={"temperature": 0.7}
     )
 
     return final_reply
@@ -30,7 +30,7 @@ def main():
     #chat_messages = input("Enter your message: ")
     # result = get_initial_response([{"role": "user", "content": chat_messages}])
     chat_messages = [
-        {"role": "user", "content": "Do you think the price of Levia will go up in the future?"}
+        {"role": "user", "content": "How to use Mysql API"}
         ]
     engine_output = []
     result = final_reply_flow(chat_messages, engine_output)
