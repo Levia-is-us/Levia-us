@@ -33,7 +33,7 @@ class ToolCaller:
             
             # Return result if not None
             if result is not None:
-                return {"result": result}
+                return result
             else:
                 return {"error": "Tool execution returned None"}
 

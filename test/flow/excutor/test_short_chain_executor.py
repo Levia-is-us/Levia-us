@@ -14,7 +14,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from engine.flow.executor.chat_executor import handle_new_tool_execution
+from engine.flow.executor.short_chain_executor import process_tool_execution_plan
 
 @pytest.mark.parametrize("plan,messages", [
     (
@@ -44,7 +44,7 @@ from engine.flow.executor.chat_executor import handle_new_tool_execution
     )
 ])
 def test_handle_new_tool_execution(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed plan", plan)
 
 test_data = [
@@ -61,18 +61,15 @@ test_data = [
 
 @pytest.mark.parametrize("plan,messages", test_data)
 def test_terminal_handle_new_tool_execution_need_input(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
 
 @pytest.mark.parametrize("plan,messages", test_data)
 def test_event_handle_new_tool_execution_need_input(monkeypatch, plan, messages):
-    env_vars = dict(os.environ)
-    env_vars["INTERACTION_MODE"] = "event"
-    monkeypatch.setattr(os, "environ", env_vars)
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
     messages.append({"role": "user", "content": "I want to search the latest news about AI"})
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed input plan", plan)
 
 @pytest.mark.parametrize("plan,messages", [
@@ -97,6 +94,6 @@ def test_event_handle_new_tool_execution_need_input(monkeypatch, plan, messages)
     )
 ])
 def test_handle_new_tool_execution_no_suitable_tool_found(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
     assert plan[0]["tool"] == "No tool found for current step"

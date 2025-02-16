@@ -7,7 +7,7 @@ import os
 
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
-from engine.flow.executor.short_chain_executor import short_chain_executor
+from engine.flow.executor.short_chain_executor import execute_intent_chain
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
@@ -41,13 +41,19 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         )
         return final_reply
     elif reply_info["type"] == "continue_execution":
-        handle_input_intent(user_id)
+        plan_result = handle_input_intent(user_id)
+        final_reply = handle_reply_flow(chat_messages, plan_result)
+        short_term_memory.add_context(
+            create_chat_message("assistant", f"{final_reply}"), user_id
+        )
+        return final_reply
+
 
 
 def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str):
     """Handle intent summary type response"""
     user_intent = reply_info["response"]
-    chat_executor(user_id, user_intent, chat_messages)
+    return chat_executor(user_id, user_intent, chat_messages)
     
 
 
@@ -55,6 +61,6 @@ def handle_input_intent(user_id: str) -> str:
     """Handle intent summary type response"""
     chat_messages = short_term_memory.get_context(user_id)
     plan_context = plan_context_memory.get_current_plan_context(user_id)
-    short_chain_executor(
+    return execute_intent_chain(
         chat_messages=chat_messages, plan_steps=plan_context, user_id=user_id
     )

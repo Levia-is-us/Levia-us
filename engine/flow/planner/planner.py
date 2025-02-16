@@ -31,9 +31,6 @@ def check_plan_sufficiency(
     intent: str, plan_intent: str, execution_records: list
 ) -> bool:
     """Check if existing plan is sufficient for current intent"""
-    # print(f"intent: {intent}")
-    # print(f"plan: {plan_intent}")
-    # print(f"execution_records: {execution_records}")
     memories_check_prompt = check_plan_fittable_prompt(
         intent, plan_intent, execution_records
     )
@@ -42,7 +39,4 @@ def check_plan_sufficiency(
         memories_check_prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0}
     )
     result = extract_json_from_str(result)
-    # print(f"result: {result}")
-    # print(f"type of result: {type(result)}")
-
     return result["solution_sufficient"]["result"] in [True, "true"]

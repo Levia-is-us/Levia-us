@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from engine.llm_provider.llm import create_chat_completion
 from dotenv import load_dotenv
+import ast
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 env_path = os.path.join(project_root, ".env")
