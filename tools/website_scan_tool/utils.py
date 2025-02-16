@@ -75,38 +75,47 @@ def setup_driver():
 
 
 def get_prompt_links(links, intent):
-    links_json = json.dumps({"links": links, "intent": intent})
+    try:
+        links_json = json.dumps({"links": links, "intent": intent})
 
-    result = create_chat_completion(
-        system_prompt="You are a helpful assistant that filters links based on intent",
-        model=PERFORMANCE_MODEL_NAME,
-        prompt=get_links_filter_prompt(links_json),
-        config={"temperature": 0, "max_tokens": 2000, "stream": False},
-    )
+        result = create_chat_completion(
+            system_prompt="You are a helpful assistant that filters links based on intent",
+            model=PERFORMANCE_MODEL_NAME,
+            prompt=get_links_filter_prompt(links_json),
+            config={"temperature": 0, "max_tokens": 2000, "stream": False},
+        )
+    except Exception as e:
+        return
+
     return json.loads(result)
 
 
 def get_summary_links(links, intent):
     links_json = json.dumps({"links": links, "intent": intent})
-    result = create_chat_completion(
+    try:
+        result = create_chat_completion(
         system_prompt="You are an AI assistant specialized in summarizing web pages. I will provide a list of multiple pages, each with a URL and its extracted text. Your task is to analyze the intent of each page and generate a comprehensive summary that combines and needs to be fully explained the key points from all pages based on their intent. The output should be in Markdown format.",
         model=PERFORMANCE_MODEL_NAME,
         prompt=links_summary_prompt.format(input=links_json),
         config={"temperature": 0.7, "stream": False},
     )
 
+    except Exception as e:
+        return
     return result
 
-
 def get_Links(driver, url):
-    driver.get(url)
-    WebDriverWait(driver, 10).until(
-        lambda d: d.execute_script("return document.readyState") == "complete"
-    )
-    links = driver.find_elements(By.TAG_NAME, "a")
-    domain = urlparse(url).scheme + "://" + urlparse(url).netloc
-    path = urlparse(url).path
-    link_data = [{"url": url, "text": "core page"}]
+    try:
+       driver.get(url)
+       WebDriverWait(driver, 10).until(
+           lambda d: d.execute_script("return document.readyState") == "complete"
+       )
+       links = driver.find_elements(By.TAG_NAME, "a")
+       domain = urlparse(url).scheme + "://" + urlparse(url).netloc
+       path = urlparse(url).path
+       link_data = [{"url": url, "text": "core page"}]
+    except Exception as e:
+        return link_data
 
     for link in links:
         try:
@@ -173,13 +182,16 @@ def get_all_content(links):
     results = []
     driver = setup_driver()
     for link in links:
-        url = link["url"]
-        driver.get(url)
-        content = driver.find_element(By.TAG_NAME, "body").text
-        link["content"] = content
-        results.append(link)
-        if visual == "T":
-            smooth_scroll_to_bottom(driver)
+        try:
+            url = link["url"]
+            driver.get(url)
+            content = driver.find_element(By.TAG_NAME, "body").text
+            link["content"] = content
+            results.append(link)
+            if visual == "T":
+                smooth_scroll_to_bottom(driver)
+        except Exception as e:
+            continue
 
     driver.quit()
     return results

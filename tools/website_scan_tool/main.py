@@ -20,12 +20,15 @@ from tools.website_scan_tool.utils import (
 
 @simple_tool("Website Scan Tool")
 def website_scan(urls: list, intent: str):
-    raw_links = get_all_links(urls)
-    unique_links = remove_duplicate_links(raw_links)
-    filtered_links = get_prompt_links(unique_links, intent)
-    links_with_content = get_all_content(filtered_links)
-    summary = get_summary_links(links_with_content, intent)
-    return summary
+    try:
+        raw_links = get_all_links(urls)
+        unique_links = remove_duplicate_links(raw_links)
+        filtered_links = get_prompt_links(unique_links, intent)
+        links_with_content = get_all_content(filtered_links)
+        summary = get_summary_links(links_with_content, intent)
+        return summary
+    except Exception as e:
+        return
 
 
 def main():
