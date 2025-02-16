@@ -107,7 +107,7 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
     content_list: <search results>
     
     Output format:
-    [url1, url2, url3]
+    ["url1", "url2", "url3"]
     """
     try:
         output = create_chat_completion(
@@ -116,10 +116,13 @@ def extract_relevance_url(intent: str, content_list: str) -> list:
             prompt=f"Intent: {intent}\nContent List: {content_list}",
             config={"temperature": 0.7},
         )
-        urls = eval(output)
+        if output == []:
+            urls = "No results found."
+        else:
+            urls = eval(output)
     except Exception as e:
         print(f"Extract relevance url error: {str(e)}")
-        urls = []
+        raise Exception("No output from the model")
     return urls
 
 

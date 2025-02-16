@@ -21,8 +21,8 @@ def create_execution_plan(intent: str) -> str:
     plan = extract_json_from_str(plan)
     for step in plan:
         output_stream(f" - {step['step']}: {step['intent']} - \n")
-        output_stream(f" - Step Description: {step['Description']} - \n")
-        output_stream(f" - Step Reason: {step['Reason']} - \n")
+        output_stream(f" - Step Description: {step['description']} - \n")
+        output_stream(f" - Step Reason: {step['reason']} - \n")
         output_stream(f"\033[95m--------------------------------\033[0m")
     return plan
 
