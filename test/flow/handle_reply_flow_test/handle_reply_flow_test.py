@@ -28,6 +28,3 @@ final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": engine_outp
 
 analysis = extract_code_breakdown_from_doc(final_reply)
 final_reply = extract_str_from_doc(final_reply)
-
-print(f"analysis: {analysis}")
-print(f"final_reply: {final_reply}")
