@@ -36,6 +36,7 @@ CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
 def chat_executor(user_id: str, user_intent: str, chat_messages: list):
+    print("\033[93mRecalling similar scenes from episodic memory...\033[0m")
     # task_in_process,res = long_chain_executor(user_id, user_intent, chat_messages)
     # if task_in_process:
     #     return res
