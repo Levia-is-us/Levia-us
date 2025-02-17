@@ -26,7 +26,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     # Get initial response
 
     chat_messages = short_term_memory.get_context(user_id)
-    print("\033[93mThinking about user's intent...\033[0m")
+    print(f"\033[93mAnalyzing user's intent ...\033[0m")
     reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
     short_term_memory.add_context(
@@ -37,7 +37,6 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
-        print("\033[93mGenerating reply...\033[0m")
         final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": response}])
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
