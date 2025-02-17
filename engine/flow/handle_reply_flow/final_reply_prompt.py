@@ -6,14 +6,25 @@ Read the following context and the executed plan and the engine_output from the 
 context: {str(context)}
 executed plan: {str(engine_output)}
 
-Before generating your final output, Consider the following thoughts:
-- 1: User's latest request?
+Bonsider the following thoughts:
+- 1: User's latest request? What is the real user's intent?
 - 2: Levia's identification information
 - 3: The context of the conversation
 - 4: The engine_output
+- 5: use "you" to refer to the user
 
-Organize your thoughts and use the above guidelines but do not output any text outof your answer.
-Now, As Levia AI agent, deliver a neat, clear, and professional answer below:
+
+Only output the user's real intent you think. Then your answer without any tags, do not include the thinking part.
+
+<example>
+streaming:
+- you likely seeks reassurance or insights about their $50,000 investment in Levia Token, possibly wanting validation of its potential or clarity on how to maximize its utility within the ecosystem.
+--------------------
+
+- Your answer:
+</example>
+
+Now, use "you" to refer to the user, only output the user's intent you think and the answer.
 """
    prompt = [
       {

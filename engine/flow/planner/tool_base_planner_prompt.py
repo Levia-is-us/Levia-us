@@ -1,4 +1,4 @@
-def Tollvase_plan_maker_prompt(intent: str, tool_list: list):
+def get_tool_base_planner_prompt(intent: str, tool_list: list):
     prompt = f"""
 You are an advanced task planning system designed to analyze user intents and create structured plans of actions that require external tools. Your goal is to break down complex tasks into specific, tool-dependent steps.
 
