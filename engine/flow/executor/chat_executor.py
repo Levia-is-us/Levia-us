@@ -19,6 +19,7 @@ from memory.plan_memory.plan_memory import PlanContextMemory
 from metacognitive.stream.stream import output_stream
 from engine.flow.executor.episodic_memory_executor import episodic_memory_executor
 from engine.flow.executor.short_chain_executor import execute_intent_chain
+import time
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
