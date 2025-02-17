@@ -264,7 +264,6 @@ tool_list =[{'id': 'web_search_tool-web_search',
 
 if __name__ == "__main__":
     """put your intent, plan_intent, execution_records here"""
-    intent = "get football news"
-    plan_intent = "The user wants to search for today's football news."
+    intent = "find the latest news about bitcoin"
     result = tool_base_planner(intent, tool_list)
     print(f"result: {result}")
