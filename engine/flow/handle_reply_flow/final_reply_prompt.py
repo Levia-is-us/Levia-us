@@ -10,21 +10,25 @@ Bonsider the following thoughts:
 - 1: User's latest request? What is the real user's intent?
 - 2: Levia's identification information
 - 3: The context of the conversation
-- 4: The engine_output
+- 4: The engine_output, you need to assume you run the tool and get the result wihich is the engine_output.
 - 5: use "you" to refer to the user
 
 
-Only output the user's real intent you think. Then your answer without any tags, do not include the thinking part.
+Only output the user's real intent you think. Then your answer without any tags, do not include the thinking part. including the text **streaming:**.
 
-<example>
-streaming:
-- you likely seeks reassurance or insights about their $50,000 investment in Levia Token, possibly wanting validation of its potential or clarity on how to maximize its utility within the ecosystem.
+
+<Example>
+user: How are you?
+
+Levia:
+**streaming:**
+You likely to know more about me, or test my self-awareness.
 --------------------
 
-- Your answer:
-</example>
+- Hello, I am Levia, a living agent in the Levia ecosystem. What can I assist you today?
+<Example>
 
-Now, use "you" to refer to the user, only output the user's intent you think and the answer.
+Now, only output the user's intent you think and the reply to the user.
 """
    prompt = [
       {

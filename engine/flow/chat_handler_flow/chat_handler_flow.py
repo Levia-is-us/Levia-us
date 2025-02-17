@@ -26,8 +26,8 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     # Get initial response
 
     chat_messages = short_term_memory.get_context(user_id)
+    print(f"\033[93mAnalyzing user's intent ...\033[0m")
     reply_info = handle_intent_flow(chat_messages, user_input)
-    print(f"reply_info: {reply_info}")
     output_stream(f"{reply_info['intent']}")
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
@@ -55,7 +55,6 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         )
         return final_reply
 
-    print(f"final_reply: {final_reply}")
     analysis = extract_code_breakdown_from_doc(final_reply)
     output_stream(f"{analysis}")
     final_reply = extract_str_from_doc(final_reply)
