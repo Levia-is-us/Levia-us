@@ -19,6 +19,7 @@ from memory.plan_memory.plan_memory import PlanContextMemory
 from metacognitive.stream.stream import output_stream
 from engine.flow.planner.tool_base_planner import tool_base_planner
 from memory.episodic_memory.episodic_memory import store_long_pass_memory
+import uuid
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
@@ -85,7 +86,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
         metadata = {
             "execution_records": plan
         }
-        store_long_pass_memory(id=user_intent, memory=user_intent, metadata=metadata, uid=user_id)
+        store_long_pass_memory(id=str(uuid.uuid4()), memory=user_intent, metadata=metadata, uid=user_id)
 
 def get_unique_tools(found_tools):
     unique_tools = []

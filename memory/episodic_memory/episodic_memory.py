@@ -45,12 +45,13 @@ def store_long_pass_memory(
     try:
         metadata["uid"] = uid
         for key, value in metadata.items():
-            if isinstance(value, dict):
+            # if isinstance(value, dict):
                 metadata[key] = str(value)
         embedding = create_embedding(memory)
         save_memory(id, embedding, metadata, namespace)
     except Exception as e:
         print(f"\033[91mError storing long pass memory: {str(e)}\033[0m")
+        print(f"\033[91mError traceback: {e.__traceback__.tb_frame.f_code.co_filename}:{e.__traceback__.tb_lineno}\033[0m")
 
 
 def retrieve_long_pass_memory(

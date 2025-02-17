@@ -12,7 +12,7 @@ import os
 
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
-from engine.flow.executor.short_chain_executor import execute_intent_chain
+from engine.flow.executor.short_chain_executor import process_plan_execution
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
@@ -24,16 +24,15 @@ plan_context_memory = PlanContextMemory()
 def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
-
+    chat_messages = short_term_memory.get_context(user_id)
+    print(f"\033[93mAnalyzing user's intent ...\033[0m")
+    reply_info = handle_intent_flow(chat_messages, user_input)
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
     )
     chat_messages = short_term_memory.get_context(user_id)
-    print(f"\033[93mAnalyzing user's intent ...\033[0m")
-    reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
     
-    chat_messages.append(create_chat_message("user", user_input))
     final_reply = ""
     # Handle different response types
     if reply_info["type"] == "direct_answer":
@@ -65,7 +64,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
 
 def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str):
     """Handle intent summary type response"""
-    user_intent = reply_info["response"]
+    user_intent = reply_info["intent"]
     return chat_executor(user_id, user_intent, chat_messages)
     
 
@@ -74,6 +73,4 @@ def handle_input_intent(user_id: str) -> str:
     """Handle intent summary type response"""
     chat_messages = short_term_memory.get_context(user_id)
     plan_context = plan_context_memory.get_current_plan_context(user_id)
-    return execute_intent_chain(
-        chat_messages=chat_messages, plan_steps=plan_context, user_id=user_id
-    )
+    return process_plan_execution(chat_messages, plan_context, user_id=user_id)
