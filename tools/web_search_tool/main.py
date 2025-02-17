@@ -16,7 +16,7 @@ from tools.web_search_tool.util import (
 from engine.tool_framework import run_tool, BaseTool
 
 
-@run_tool("Web Search Tool")
+@run_tool()
 class WebSearchTool(BaseTool):
     """Tool for searching web content"""
     

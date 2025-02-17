@@ -30,8 +30,8 @@ tool_caller_client = ToolCaller(registry)
 plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
-INTERACTION_MODE = os.environ["INTERACTION_MODE"]
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
 def execute_intent_chain(
     user_intent: str,
@@ -65,7 +65,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str):
         output_stream(f" - Processing step: {step} - \n")
         found_tools = extract_tools_from_plan(plan)
         if not validate_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            output_stream(f" - Failed to process step: {step['Description']} - \n")
+            output_stream(f" - Failed to process step: {step['description']} - \n")
             return
             
     # Execute tools for each plan step
@@ -131,7 +131,7 @@ def validate_step_necessity(step, plan, messages_history, done_steps):
 
 def resolve_tool_for_step(step, plan, messages_history, step_index, user_id: str):
     """Find appropriate tool for a step from memory"""
-    memories = retrieve_short_pass_memory(step["Description"])
+    memories = retrieve_short_pass_memory(step["description"])
     if not memories:
         return False
     
@@ -180,7 +180,7 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             }
             
         execution_result = execute_tool_operation(tool_config, reply_json)
-        if execution_result["status"] == "failure":
+        if execution_result == {"status": "failure"}:
             return {
                 "toolName": tool_name,
                 "result": "execution failed",
@@ -218,14 +218,19 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.5})
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0})
     reply_json = extract_json_from_str(reply)
+    print(f" - {reply_json} - \n")
     output_stream(f" - {reply_json} - \n")
     return reply_json
 
 def execute_tool_operation(tool_config, reply_json):
     """Execute tool with provided arguments"""
-    args = reply_json["extracted_arguments"].get("required_arguments", {})
+    args = {}
+    required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
+    for arg_name, arg_info in required_args.items():
+        args[arg_name] = arg_info.get("value", {})
+
     result,_ = execute_tool(
         tool_caller_client,
         tool_config['tool'],

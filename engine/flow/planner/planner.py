@@ -6,7 +6,7 @@ from metacognitive.stream.stream import output_stream
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def create_execution_plan(intent: str) -> str:
@@ -16,7 +16,7 @@ def create_execution_plan(intent: str) -> str:
         {"role": "user", "content": plan_maker_prompt},
     ]
     plan = chat_completion(
-        prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0.5}
+        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5}
     )
     plan = extract_json_from_str(plan)
     for step in plan:
@@ -36,7 +36,7 @@ def check_plan_sufficiency(
     )
 
     result = chat_completion(
-        memories_check_prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0}
+        memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}
     )
     result = extract_json_from_str(result)
     return result["solution_sufficient"]["result"] in [True, "true"]

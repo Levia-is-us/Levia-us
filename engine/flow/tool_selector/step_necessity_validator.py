@@ -5,7 +5,7 @@ from engine.llm_provider.llm import chat_completion
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def step_tool_check(plan, current_step, context, tools_and_outputs):
@@ -13,6 +13,6 @@ def step_tool_check(plan, current_step, context, tools_and_outputs):
         plan, current_step, context, tools_and_outputs
     )
     result = chat_completion(
-        prompt, model=PERFORMANCE_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
+        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
     )
     return result

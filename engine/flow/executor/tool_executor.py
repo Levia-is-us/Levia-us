@@ -6,7 +6,7 @@ from engine.tool_framework.tool_caller import ToolCaller
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 db_pool = MySQLPool()
 
@@ -46,7 +46,7 @@ def verify_tool_execution(execution_record: dict, result: dict) -> str:
     )
 
     llm_confirmation = chat_completion(
-        llm_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.7}
+        llm_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}
     )
 
     llm_confirmation = extract_json_from_str(llm_confirmation)
