@@ -62,7 +62,7 @@ If the tools are sufficient:
       "step": "step 1",
       "tool": "Specific Tool for Step 1",
       "data": "Specific data of tool in tool_list for Step 1",
-      "intent": "Intent for Step 1",
+      "step purpose": "Purpose of step 1",
       "description": "A general overview of the objective to be achieved by this tool in the first part of the task.",
       "reason": "Why we need to do this step and why it requires this specific external tool or action."
     }},
@@ -70,7 +70,7 @@ If the tools are sufficient:
       "step": "step 2",
       "tool": "Specific Tool for Step 2",
       "data": "Specific data of tool in tool_list for Step 2",
-      "intent": "Intent for Step 2",
+      "step purpose": "Purpose of step 2",
       "description": "A general overview of the objective to be achieved by this tool in the next part of the task.",
       "reason": "Why we need to do this step and why it requires this specific external tool or action."
     }}
