@@ -11,19 +11,26 @@ from engine.tool_framework.tool_caller import ToolCaller
 
 def main():
     registry = ToolRegistry()
-
+    
     # Use absolute path
-    tools_dir = os.path.join(os.path.dirname(__file__), "./")
+    tools_dir = os.path.join(project_root, "tools")
     registry.scan_directory(tools_dir)  # Scan tools directory
 
     # Create ToolCaller instance
     caller = ToolCaller(registry)
-    result = caller.call_tool(
-        tool_name="web_search_tool",
-        method="web_search",
-        kwargs={"intent": "How to make a cake"},
-    )
-
+    
+    # List all available tools
+    tools = registry.list_tools()
+    print("Available tools:", len(tools))
+    for tool in tools:
+        print(f"Tool: {tool['name']}")
+        print(f"Description: {tool['description']}")
+        print("Methods:")
+        for method, info in tool['methods'].items():
+            print(f" - {method}{info['signature']}")
+    
+    result = caller.call_tool(tool_name="WebSearchTool", method="web_search", kwargs={"intent": "What is the capital of France?"})
+    
     if result:
         if "error" in result:
             print(f"Tool execution error: {result['error']}")
