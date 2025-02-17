@@ -91,7 +91,7 @@ def get_prompt_links(links, intent):
 
 
 def get_summary_links(links, intent):
-    links_json = json.dumps({"links": links, "intent": intent})
+    links_json = json.dumps({"links": links, "intent": intent, "time": time.strftime("%Y/%m/%d")})
     try:
         result = create_chat_completion(
         system_prompt="You are an AI assistant specialized in summarizing web pages. I will provide a list of multiple pages, each with a URL and its extracted text. Your task is to analyze the intent of each page and generate a comprehensive summary that combines and needs to be fully explained the key points from all pages based on their intent. The output should be in Markdown format.",
@@ -104,36 +104,8 @@ def get_summary_links(links, intent):
         raise Exception(e)
     return result
 
-def get_Links(driver, url):
-    try:
-       driver.get(url)
-       WebDriverWait(driver, 10).until(
-           lambda d: d.execute_script("return document.readyState") == "complete"
-       )
-       links = driver.find_elements(By.TAG_NAME, "a")
-       domain = urlparse(url).scheme + "://" + urlparse(url).netloc
-       path = urlparse(url).path
-       link_data = [{"url": url, "text": "core page"}]
-    except Exception as e:
-        return [{"url": url, "text": "core page"}]
-
-    for link in links:
-        try:
-
-            href = link.get_attribute("href")
-            text = link.text
-
-            if href:
-                if is_absolute_url(href):
-                    href = href
-                else:
-                    href = urljoin(domain, href)
-
-                if path != urlparse(href).path:
-                    link_data.append({"url": href, "text": text})
-
-        except:
-            continue
+def get_Links(url):
+    link_data = [{"url": url, "text": "core page"}]
 
     return link_data
 
@@ -144,10 +116,11 @@ def get_all_links(urls):
     driver = setup_driver()
 
     for url in urls:
-        links = get_Links(driver, url)
+        links = get_Links(url)
         links_data.extend(links)
 
     if visual == "T":
+        driver.get(urls[0])
         smooth_scroll_to_bottom(driver)
     else:
         driver.quit()
