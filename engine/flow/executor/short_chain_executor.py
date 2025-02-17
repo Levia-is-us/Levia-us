@@ -40,7 +40,7 @@ def execute_intent_chain(
     user_id: str
 ):   
     output_stream(f" - Do not have experience for {user_intent} - \n")
-    output_stream(f" - Creating new execution plan ... - \n")
+    print(f"\033[93m - Creating new execution plan ... - \033[0m\n")
     plan = create_execution_plan(user_intent)
     process_tool_execution_plan(
         plan, messages_history, user_id, user_intent
@@ -60,11 +60,10 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     Returns:
         list: Records of tool execution results
     """
-    
     # Analyze each step and find appropriate tools
     found_tools = []
     for step_index, step in enumerate(plan):
-        output_stream(f" - Processing step: {step} - \n")
+        print(f"\033[93m - finding appropriate tool for step: {step['intent']} - \033[0m\n")
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
