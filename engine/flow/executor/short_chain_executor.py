@@ -61,12 +61,13 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str):
     """
     
     # Analyze each step and find appropriate tools
+    found_tools = []
     for step_index, step in enumerate(plan):
         output_stream(f" - Processing step: {step} - \n")
-        found_tools = extract_tools_from_plan(plan)
-        if not validate_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            output_stream(f" - Failed to process step: {step['description']} - \n")
-            return
+        found_tools.append(resolve_tool_for_step(step))
+
+    #replan
+    
             
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id)
@@ -108,47 +109,69 @@ def process_plan_execution(messages_history, plan_steps, user_id: str):
             step["executed"] = True
     # return tool_results
 
-def validate_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
-    """
-    Process a single plan step to determine tool necessity and find appropriate tool
-    """
-    if found_tools is None:
-        found_tools = []
-    # Check if step is necessary
-    necessity_check = validate_step_necessity(step, plan, messages_history, found_tools)
-    if not necessity_check["steps_necessity"] == "Yes":
-        step["tool_necessity"] = False
-        # plan_context_memory.update_step_status_context(step_index, tool_necessity=False, user_key=user_id)
-        return True
+# def validate_plan_step(step, plan, messages_history, step_index, user_id: str, found_tools):
+#     """
+#     Process a single plan step to determine tool necessity and find appropriate tool
+#     """
+#     if found_tools is None:
+#         found_tools = []
+#     # Check if step is necessary
+#     necessity_check = validate_step_necessity(step, plan, messages_history, found_tools)
+#     if not necessity_check["steps_necessity"] == "Yes":
+#         step["tool_necessity"] = False
+#         # plan_context_memory.update_step_status_context(step_index, tool_necessity=False, user_key=user_id)
+#         return True
         
-    # Find appropriate tool for the step
-    return resolve_tool_for_step(step, plan, messages_history, step_index, user_id)
+#     # Find appropriate tool for the step
+#     return resolve_tool_for_step(step, plan, messages_history, step_index, user_id)
     
 def validate_step_necessity(step, plan, messages_history, done_steps):
     """Check if a step is necessary to execute"""
     result = step_tool_check(plan, step, messages_history, done_steps)
     return extract_json_from_str(result)
 
-def resolve_tool_for_step(step, plan, messages_history, step_index, user_id: str):
+def resolve_tool_for_step(step):
     """Find appropriate tool for a step from memory"""
     memories = retrieve_short_pass_memory(step["description"])
     if not memories:
         return False
+    return memories["matches"]
     
-    # print(f"Finding tool for step: {memories}")
-    tool_name = tool_select(plan, step, messages_history, memories)
-    # Search for tool in memories
-    if "matches" in memories:
-        for match in memories["matches"]:
-            if match["metadata"]["tool"] == tool_name:
-                del match["metadata"]["description"]
-                step["tool"] = match
-                step["tool_necessity"] = True
-                # plan_context_memory.update_step_status_context(step_index, tool_necessity=True, execution_tool=match, user_key=user_id)
-                return True
-    step["tool"] = "No tool found for current step"
-    step["tool_necessity"] = True
-    return False
+    # # print(f"Finding tool for step: {memories}")
+    # tool_name = tool_select(plan, step, messages_history, memories)
+    # # Search for tool in memories
+    # if "matches" in memories:
+    #     for match in memories["matches"]:
+    #         if match["metadata"]["tool"] == tool_name:
+    #             del match["metadata"]["description"]
+    #             step["tool"] = match
+    #             step["tool_necessity"] = True
+    #             # plan_context_memory.update_step_status_context(step_index, tool_necessity=True, execution_tool=match, user_key=user_id)
+    #             return True
+    # step["tool"] = "No tool found for current step"
+    # step["tool_necessity"] = True
+    # return False
+
+# def resolve_tool_for_step(step, plan, messages_history, step_index, user_id: str):
+#     """Find appropriate tool for a step from memory"""
+#     memories = retrieve_short_pass_memory(step["description"])
+#     if not memories:
+#         return False
+    
+#     # print(f"Finding tool for step: {memories}")
+#     tool_name = tool_select(plan, step, messages_history, memories)
+#     # Search for tool in memories
+#     if "matches" in memories:
+#         for match in memories["matches"]:
+#             if match["metadata"]["tool"] == tool_name:
+#                 del match["metadata"]["description"]
+#                 step["tool"] = match
+#                 step["tool_necessity"] = True
+#                 # plan_context_memory.update_step_status_context(step_index, tool_necessity=True, execution_tool=match, user_key=user_id)
+#                 return True
+#     step["tool"] = "No tool found for current step"
+#     step["tool_necessity"] = True
+#     return False
 
 def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_index: int):
     """
