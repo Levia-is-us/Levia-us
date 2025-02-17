@@ -35,7 +35,7 @@ def main():
         if "error" in result:
             print(f"Tool execution error: {result['error']}")
         else:
-            print(f"Success: {result['result']}")
+            print(f"Success: {result}")
     else:
         print("Tool call failed, no result returned")
 
