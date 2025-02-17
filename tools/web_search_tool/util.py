@@ -63,7 +63,7 @@ def generate_search_keywords(intent: str) -> list:
     - Extract only the most relevant and minimal keywords from the input.
     - The keywords should accurately reflect the search query, and as few keywords as necessary to do so.
     - Ensure clarity and avoid redundancy.
-    - The output should be only the keywords, no other text.
+    - The output should be only the list of keywords, no other text.
     """
 
     try:
