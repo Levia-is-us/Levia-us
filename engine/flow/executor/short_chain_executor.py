@@ -43,10 +43,9 @@ def execute_intent_chain(
     output_stream(f" - Do not have experience for {user_intent} - \n")
     print(f"\033[93mCreating new execution plan ... - \033[0m\n")
     plan = create_execution_plan(user_intent)
-    process_tool_execution_plan(
+    return process_tool_execution_plan(
         plan, messages_history, user_id, user_intent
     )
-    return plan
 
 def process_tool_execution_plan(plan, messages_history: list, user_id: str, user_intent: str):
     """
@@ -83,7 +82,10 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
         plan_context_memory.create_plan_context(plan, user_id)
-        store_long_pass_memory(id=user_intent, memory=user_intent, metadata=plan, uid=user_id)
+        metadata = {
+            "execution_records": plan
+        }
+        store_long_pass_memory(id=user_intent, memory=user_intent, metadata=metadata, uid=user_id)
 
 def get_unique_tools(found_tools):
     unique_tools = []
