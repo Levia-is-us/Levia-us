@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from engine.llm_provider.llm import chat_completion
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def generate_search_keywords(intent: str) -> list:
@@ -67,7 +67,7 @@ def generate_search_keywords(intent: str) -> list:
                 {"role": "assistant", "content": prompt},
                 {"role": "user", "content": intent},
             ],
-            model=QUALITY_MODEL_NAME,
+            model=CHAT_MODEL_NAME,
             config={"temperature": 0.5},
         )
 
@@ -127,7 +127,7 @@ def extract_relevance_url(intent: str, contents: str) -> list:
                     "content": f"Intent: {intent}\nContents: {contents}",
                 },
             ],
-            model=QUALITY_MODEL_NAME,
+            model=CHAT_MODEL_NAME,
             config={"temperature": 0.7},
         )
         # Try to parse JSON directly from output
