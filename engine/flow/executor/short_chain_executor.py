@@ -41,7 +41,7 @@ def execute_intent_chain(
     user_id: str
 ):   
     output_stream(f" - Do not have experience for {user_intent} - \n")
-    print(f"\033[93m - Creating new execution plan ... - \033[0m\n")
+    print(f"\033[93mCreating new execution plan ... - \033[0m\n")
     plan = create_execution_plan(user_intent)
     process_tool_execution_plan(
         plan, messages_history, user_id, user_intent
@@ -64,15 +64,16 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     # Analyze each step and find appropriate tools
     found_tools = []
     for step_index, step in enumerate(plan):
-        print(f"\033[93m - finding appropriate tool for step: {step['intent']} - \033[0m\n")
+        print(f"\033[93mFinding appropriate tool for step: {step['intent']} - \033[0m\n")
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
     found_tools = get_unique_tools(found_tools)
+    print(f"\033[93mMaking new plan based on current tools - \033[0m\n")
     plan = tool_base_planner(user_intent, found_tools)
-    print(f" - replan: {plan} - \n")
             
     if(plan["status"] == "failed"):
+        print(f"\033[93m - Failed to make plan with current tools - \033[0m\n")
         return plan
     plan = plan["plan"]
 
@@ -98,6 +99,7 @@ def process_plan_execution(messages_history, plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         # if not step.get("tool_necessity", True):
+        print(f"\033[93m - Executing step: {step['step purpose']} - \033[0m\n")
         #     continue
         if step.get("executed", False):
             continue

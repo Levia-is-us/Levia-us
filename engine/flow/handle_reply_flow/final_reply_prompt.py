@@ -10,7 +10,7 @@ Bonsider the following thoughts:
 - 1: User's latest request? What is the real user's intent?
 - 2: Levia's identification information
 - 3: The context of the conversation
-- 4: The engine_output
+- 4: The engine_output, you need to assume you run the tool and get the result wihich is the engine_output.
 - 5: use "you" to refer to the user
 
 
