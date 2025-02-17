@@ -25,7 +25,10 @@ def main():
     result = caller.call_tool(
         tool_name="WebsiteScanTool",
         method="website_scan",
-        kwargs={'url_list': ['https://apnews.com/', 'https://www.cbsnews.com/', 'https://www.npr.org/sections/news/'], 'intent': '搜一下今天的新闻'}
+        kwargs={
+            "url_list": ["https://leviaprotocol.gitbook.io/leviaprotocol"],
+            "intent": "What is Levia,and how it works?"
+        }
     )
 
     if result:
