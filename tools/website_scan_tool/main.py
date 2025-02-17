@@ -33,8 +33,7 @@ class WebsiteScanTool(BaseTool):
         try:
             raw_links = get_all_links(url_list)
             unique_links = remove_duplicate_links(raw_links)
-            filtered_links = get_prompt_links(unique_links, intent)
-            links_with_content = get_all_content(filtered_links)
+            links_with_content = get_all_content(unique_links)
             summary = get_summary_links(links_with_content, intent)
             return summary
         except Exception as e:
