@@ -50,20 +50,24 @@ If the tools are sufficient:
 {{
   "status": "success",
   "plan": [
-    {
+    {{
       "step": "step 1",
       "tool": "Specific Tool for Step 1",
+      "tool_method": "Specific Method for Step 1",
+      "tool_args": "Specific Args for Step 1",
       "intent": "Intent for Step 1",
       "description": "A general overview of the objective to be achieved by this tool in the first part of the task.",
       "reason": "Why we need to do this step and why it requires this specific external tool or action."
-    },
-    {
+    }},
+    {{
       "step": "step 2",
       "tool": "Specific Tool for Step 2",
+      "tool_method": "Specific Method for Step 2",
+      "tool_args": "Specific Args for Step 2",
       "intent": "Intent for Step 2",
       "description": "A general overview of the objective to be achieved by this tool in the next part of the task.",
       "reason": "Why we need to do this step and why it requires this specific external tool or action."
-    }
+    }}
   ]
 }}
 
