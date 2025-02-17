@@ -30,9 +30,15 @@ class WebsiteScanTool(BaseTool):
         Returns:
             Extracted information
         """
-        links = get_all_links(url_list)
-        links = remove_duplicate_links(links)
-        links = get_prompt_links(links, intent)
-        links = get_all_content(links)
-        result = get_summary_links(links, intent)
-        return result
+        try:
+            raw_links = get_all_links(url_list)
+            unique_links = remove_duplicate_links(raw_links)
+            filtered_links = get_prompt_links(unique_links, intent)
+            links_with_content = get_all_content(filtered_links)
+            summary = get_summary_links(links_with_content, intent)
+            return summary
+        except Exception as e:
+            if(str(e) == "website connection timeout"):
+                return "website connection timeout"
+            else:
+                raise Exception(e)
