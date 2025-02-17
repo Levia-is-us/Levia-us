@@ -1,38 +1,34 @@
 import os
 import sys
-import dotenv
+
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
-env_path = os.path.join(project_root, ".env")
-dotenv.load_dotenv(env_path)
-
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
-
+sys.path.append(project_root)
 from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
 
+
 def main():
     registry = ToolRegistry()
-    tools_dir = os.path.join(project_root, "tools")
-    registry.scan_directory(tools_dir)
 
+    # Use absolute path
+    tools_dir = os.path.join(os.path.dirname(__file__), "./")
+    registry.scan_directory(tools_dir)  # Scan tools directory
+
+    # Create ToolCaller instance
     caller = ToolCaller(registry)
     result = caller.call_tool(
-        tool_name="WebSearchTool",
+        tool_name="web_search_tool",
         method="web_search",
-        kwargs={
-            "intent": "The user wants to become wise and rich."
-        }
+        kwargs={"intent": "How to make a cake"},
     )
 
     if result:
         if "error" in result:
             print(f"Tool execution error: {result['error']}")
         else:
-            print(f"Success: {result['result']}")
+            print(f"response info: {result}")
     else:
         print("Tool call failed, no result returned")
 
