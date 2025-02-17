@@ -25,13 +25,14 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
 
+    short_term_memory.add_context(
+        create_chat_message("user", user_input), user_id
+    )
     chat_messages = short_term_memory.get_context(user_id)
     print(f"\033[93mAnalyzing user's intent ...\033[0m")
     reply_info = handle_intent_flow(chat_messages, user_input)
     output_stream(f"{reply_info['intent']}")
-    short_term_memory.add_context(
-        create_chat_message("user", user_input), user_id
-    )
+    
     chat_messages.append(create_chat_message("user", user_input))
     final_reply = ""
     # Handle different response types
