@@ -70,11 +70,20 @@ def generate_search_keywords(intent: str) -> list:
             model=QUALITY_MODEL_NAME,
             config={"temperature": 0.5},
         )
-        keywords = eval(output)
+
+        try:
+            keywords = json.loads(output)
+            if not isinstance(keywords, list):
+                print("Invalid keywords format: expected list")
+                return []
+        except json.JSONDecodeError as json_err:
+            print(f"Failed to parse keywords")
+            return []
+
+        return keywords
     except Exception as e:
         print(f"Generate search keywords error: {str(e)}")
-        keywords = []
-    return keywords
+        return []
 
 
 def extract_relevance_url(intent: str, contents: str) -> list:
@@ -314,6 +323,65 @@ def extract_search_result(element):
     return url, summary
 
 
+def process_multiple_results(search_results):
+    """
+    Process search results when there are more than 3 results.
+
+    Args:
+        search_results: List of search result elements
+
+    Returns:
+        tuple: Lists of URLs and summaries
+    """
+    results = [extract_search_result(elem) for elem in search_results]
+    return zip(*[r for r in results if r[0]])
+
+
+def process_dual_results(search_results):
+    """
+    Process search results when there are 2 results.
+
+    Args:
+        search_results: List containing two search result elements
+
+    Returns:
+        tuple: Lists of URLs and summaries
+    """
+    # Extract URLs and summaries from the first result
+    first_url, first_summary = extract_search_result(search_results[0])
+
+    # Extract URLs and summaries from the other result
+    other_results = search_results[1]
+    child_divs = other_results.find_elements(By.CSS_SELECTOR, ":scope > div")
+    other_results = [extract_search_result(elem) for elem in child_divs]
+
+    urls = [first_url] + [url for url, _ in other_results if url]
+    summaries = [first_summary] + [summary for _, summary in other_results if summary]
+
+    return urls, summaries
+
+
+def process_single_result(search_result):
+    """
+    Process a single search result.
+
+    Args:
+        search_result: Single search result element
+
+    Returns:
+        tuple: Lists of URLs and summaries
+    """
+    try:
+        # Extract search tab and child divs
+        search_tab = search_result.find_element(By.CSS_SELECTOR, "#kp-wp-tab-overview")
+        child_divs = search_tab.find_elements(By.CSS_SELECTOR, ":scope > div")
+        results = [extract_search_result(elem) for elem in child_divs]
+        return zip(*[r for r in results if r[0]])
+    except Exception as e:
+        print(f"Error processing single result: {e}")
+        return [], []
+
+
 def handle_search_results(search_results: list) -> list:
     """
     Extract URLs and content from search results and return formatted strings.
@@ -324,41 +392,27 @@ def handle_search_results(search_results: list) -> list:
     Returns:
         list: Formatted strings with URLs and content
     """
-    content_list = []
+    length = len(search_results)
 
-    if len(search_results) > 3:
-        # Remove the second search result with no contents
-        search_results.remove(search_results[1])
+    try:
+        if length > 3:
+            urls, summaries = process_multiple_results(search_results)
+        elif length > 1:
+            urls, summaries = process_dual_results(search_results)
+        elif length == 1:
+            urls, summaries = process_single_result(search_results[0])
+        else:
+            return []
 
-        # Process remaining results
-        results = [extract_search_result(elem) for elem in search_results]
-        urls, summaries = zip(*[r for r in results if r[0]])  # Filter out empty URLs
-
-    else:
-        # Process first result
-        first_url, first_summary = extract_search_result(search_results[0])
-
-        # Process remaining results
-        other_results = search_results[1]
-        child_divs = other_results.find_elements(By.CSS_SELECTOR, ":scope > div")
-        other_results = [extract_search_result(elem) for elem in child_divs]
-
-        # Combine results
-        urls = [first_url] + [url for url, _ in other_results if url]
-        summaries = [first_summary] + [
-            summary for _, summary in other_results if summary
-        ]
-
-    # Format results
-    content_list.extend(
-        [
+        return [
             f"url: {url} content: {summary}"
             for url, summary in zip(urls, summaries)
             if url and summary
         ]
-    )
 
-    return content_list
+    except Exception as e:
+        print(f"Error handling search results: {e}")
+        return []
 
 
 def search_visual(keywords: list) -> list:
