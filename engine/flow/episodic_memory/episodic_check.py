@@ -7,6 +7,6 @@ CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 def episodic_check(user_intent, context, plan):
     prompt = episodic_check_prompt(user_intent, context, plan)
-    result = chat_completion(prompt, model_name=QUALITY_MODEL_NAME, config={"temperature": 0})
+    result = chat_completion(prompt, QUALITY_MODEL_NAME, config={"temperature": 0})
     return result
 

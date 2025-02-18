@@ -25,17 +25,12 @@ def episodic_memory_executor(user_id: str, user_intent: str, chat_messages: list
     high_score_memories = filter_memories_by_score(memories)
     top_memory = high_score_memories[0]
     try:
-        execution_records = [
-            eval(record) for record in top_memory["metadata"]["execution_records"]
-        ]
-
+        execution_records = top_memory["metadata"]["execution_records"]
+        print(f"execution_records: {execution_records}")
         result = episodic_check(user_intent, chat_messages, execution_records)
-        
         print(f"result: {result}")
-
-        if check_plan_sufficiency(user_intent, top_memory["id"], execution_records):
-            res = process_tool_execution_plan(execution_records, chat_messages, user_id)
-            return str(res)
+        # res = process_tool_execution_plan(execution_records, chat_messages, user_id)
+        # return str(res)
     except Exception as e:
         print(f"execute existing records error: {str(e)}")
         

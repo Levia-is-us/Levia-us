@@ -9,7 +9,7 @@ def backup_reply(chat_messages):
             {"role": "system", "content": backup_llm_prompt},
             {"role": "user", "content": chat_messages}
         ]
-        result = chat_completion(propmt, model_name=CHAT_MODEL_NAME, config={"temperature": 0})
+        result = chat_completion(propmt, CHAT_MODEL_NAME, config={"temperature": 0})
         return result
     except Exception as e:
         print(f"Our system is currently experiencing high traffic. We kindly ask that you please try again later.")
