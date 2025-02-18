@@ -8,6 +8,7 @@ from engine.tool_framework.tool_registry import ToolRegistry
 import os
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
+from engine.flow.episodic_memory.episodic_check import episodic_check
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
@@ -27,6 +28,11 @@ def episodic_memory_executor(user_id: str, user_intent: str, chat_messages: list
         execution_records = [
             eval(record) for record in top_memory["metadata"]["execution_records"]
         ]
+
+        result = episodic_check(user_intent, chat_messages, execution_records)
+        
+        print(f"result: {result}")
+
         if check_plan_sufficiency(user_intent, top_memory["id"], execution_records):
             res = process_tool_execution_plan(execution_records, chat_messages, user_id)
             return str(res)

@@ -1,4 +1,4 @@
-from engine.flow.executor.episodic_check_prompt import episodic_check_prompt
+from engine.flow.episodic_memory.episodic_check_prompt import episodic_check_prompt
 from engine.llm_provider.llm import chat_completion
 import os
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")

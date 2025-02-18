@@ -14,7 +14,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from engine.flow.executor.episodic_memory_executor import process_tool_execution_plan
+from engine.flow.episodic_memory.episodic_memory_executor import process_tool_execution_plan
 
 
 @pytest.mark.parametrize("plan", [
