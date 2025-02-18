@@ -51,7 +51,6 @@ def chat_completion_deepseek(messages, model, config={}):
                         end = buffer.find("</input_breakdown>")
                         if end != -1:
                             breakdown = buffer[start:end]
-                            # 按 " - " 分割并打印每一行
                             for line in breakdown.split("\n"):
                                 if " - " in line:
                                     parts = line.split(" - ")
