@@ -26,7 +26,7 @@ def get_system_prompt():
 
 
 def get_system_prompt_for_openai_reasoning():
-    return create_chat_message("developer", system_prompt_social)
+    return create_chat_message("developer", system_prompt)
 
 
 def get_system_prompt_for_anthropic_reasoning():
@@ -34,4 +34,4 @@ def get_system_prompt_for_anthropic_reasoning():
 
 
 def get_system_prompt_for_deepseek_reasoning():
-    return create_chat_message("assistant", system_prompt_social)
+    return create_chat_message("assistant", system_prompt)

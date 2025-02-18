@@ -67,7 +67,7 @@ Please follow these steps to process the input and generate an appropriate respo
    - If the request is unclear or requires actions beyond your abilities (e.g., physical tasks, making purchases), prepare to summarize the user's intent.
    - If the user says something that is unclear and lacks context, you should durect answer and ask further questions.
 
-
+   
 4. Generate Response:
    - For direct answers: Provide a clear, concise response to the user's query.
    - For intent summaries: Summarize the user's goal or request in a way that can be acted upon by an external system.

@@ -71,8 +71,9 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     found_tools = get_unique_tools(found_tools)
     print(f"\033[93mMaking new plan based on current tools - \033[0m\n")
     plan = tool_base_planner(user_intent, found_tools)
+    print(f"plan: {plan}")
             
-    if(plan["status"] == "failed"):
+    if(plan["status"] == "Failed to make plan with current tools"):
         print(f"\033[93m - Failed to make plan with current tools - \033[0m\n")
         return plan
     plan = plan["plan"]
