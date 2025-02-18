@@ -25,7 +25,7 @@ class WebsocketStream(BaseStream):
         async def main():
             parsed_url = urlparse(self.ws_url)
             host = parsed_url.hostname or "localhost"
-            port = parsed_url.port or 8765
+            port = parsed_url.port or 8760
 
             async with websockets.serve(self.handler, host, port) as server:
                 self.server = server

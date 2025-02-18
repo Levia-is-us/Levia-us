@@ -23,3 +23,11 @@ def extract_code_breakdown_from_doc(doc):
     end = doc.find("</code_breakdown>", start)
     return doc[start:end].strip()
 
+
+def extract_str_from_doc(doc):
+    if ">" in doc:
+        start = doc.rfind(">") + len(">")
+        doc = doc[start : len(doc)].strip()
+        return doc
+    else:
+        return doc

@@ -4,7 +4,7 @@ from engine.utils.json_util import extract_json_from_str
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def handle_intent_flow(chat_messages: list, input_message: str) -> dict:

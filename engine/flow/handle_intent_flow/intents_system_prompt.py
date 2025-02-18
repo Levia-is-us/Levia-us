@@ -65,8 +65,10 @@ Please follow these steps to process the input and generate an appropriate respo
    - If the request is asking for actions, tools, anything that can be acted upon by an external system, prepare to summarize the user's intent.
    - If the request is asking for information, but you don't have the information, provide a direct answer.
    - If the request is unclear or requires actions beyond your abilities (e.g., physical tasks, making purchases), prepare to summarize the user's intent.
+   - If the user says something that is unclear and lacks context, you should durect answer and ask further questions.
 
-3. Generate Response:
+
+4. Generate Response:
    - For direct answers: Provide a clear, concise response to the user's query.
    - For intent summaries: Summarize the user's goal or request in a way that can be acted upon by an external system.
 
@@ -95,14 +97,6 @@ After your analysis, generate the appropriate JSON response using one of these t
        "type": "call_tools",
        "intent": "Summarized intent here for calling tools",
        "response": "Make a goal for calling tools"
-   }}
-```
-
-3. For continue execution:
-```json
-   {{
-       "type": "continue_execution",
-       "intent": "Summarized intent here for continue execution"
    }}
 ```
 
