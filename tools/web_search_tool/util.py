@@ -60,7 +60,6 @@ def generate_search_keywords(intent: str) -> list:
     - Ensure clarity and avoid redundancy.
     - The output should be only the list of keywords, no other text.
     """
-    intent = "The user wants to learn how to use MySQL."
     try:
         output = chat_completion(
             [
