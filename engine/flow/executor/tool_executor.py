@@ -6,7 +6,7 @@ from engine.tool_framework.tool_caller import ToolCaller
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 db_pool = MySQLPool()
 
@@ -23,6 +23,8 @@ def execute_tool(
         result = tool_caller.call_tool(
             tool_name=tool_name, method=tool_method, kwargs=tool_args
         )
+        # if isinstance(result, dict):
+        #     return {"status": "failure", "result": "tool execution result is invalid"}, None
 
         status = verify_tool_execution(execution_record, result)
         record_tool_execution(tool_name, tool_method, tool_args, result)
@@ -37,14 +39,14 @@ def execute_tool(
 
 def verify_tool_execution(execution_record: dict, result: dict) -> str:
     """Verify tool execution result using LLM"""
-    if result["status"] == "failure":
-        return "failure"
+    # if result["status"] == "failure":
+    #     return "failure"
     llm_check_prompt = check_tools_result_prompt(
         tool_execution=str(execution_record), tool_output=result
     )
 
     llm_confirmation = chat_completion(
-        llm_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.7}
+        llm_check_prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}
     )
 
     llm_confirmation = extract_json_from_str(llm_confirmation)

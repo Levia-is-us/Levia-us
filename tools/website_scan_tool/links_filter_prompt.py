@@ -58,6 +58,6 @@ Example output structure (do not use these specific values):
 
 Remember, your output must be a valid JSON array containing only the matching links, or an empty array if no links match.
 important: Do not include any text outside of the JSON array.
-Now, please ouput your json array below:
+Now, please output your json array below:
 """
     return links_filter_prompt

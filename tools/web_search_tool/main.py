@@ -1,6 +1,7 @@
 import sys
 import os
 
+
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
@@ -16,18 +17,16 @@ from tools.web_search_tool.util import (
 from engine.tool_framework import run_tool, BaseTool
 
 
-@run_tool("Web Search Tool")
+@run_tool
 class WebSearchTool(BaseTool):
-    """Tool for searching web content"""
-    
+    """
+    This tool is used to search the web for information.
+    Args:
+        intent (str): The intent of the user.
+    Returns:
+        A list of URLs that match the intent.
+    """
     def web_search(self, intent: str):
-        """
-        This tool is used to search the web for information.
-        Args:
-            intent (str): The intent of the user.
-        Returns:
-            A list of URLs that match the intent.
-        """
         # Generate search keywords
         keywords = generate_search_keywords(intent)
 
@@ -42,9 +41,9 @@ class WebSearchTool(BaseTool):
             return "No results found."
         else:
             # Extract relevance URLs
-            relevance_urls = extract_relevance_url(intent, content_list)
+            contents = " ".join(content_list)
+            relevance_urls = extract_relevance_url(intent, contents)
             if not relevance_urls:
                 return "No results found."
             return relevance_urls
-
 

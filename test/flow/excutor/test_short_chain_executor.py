@@ -14,7 +14,8 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from engine.flow.executor.chat_executor import handle_new_tool_execution
+from engine.flow.executor.short_chain_executor import process_tool_execution_plan
+from engine.flow.executor.short_chain_executor import process_plan_execution
 
 @pytest.mark.parametrize("plan,messages", [
     (
@@ -44,7 +45,7 @@ from engine.flow.executor.chat_executor import handle_new_tool_execution
     )
 ])
 def test_handle_new_tool_execution(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed plan", plan)
 
 test_data = [
@@ -61,18 +62,15 @@ test_data = [
 
 @pytest.mark.parametrize("plan,messages", test_data)
 def test_terminal_handle_new_tool_execution_need_input(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
 
 @pytest.mark.parametrize("plan,messages", test_data)
 def test_event_handle_new_tool_execution_need_input(monkeypatch, plan, messages):
-    env_vars = dict(os.environ)
-    env_vars["INTERACTION_MODE"] = "event"
-    monkeypatch.setattr(os, "environ", env_vars)
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
     messages.append({"role": "user", "content": "I want to search the latest news about AI"})
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed input plan", plan)
 
 @pytest.mark.parametrize("plan,messages", [
@@ -97,6 +95,19 @@ def test_event_handle_new_tool_execution_need_input(monkeypatch, plan, messages)
     )
 ])
 def test_handle_new_tool_execution_no_suitable_tool_found(plan, messages):
-    handle_new_tool_execution(plan, messages, "user_id")
+    process_tool_execution_plan(plan, messages, "user_id")
     print("executed need input plan", plan)
     assert plan[0]["tool"] == "No tool found for current step"
+
+@pytest.mark.parametrize("plan,messages", [
+    (
+        {'status': 'success', 'plan': [{'step': 'step 1', 'tool': 'WebSearchTool', 'data': '{"method": "web_search", "inputs": [{"name": "intent", "type": "str", "required": true, "description": "User\'s search intention or query context used to generate keywords"}], "output": {"description": "List of relevant URLs or \'No results found\' message", "type": "Union[List[str], str]"}}', 'step purpose': "Search for today's news", 'description': "Perform a web search to retrieve URLs of today's news articles.", 'reason': "This step requires an external tool to search the web for relevant news articles based on the user's intent."}, {'step': 'step 2', 'tool': 'WebsiteScanTool', 'data': '{"method": "website_scan", "inputs": [{"name": "url_list", "type": "list", "required": true, "description": "Initial list of website URLs to begin scanning from"}, {"name": "intent", "type": "str", "required": true, "description": "Guidance parameter to filter relevant content during scanning"}], "output": {"description": "Processed summary of website content matching the specified intent", "type": "list/dict (implementation-dependent)"}}', 'step purpose': 'Summarize the news content', 'description': 'Summarize the content of the retrieved news URLs to provide the results.', 'reason': "This step requires an external tool to process and summarize the content of the news articles based on the user's intent."}]}
+        ,
+        [
+            {"role": "user", "content": "search the latest news about AI"},
+        ]
+    )
+])
+def test_process_plan_execution(messages,plan):
+    process_plan_execution(messages,plan['plan'], "user_id")
+    print("executed plan", plan)

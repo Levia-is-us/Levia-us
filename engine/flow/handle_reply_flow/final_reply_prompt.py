@@ -46,14 +46,10 @@ The user seems to be inquiring about [brief description of interpreted intent].
 
 [Your detailed response addressing the user's query, demonstrating your capabilities, and engaging the user in further conversation if appropriate]
 """
-      prompt = [
-      {
-         "role": "assistant",
-         "content": final_system_prompt
-      },
+   prompt = [
       {
          "role": "user",
          "content": final_system_prompt
       }
    ]
-      return prompt
+   return prompt

@@ -41,3 +41,4 @@ class ListAbilitiesTool(BaseTool):
                     "signature": "(...)"
                 }
         return abilities
+    
