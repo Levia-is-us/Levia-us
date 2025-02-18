@@ -54,13 +54,6 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id
         )
-    elif reply_info["type"] == "continue_execution":
-        plan_result = handle_input_intent(user_id)
-        final_reply = handle_reply_flow(chat_messages, plan_result)
-        short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}"), user_id
-        )
-        return final_reply
 
     analysis = extract_code_breakdown_from_doc(final_reply)
     output_stream(f"{analysis}")

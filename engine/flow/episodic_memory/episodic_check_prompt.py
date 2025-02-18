@@ -68,7 +68,9 @@ Please follow these steps to complete your task:
 Wrap your reasoning for each step inside <reasoning> tags. After your analysis, provide your conclusion in one of the following formats:
 
 a) If the plan can be completed with available information and is sufficient to achieve the user intent, output the filled plan as a JSON array. Example:
-[
+{
+  "status": "success",
+  "plan": [
   {
     "step": "step 1",
     "tool": "WebSearchTool",
@@ -95,6 +97,7 @@ a) If the plan can be completed with available information and is sufficient to 
     "reason": "This step is necessary to gather relevant information that matches the user's intent"
   }
 ]
+}
 
 b) If any required information is missing, output a JSON object in this format:
 {
