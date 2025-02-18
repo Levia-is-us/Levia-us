@@ -85,3 +85,7 @@ from engine.flow.executor.episodic_memory_executor import process_tool_execution
 ])
 def test_process_tool_execution_plan(plan):
     process_tool_execution_plan(plan, "user_id")
+
+
+# def test_episodic_memory_executor(metadata):
+    # store_long_pass_memory(id='search news', memory='search news', metadata=metadata)

@@ -20,6 +20,7 @@ from metacognitive.stream.stream import output_stream
 from engine.flow.planner.tool_base_planner import tool_base_planner
 from memory.episodic_memory.episodic_memory import store_long_pass_memory
 import uuid
+import copy
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
@@ -79,14 +80,17 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id)
-    
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
-        plan_context_memory.create_plan_context(plan, user_id)
+        plan_context = copy.deepcopy(plan)
+        for step in plan_context:
+            step.pop('tool_executed_result', None)
+            step.pop('executed', None)
         metadata = {
-            "execution_records": plan
+            "execution_records": plan_context
         }
         store_long_pass_memory(id=str(uuid.uuid4()), memory=user_intent, metadata=metadata, uid=user_id)
+    return plan
 
 def get_unique_tools(found_tools):
     unique_tools = []
