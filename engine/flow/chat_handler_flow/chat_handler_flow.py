@@ -35,6 +35,13 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         return response
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
+        print(f"plan_result: {plan_result}")
+        final_reply = handle_reply_flow(chat_messages, plan_result)
+        short_term_memory.add_context(
+            create_chat_message("assistant", f"{final_reply}"), user_id
+        )
+    elif reply_info["type"] == "continue_execution":
+        plan_result = handle_input_intent(user_id)
         final_reply = handle_reply_flow(chat_messages, plan_result)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id

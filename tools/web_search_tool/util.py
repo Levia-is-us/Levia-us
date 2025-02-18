@@ -64,7 +64,7 @@ def generate_search_keywords(intent: str) -> list:
     - Ensure clarity and avoid redundancy.
     - The output should be only the keywords, no other text.
     """
-
+    intent = "The user wants to learn how to use MySQL."
     try:
         output = create_chat_completion(
             system_prompt = prompt,
@@ -319,3 +319,4 @@ def search_visual(keywords: list) -> list:
         driver.quit()
 
     return content_list
+

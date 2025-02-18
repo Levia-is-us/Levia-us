@@ -62,12 +62,20 @@ def handle_new_tool_execution(plan, messages_history: list, user_id: str):
     
     # Analyze each step and find appropriate tools
     for step_index, step in enumerate(plan):
-        output_stream(f" - Processing step: {step} - \n")
-        found_tools = _get_tools_from_plan_steps(plan)
-        if not _process_plan_step(step, plan, messages_history, step_index, user_id, found_tools):
-            output_stream(f" - Failed to process step: {step['Description']} - \n")
-            return
+        print(f"\033[93mFinding appropriate tool for step: {step['intent']} - \033[0m\n")
+        found_tools.extend(resolve_tool_for_step(step))
+
+    #replan
+    found_tools = get_unique_tools(found_tools)
+    print(f"\033[93mMaking new plan based on current tools - \033[0m\n")
+    plan = tool_base_planner(user_intent, found_tools)
+    print(f"plan: {plan}")
             
+    if(plan["status"] == "Failed to make plan with current tools"):
+        print(f"\033[93m - Failed to make plan with current tools - \033[0m\n")
+        return plan
+    plan = plan["plan"]
+
     # Execute tools for each plan step
     execute_plan_steps(messages_history, plan, user_id)
     
