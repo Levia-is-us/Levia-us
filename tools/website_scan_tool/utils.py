@@ -119,8 +119,11 @@ def get_all_links(urls):
         links_data.extend(links)
 
     if visual == "T":
-        driver.get(urls[0])
-        smooth_scroll_to_bottom(driver)
+        try:
+            driver.get(urls[0])
+            smooth_scroll_to_bottom(driver)
+        except Exception as e:
+            pass
     else:
         driver.quit()
 
