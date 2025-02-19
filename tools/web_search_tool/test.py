@@ -29,7 +29,7 @@ def main():
         for method, info in tool['methods'].items():
             print(f" - {method}{info['signature']}")
     
-    result = caller.call_tool(tool_name="WebSearchTool", method="web_search", kwargs={"intent": "What is the capital of France?"})
+    result = caller.call_tool(tool_name="WebSearchTool", method="web_search", kwargs={'intent': 'search some news'})
     
     if result:
         if "error" in result:

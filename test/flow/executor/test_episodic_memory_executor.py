@@ -14,7 +14,8 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from engine.flow.executor.episodic_memory_executor import process_tool_execution_plan
+from engine.flow.episodic_memory.episodic_memory_executor import process_tool_execution_plan
+from engine.flow.episodic_memory.episodic_memory_executor import episodic_memory_executor
 
 
 @pytest.mark.parametrize("plan", [
@@ -87,5 +88,10 @@ def test_process_tool_execution_plan(plan):
     process_tool_execution_plan(plan, "user_id")
 
 
-# def test_episodic_memory_executor(metadata):
-    # store_long_pass_memory(id='search news', memory='search news', metadata=metadata)
+@pytest.mark.parametrize("chat_messages", [
+    ([
+        {"role": "user", "content": "search some news"},
+    ]),
+])
+def test_episodic_memory_executor(chat_messages):
+    episodic_memory_executor("user_id", 'User requests execution of a news search operation', chat_messages)

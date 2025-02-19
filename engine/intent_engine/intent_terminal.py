@@ -8,6 +8,8 @@ from engine.flow.system_prompt.system_prompt import (
 from engine.llm_provider.llm import get_model_by_name
 from engine.flow.chat_handler_flow.chat_handler_flow import handle_chat_flow
 from memory.short_term_memory.short_term_memory import ShortTermMemory
+from engine.llm_provider.llm import chat_completion
+from engine.intent_engine.backup_reply import backup_reply
 import os
 
 from metacognitive.stream.stream import output_stream
@@ -66,4 +68,6 @@ def terminal_chat():
             break
         except Exception as e:
             print(f"\033[91mError occurred: {str(e)}\033[0m")
+            reply = backup_reply(short_term_memory.get_context("local-dev"))
+            print(reply)
 

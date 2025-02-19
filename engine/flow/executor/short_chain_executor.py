@@ -3,11 +3,8 @@ from memory.episodic_memory.episodic_memory import retrieve_short_pass_memory
 from engine.flow.executor.tool_executor import execute_tool
 from engine.flow.planner.planner import create_execution_plan
 from engine.utils.json_util import extract_json_from_str
-import json
-
 from engine.tool_framework.tool_caller import ToolCaller
 from engine.flow.executor.tool_executor import verify_tool_execution
-from engine.flow.tool_selector.tool_select import tool_select
 from engine.flow.tool_selector.step_necessity_validator import step_tool_check
 from engine.flow.executor.next_step_prompt import next_step_prompt
 import os
@@ -72,8 +69,9 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     found_tools = get_unique_tools(found_tools)
     print(f"\033[93mMaking new plan based on current tools - \033[0m\n")
     plan = tool_base_planner(user_intent, found_tools)
+    print(f"plan: {plan}")
             
-    if(plan["status"] == "failed"):
+    if(plan["status"] == "Failed to make plan with current tools"):
         print(f"\033[93m - Failed to make plan with current tools - \033[0m\n")
         return plan
     plan = plan["plan"]
