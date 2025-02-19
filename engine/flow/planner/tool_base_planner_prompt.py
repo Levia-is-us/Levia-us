@@ -85,7 +85,7 @@ If the tools are insufficient:
 
 Remember:
 - Keep your plan as concise as possible, using only the steps necessary to accomplish the user's intent that require external tools or actions.
-- Do not include any analysis or summary steps in your final output.
+- Do not output any text outside the JSON object.
 - The "tool" field should match the "tool" in "metadata" of the tool_list.
 - The "data" field should match the "data" in "metadata" of the tool_list.
 
