@@ -1,4 +1,4 @@
-from engine.flow.episodic_memory.episodic_check_prompt import episodic_check_prompt
+from engine.flow.episodic_memory_handle_flow.episodic_check_prompt import episodic_check_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 import os

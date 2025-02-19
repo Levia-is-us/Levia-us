@@ -8,7 +8,7 @@ from engine.tool_framework.tool_registry import ToolRegistry
 import os
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
-from engine.flow.episodic_memory.episodic_check import episodic_check
+from engine.flow.episodic_memory_handle_flow.episodic_check import episodic_check
 
 registry = ToolRegistry()
 project_root = os.path.dirname(
