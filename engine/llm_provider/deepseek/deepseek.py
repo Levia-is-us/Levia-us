@@ -22,7 +22,7 @@ def print_buffer_to_stream(buffer, buffer_type):
     #     print("\033[31m" + buffer + "\033[0m")
     # else:
     #     print("\033[32m" + buffer + "\033[0m")
-    output_stream(f"{buffer_type}: {buffer}")
+    output_stream(f"{buffer}")
 def format_content(content):
     if not content or content == "":
         return ""
@@ -62,37 +62,36 @@ def chat_completion_deepseek(messages, model, config={}):
         full_response = ""
         buffer = ""
         buffer_type = ""
+        print_stream = False
         for chunk in completion:
             content = chunk.choices[0].delta.content
             if not content or content == "":
                 continue
             full_response += content
-            buffer_end = re.search("</([^>]+)", content) 
+            buffer_end = re.search("</([^>]+)|</()", content)
             buffer_start = re.search("<([^>]+)", content)
             buffer_new_line = re.search("\n", content) or re.search("-", content)
-            has_test = re.search("input_breakdown", content)
             content = format_content(content)
             
-            if has_test:
-                print_buffer_to_stream(buffer, buffer_type)
-                buffer = ""
-                continue
-            
             if buffer_new_line:
-                print_buffer_to_stream(buffer, buffer_type)
+                if print_stream:
+                    print_buffer_to_stream(buffer, buffer_type)
                 buffer = ""
                 continue
 
             if buffer_end:
                 # output 
-                print_buffer_to_stream(buffer, buffer_type)
+                if print_stream:
+                    print_buffer_to_stream(buffer, buffer_type)
                 buffer_type = ""
                 buffer = ""
+                print_stream = False
                 continue
                 
             if buffer_start:
                 buffer_type = buffer_start.group(1)
                 buffer = ""
+                print_stream = True
                 continue
             
             buffer += content
