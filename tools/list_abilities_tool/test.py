@@ -22,12 +22,13 @@ def main():
     # List all available tools
     tools = registry.list_tools()
     print("Available tools:", len(tools))
+    tool_list = []
     for tool in tools:
-        print(f"Tool: {tool['name']}")
-        print(f"Description: {tool['description']}")
-        print("Methods:")
-        for method, info in tool['methods'].items():
-            print(f" - {method}{info['signature']}")
+        tool_list.append({
+            "name": tool['name'],
+            "description": tool['description']
+        })
+    print(f"tool_list: {tool_list}")
     
     result = caller.call_tool(tool_name="ListAbilitiesTool", method="list_abilities", kwargs={})
     

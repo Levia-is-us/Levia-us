@@ -109,8 +109,8 @@ c) If you determine that the plan cannot achieve the user intent, output a JSON 
 {{
   "status": "failed"
 }}
-
-Begin your analysis now:
+Important: Only output the JSON object, no other text or comments outside the JSON object.
+Now, output the JSON object below:
 """
     propmt = [{"role": "user", "content": episodic_check_prompt}]
     return propmt
