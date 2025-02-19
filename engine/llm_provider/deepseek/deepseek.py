@@ -1,3 +1,4 @@
+import re
 from openai import OpenAI
 
 import os
@@ -11,6 +12,23 @@ from metacognitive.stream.stream import output_stream
 api_key = os.getenv("DEEPSEEK_API_KEY")
 base_url = os.getenv("DEEPSEEK_BASE_URL") or "https://api.deepseek.com"
 
+def print_buffer_to_stream(buffer, buffer_type):
+    buffer = format_content(buffer)
+    if not buffer or buffer == "":
+        return
+    # if buffer_type == "think":
+    #     print("\033[32m" + buffer + "\033[0m")
+    # elif buffer_type == "input_breakdown":
+    #     print("\033[31m" + buffer + "\033[0m")
+    # else:
+    #     print("\033[32m" + buffer + "\033[0m")
+    output_stream(f"{buffer}")
+def format_content(content):
+    if not content or content == "":
+        return ""
+    content = content.replace("\n", "")
+    content = content.replace("-", "")
+    return content
 
 def chat_completion_deepseek(messages, model, config={}):
     """
@@ -36,55 +54,58 @@ def chat_completion_deepseek(messages, model, config={}):
         # Update with any additional config parameters
         completion_params.update(config)
         completion = client.chat.completions.create(**completion_params)
+
+        if not completion_params.get("stream", False):
+            return completion.choices[0].message.content
+        # <think>
         
-        if completion_params.get("stream", False):
-            full_response = ""
-            buffer = ""
-            for chunk in completion:
-                if chunk.choices[0].delta.content:
-                    content = chunk.choices[0].delta.content
-                    full_response += content
-                    buffer += content
-                    
-                    if "<input_breakdown>" in buffer:
-                        start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
-                        end = buffer.find("</input_breakdown>")
-                        if end != -1:
-                            breakdown = buffer[start:end]
-                            # 按 " - " 分割并打印每一行
-                            for line in breakdown.split("\n"):
-                                if " - " in line:
-                                    parts = line.split(" - ")
-                                    for part in parts:
-                                        if part.strip():
-                                            output_stream(f" - {part.strip()} - \n")
-                            buffer = buffer[end+len("</input_breakdown>"):]
-                        else:
-                            buffer = buffer[start:]
-                    elif " - " in buffer and model["type"] == "reasoning":
-                        sentences = buffer.split(" - ")
-                        for sentence in sentences[:-1]:
-                            if sentence.strip():
-                                output_stream(f" - {sentence.strip()} - \n")
-                        buffer = sentences[-1]
+        full_response = ""
+        buffer = ""
+        buffer_type = ""
+        print_stream = False
+        for chunk in completion:
+            content = chunk.choices[0].delta.content
+            if not content or content == "":
+                continue
+            full_response += content
+            buffer_end = re.search("</([^>]+)|</()", content)
+            buffer_start = re.search("<([^>]+)", content)
+            buffer_new_line = re.search("\n", content) or re.search("-", content)
+            content = format_content(content)
             
-            if "<input_breakdown>" in buffer:
-                start = buffer.find("<input_breakdown>") + len("<input_breakdown>")
-                end = buffer.find("</input_breakdown>")
-                if end != -1:
-                    breakdown = buffer[start:end]
-                    for line in breakdown.split("\n"):
-                        if " - " in line:
-                            parts = line.split(" - ")
-                            for part in parts:
-                                if part.strip():
-                                    output_stream(f" - {part.strip()} - \n")
-            elif buffer and model["type"] == "reasoning":
-                output_stream(f" - {buffer.strip()} - \n")
-        else:
-            full_response = completion.choices[0].message.content
+            if buffer_new_line:
+                if print_stream:
+                    print_buffer_to_stream(buffer, buffer_type)
+                buffer = ""
+                continue
+
+            if buffer_end:
+                # output 
+                if print_stream:
+                    print_buffer_to_stream(buffer, buffer_type)
+                buffer_type = ""
+                buffer = ""
+                print_stream = False
+                continue
+                
+            if buffer_start:
+                buffer_type = buffer_start.group(1)
+                buffer = ""
+                print_stream = True
+                continue
+            
+            buffer += content
 
         return full_response
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print("\033[31m" + f"An error occurred: {e}" + "\033[0m")
         return None
+
+# <think>
+# </think>
+
+# <input_breakdown>
+# </input_breakdown>
+
+# ```json
+# ```

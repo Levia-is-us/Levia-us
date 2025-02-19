@@ -60,7 +60,6 @@ def generate_search_keywords(intent: str) -> list:
     - Ensure clarity and avoid redundancy.
     - The output should be only the list of keywords, no other text.
     """
-
     try:
         output = chat_completion(
             [
@@ -463,3 +462,4 @@ def search_visual(keywords: list) -> list:
         driver.quit()
 
     return content_list
+
