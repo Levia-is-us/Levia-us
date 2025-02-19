@@ -15,6 +15,10 @@ def episodic_check(user_intent, context, plan):
     end_index = result.find(end_tag)
     if start_index != -1 and end_index != -1 and end_index > start_index:
         result = result[:start_index] + result[end_index + len(end_tag):]
-    result = extract_json_from_str(result)
+    try:
+        result = extract_json_from_str(result)
+    except:
+        massage = "wrong format of episodic_check result: " + result
+        raise Exception(massage)
     return result
 

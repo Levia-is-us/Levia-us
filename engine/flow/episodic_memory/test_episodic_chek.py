@@ -46,5 +46,62 @@ As we chat, I'll keep refining my understanding of your preferences, so I can ev
                {"role": "user", "content": "can you tell me some news?"},
                ]
 
-    plan = [{'step': 'step 1', 'tool': 'WebSearchTool', 'data': {'method': 'web_search', 'inputs': [{'name': 'intent', 'type': 'str', 'required': True, 'description': "User's search intention or query context used to generate keywords", 'source': 'context', 'method': 'LLM'}], 'output': {'description': "List of relevant URLs or 'No results found' message", 'type': 'Union[List[str], str]'}}, 'step purpose': 'Perform a web search to find current news articles', 'description': "Use the WebSearchTool to execute a web search based on the user's intent to find current news articles.", 'reason': "This step is necessary to gather URLs of current news articles that match the user's search intent."}, {'step': 'step 2', 'tool': 'WebsiteScanTool', 'data': {'method': 'website_scan', 'inputs': [{'name': 'url_list', 'type': 'list', 'required': True, 'description': 'Initial list of website URLs to begin scanning from', 'source': 'step 1', 'method': 'direct'}, {'name': 'intent', 'type': 'str', 'required': True, 'description': 'Guidance parameter to filter relevant content during scanning', 'source': 'context', 'method': 'LLM'}], 'output': {'description': 'Processed summary of website content matching the specified intent', 'type': 'list/dict (implementation-dependent)'}}, 'step purpose': 'Extract relevant content from the search results', 'description': 'Use the WebsiteScanTool to scan the URLs obtained from the web search and extract relevant news content.', 'reason': 'This step is necessary to filter and summarize the content from the search results to provide the user with relevant news articles.'}]
+    plan = [
+        {
+            'step': 'step 1',
+            'tool': 'WebSearchTool',
+            'data': {
+                'method': 'web_search',
+                'inputs': [
+                    {
+                        'name': 'intent',
+                        'type': 'str',
+                        'required': True,
+                        'description': "User's search intention or query context used to generate keywords",
+                        'source': 'context',
+                        'method': 'LLM'
+                    }
+                ],
+                'output': {
+                    'description': "List of relevant URLs or 'No results found' message",
+                    'type': 'Union[List[str], str]'
+                }
+            },
+            'step purpose': 'Perform a web search to find current news articles',
+            'description': "Use the WebSearchTool to execute a web search based on the user's intent to find current news articles.",
+            'reason': "This step is necessary to gather URLs of current news articles that match the user's search intent."
+        },
+        {
+            'step': 'step 2', 
+            'tool': 'WebsiteScanTool',
+            'data': {
+                'method': 'website_scan',
+                'inputs': [
+                    {
+                        'name': 'url_list',
+                        'type': 'list',
+                        'required': True,
+                        'description': 'Initial list of website URLs to begin scanning from',
+                        'source': 'step 1',
+                        'method': 'direct'
+                    },
+                    {
+                        'name': 'intent',
+                        'type': 'str',
+                        'required': True,
+                        'description': 'Guidance parameter to filter relevant content during scanning',
+                        'source': 'context',
+                        'method': 'LLM'
+                    }
+                ],
+                'output': {
+                    'description': 'Processed summary of website content matching the specified intent',
+                    'type': 'list/dict (implementation-dependent)'
+                }
+            },
+            'step purpose': 'Extract relevant content from the search results',
+            'description': 'Use the WebsiteScanTool to scan the URLs obtained from the web search and extract relevant news content.',
+            'reason': 'This step is necessary to filter and summarize the content from the search results to provide the user with relevant news articles.'
+        }
+    ]
     print(episodic_check(user_intent, context, plan))
