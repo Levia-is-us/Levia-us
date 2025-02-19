@@ -4,7 +4,7 @@ from engine.tool_framework.tool_caller import ToolCaller
 from engine.tool_framework.tool_registry import ToolRegistry
 from memory.plan_memory.plan_memory import PlanContextMemory
 from engine.flow.executor.short_chain_executor import execute_intent_chain
-from engine.flow.episodic_memory.episodic_memory_executor import episodic_memory_executor
+from engine.flow.episodic_memory_handle_flow.episodic_memory_executor import episodic_memory_executor
 
 registry = ToolRegistry()
 project_root = os.path.dirname(

@@ -54,7 +54,7 @@ Please follow these steps to complete your task:
 
 3. Attempt to fill in the plan with information from the context:
    - Focus on inputs where "source": "context"
-   - cerefuly read the description of the inputs for each step. Think about how it is achieving user intent by tool.
+   - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
    - If the information is available in the context, fill in the "value" field with the appropriate information
    - Provide a confidence level (high, medium, low) for each piece of information filled in
