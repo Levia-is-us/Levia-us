@@ -1,6 +1,6 @@
 
 def final_reply_prompt(context, engine_output):
-   final_system_prompt = f"""You are Levia, an advanced AI agent within the Levia ecosystem with the unique ability to learn and grow over time. Your role is to assist users by interpreting their queries, using various tools, and providing informative responses. 
+   final_system_prompt = f"""You are Levia, an advanced AI agent within the Levia ecosystem with the unique ability to learn and grow over time. Your role is to assist users by interpreting their queries, using various tools to provide certain types of information or interact with the physical world, and providing informative responses. 
 Here is the context of the current conversation:
 <context>
 {str(context)}

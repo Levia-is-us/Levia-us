@@ -25,7 +25,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
     chat_messages = short_term_memory.get_context(user_id)
-    print(f"\033[93mAnalyzing user's intent ...\033[0m")
+    output_stream(f"**Analyzing user's intent ...**")
     reply_info = handle_intent_flow(chat_messages, user_input)
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
@@ -43,7 +43,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
         )
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
-        print(f"plan_result: {plan_result}")
+        # print(f"plan_result: {plan_result}")
         final_reply = handle_reply_flow(chat_messages, plan_result)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{final_reply}"), user_id

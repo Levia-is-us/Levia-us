@@ -79,7 +79,7 @@ If the tools are sufficient:
 
 If the tools are insufficient:
 {{
-  "status": "Failed to make plan with current tools",
+  "status": "Failed",
   "reason": "Detailed explanation of what tools are needed to complete the user's intent. and explain that what steps you can do and what steps you can't do."
 }}
 
