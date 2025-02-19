@@ -34,9 +34,9 @@ class TaskManager:
                 self.init_tasks(user_id)
             self.tasks[user_id].append(task)
 
-    def get_current_task(self, user_id="local"):
+    def update_task_status(self, task_index, status, user_id="local"):
         with self.task_lock:
-            return self.tasks[user_id][self.current_tasks[user_id]]
+            self.tasks[user_id][task_index]["status"] = status
 
     def get_next_task(self, user_id="local"):
         with self.task_lock:
@@ -58,3 +58,15 @@ class TaskManager:
     def get_task_by_index(self, index, user_id="local"):
         with self.task_lock:
             return self.tasks[user_id][index]
+
+    def set_current_task(self, task_input):
+        with self.task_lock:
+            self.current_tasks = {"task": task_input, "status": "pending"}
+    
+    def clean_current_task(self):
+        with self.task_lock:
+            self.current_tasks = {}
+
+    def get_current_task(self):
+        with self.task_lock:
+            return self.current_tasks
