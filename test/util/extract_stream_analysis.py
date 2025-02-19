@@ -30,7 +30,6 @@ text = """ <input_breakdown>- 1. Main Topic or Request: -
 
 
 def extract_stream_analysis(text):
-    # 使用正则表达式提取JSON部分
     json_start = text.find("{")
     json_end = text.rfind("}") + 1
     json_text = text[json_start:json_end]
