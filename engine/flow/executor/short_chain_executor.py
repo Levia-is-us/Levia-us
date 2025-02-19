@@ -61,7 +61,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     """
     # Analyze each step and find appropriate tools
     found_tools = []
-    for step in enumerate(plan):
+    for step in plan:
         output_stream(f"**Finding appropriate tool for step: {step['intent']}**")
         found_tools.extend(resolve_tool_for_step(step))
 

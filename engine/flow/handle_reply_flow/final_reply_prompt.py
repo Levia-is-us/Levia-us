@@ -42,8 +42,6 @@ Remember to demonstrate your self-learning capabilities by leveraging both your 
 
 Example output structure (do not copy the content, only the format):
 
-The user seems to be inquiring about [brief description of interpreted intent].
-
 [Your detailed response addressing the user's query, demonstrating your capabilities, and engaging the user in further conversation if appropriate]
 """
    prompt = [
