@@ -1,3 +1,5 @@
+import datetime
+
 prompt_v1 = """Analyze the input conversation and generate a structured JSON output.
 <Input>
 {input_messages}
@@ -53,6 +55,11 @@ Here is the conversation input you need to analyze:
 {input_messages}
 </input_messages>
 
+Note that the realworld time is:
+<time_now>
+{time_now}
+</time_now>
+
 Please follow these steps to process the input and generate an appropriate response:
 
 1. Analyze the Input:
@@ -63,7 +70,7 @@ Please follow these steps to process the input and generate an appropriate respo
    - Decide whether you can provide a direct answer based on your knowledge and capabilities.
    - If the request is asking for information, chat, anything that can be answered directly, just help user to do it and provide a direct answer.
    - If the request is asking for actions, tools, anything that can be acted upon by an external system, prepare to summarize the user's intent.
-   - If the request is asking for information, but you don't have the information, provide a direct answer.
+   - If the request is asking for information, but you don't have the information, summarize the user's intent.
    - If the request is unclear or requires actions beyond your abilities (e.g., physical tasks, making purchases), prepare to summarize the user's intent.
    - If the user says something that is unclear and lacks context, you should durect answer and ask further questions.
 
@@ -105,7 +112,8 @@ Ensure that your final output is strictly in the JSON format specified above, wi
 
 
 def intents_system_prompt(input_messages):
+    time_now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     prompt = [
-        {"role": "user", "content": prompt_v2.format(input_messages=input_messages)}
+        {"role": "user", "content": prompt_v2.format(input_messages=input_messages, time_now=time_now)}
     ]
     return prompt
