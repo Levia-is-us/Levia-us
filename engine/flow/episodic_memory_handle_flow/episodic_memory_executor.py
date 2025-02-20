@@ -14,7 +14,7 @@ registry = ToolRegistry()
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-print(f"registry project_root: {project_root}")
+# print(f"registry project_root: {project_root}")
 tools_dir = os.path.join(project_root, "tools")
 registry.scan_directory(tools_dir)
 tool_caller_client = ToolCaller(registry)
@@ -42,13 +42,15 @@ def process_tool_execution_plan(plan, user_id: str):
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
         plan_context_memory.create_plan_context(plan, user_id)
+    return plan
+
 
 def process_plan_execution(plan_steps, user_id: str):
     execution_outputs = []  # Store all tool execution outputs
     if isinstance(plan_steps, str):
         plan_steps = eval(plan_steps)
     for step_index, step in enumerate(plan_steps):
-        print(f"step: {step}")
+        # print(f"step: {step}")
         if step.get("executed", False):
             continue
             
@@ -59,7 +61,7 @@ def process_plan_execution(plan_steps, user_id: str):
             
         # Process input parameters
         input_params = get_input_parameters(tool_config, execution_outputs)
-        print(f"input_params: {input_params}")
+        # print(f"input_params: {input_params}")
         
         if input_params.get("status") == "need_input":
             # Save current execution state
@@ -77,7 +79,7 @@ def process_plan_execution(plan_steps, user_id: str):
         )
         if isinstance(tool_result, str):
             tool_result = eval(tool_result)
-        print(f"tool_result1: {tool_result}")
+        # print(f"tool_result1: {tool_result}")
         if tool_result:
             # Store output for potential future steps
             execution_outputs.append({
@@ -111,7 +113,7 @@ def execute_step_tool(tool_config, plan_steps, user_id: str, step_index: int, ar
     def execute_with_config(args):
             
         execution_result = execute_tool_operation(tool_config, args)
-        print(f"execution_result: {execution_result}")     
+        # print(f"execution_result: {execution_result}")     
         if execution_result:
             # plan_context_memory.update_step_status_context(
             #     step_index,
@@ -257,6 +259,7 @@ def save_execution_state(execution_outputs: list, step_index: int, user_id: str)
         "user_id": user_id
     }
     print(f"Saving execution state: {state}")
+    output_stream(f"**Saving execution state...**")
 
 def extract_input_specs(tool_config: dict) -> list[dict]:
     """Extract input specifications from tool configuration"""

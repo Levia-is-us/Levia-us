@@ -19,7 +19,7 @@ from engine.tool_framework import run_tool, BaseTool
 class ListAbilitiesTool(BaseTool):
     """Tool for listing available abilities"""
     
-    def list_abilities(self, **kwargs) -> dict: 
+    def list_abilities(self) -> dict: 
         """List all available abilities"""
         abilities = {}
         for method_name, method in self.methods.items():

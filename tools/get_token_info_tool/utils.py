@@ -22,9 +22,12 @@ def get_token_pool_info(token_address: str) -> dict:
 
 def get_token_twitter_url(pool: dict, token_address: str) -> str:
     try:
+        basc_token = pool['tokens'][0]
+        if basc_token['is_base_token'] != True:
+            basc_token = pool['tokens'][1]
         params = '?include=tokens'
         twitter_result = get_request('https://app.geckoterminal.com/api/p1/'+pool['network']['identifier']+'/pools/'+token_address+params)
-        target_token = find_token_by_token_name(twitter_result['included'], pool['tokens'][1]['name'])
+        target_token = find_token_by_token_name(twitter_result['included'], basc_token['name'])
         links = target_token['attributes']['links']
         twitter_url ='https://x.com/'+links['twitter_handle']
         return twitter_url
