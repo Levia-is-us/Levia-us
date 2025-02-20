@@ -21,6 +21,10 @@ class GetTokenInfoTool(BaseTool):
         a json about the token info details.
         {
             "price_in_usd": "100", // the price of the token in usd
+            "fdv_in_usd": "100", // the fdv of the token in usd
+            "market_cap_in_usd": "100", // the market cap of the token in usd
+            "pool_creation_date": "2021-01-01", // the creation date of the pool
+            "reserve_in_usd": "100", // the reserve of the token in usd
             "twitter_url": "https://x.com/example" // the twitter url of the token
         }
     """
@@ -32,6 +36,13 @@ class GetTokenInfoTool(BaseTool):
             return 'not found token info'
         
         twitter_url = get_token_twitter_url(pool, pool['address'])
-        return {"price_in_usd":pool['price_in_usd'], "twitter_url":twitter_url}
+        return {
+            "price_in_usd":pool['price_in_usd'],
+            "fdv_in_usd":pool['fdv_in_usd'],
+            "market_cap_in_usd":pool['market_cap_in_usd'],
+            "pool_creation_date":pool['pool_creation_date'],
+            "reserve_in_usd":pool['reserve_in_usd'],
+            "twitter_url":twitter_url
+        }
         
 
