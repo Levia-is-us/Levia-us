@@ -101,7 +101,7 @@ def process_plan_execution(plan_steps, user_id: str, chat_messages: list, top_me
         else:
             step["executed"] = True
             if input_params.get("get_param_from_llm", False):
-                delete_long_pass_memory(top_memory_id)
+                delete_long_pass_memory(top_memory_id, user_id)
 
 
 
@@ -119,7 +119,7 @@ def execute_step_tool(tool_config, plan_steps, user_id: str, step_index: int, ar
         return None
     
     tool_name = tool_config['tool']
-    
+
     def execute_with_config(args):
             
         execution_result = execute_tool_operation(tool_config, args)

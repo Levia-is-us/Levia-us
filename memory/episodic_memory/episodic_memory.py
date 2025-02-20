@@ -1,5 +1,6 @@
 from memory.vector_db_provider.vector_db import save_memory, retrieve_memory, delete_memory
 from engine.llm_provider.llm import create_embedding 
+import time
 
 short_pass_namespace = "short_pass"
 long_pass_namespace = "long_pass"
@@ -59,7 +60,16 @@ def retrieve_long_pass_memory(
 ):
     try:
         embedding = create_embedding(query)
-        memories = retrieve_memory(embedding, namespace)
+        for i in range(1):
+            try:
+                memories = retrieve_memory(embedding, namespace)
+                if memories:
+                    break
+            except Exception as e:
+                print(f"\033[91mRetry {i+1}/3 failed: {str(e)}\033[0m")
+                time.sleep(5)
+                if i == 1:  # Last attempt failed
+                    raise e
         return memories
     except Exception as e:
         print(f"\033[91mError retrieving long pass memory: {str(e)}\033[0m")
