@@ -60,20 +60,11 @@ def retrieve_long_pass_memory(
 ):
     try:
         embedding = create_embedding(query)
-        for i in range(2):
-            try:
-                memories = retrieve_memory(embedding, namespace)
-                if memories:
-                    break
-            except Exception as e:
-                print(f"\033[91mRetry {i+1}/1 failed: {str(e)}\033[0m")
-                time.sleep(5)
-                if i == 1:  # Last attempt failed
-                    raise e
+        memories = retrieve_memory(embedding, namespace)
         return memories
     except Exception as e:
         print(f"\033[91mError retrieving long pass memory: {str(e)}\033[0m")
-        return []
+        raise Exception(f"Error retrieving long pass memory: {str(e)}")
     
 def delete_long_pass_memory(id: str, namespace: str = long_pass_namespace, uid: str = "levia"):
     delete_memory(id, namespace)
