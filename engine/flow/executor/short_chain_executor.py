@@ -40,7 +40,7 @@ def execute_intent_chain(
     user_id: str
 ):   
     output_stream(f" - Do not have experience for {user_intent} - \n")
-    print(f"\033[93mCreating new execution plan ... - \033[0m\n")
+    output_stream(f"**Creating new execution plan ...**")
     plan = create_execution_plan(user_intent)
     return process_tool_execution_plan(
         plan, messages_history, user_id, user_intent
@@ -61,20 +61,27 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     """
     # Analyze each step and find appropriate tools
     found_tools = []
-    for step_index, step in enumerate(plan):
-        print(f"\033[93mFinding appropriate tool for step: {step['intent']} - \033[0m\n")
+    for step in plan:
+        output_stream(f"**Finding appropriate tool for step: {step['intent']}**")
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
     found_tools = get_unique_tools(found_tools)
-    print(f"\033[93mMaking new plan based on current tools - \033[0m\n")
+    if(len(found_tools) == 0):
+        raise Exception("failed to find tools")
+    output_stream(f"**Making new plan based on current tools...**")
     plan = tool_base_planner(user_intent, found_tools)
-    print(f"plan: {plan}")
+    # print(f"plan: {plan}")
             
-    if(plan["status"] == "Failed to make plan with current tools"):
-        print(f"\033[93m - Failed to make plan with current tools - \033[0m\n")
+    if(plan["status"] == "failed"):
+        output_stream(f"**Failed to make plan with current tools**")
         return plan
     plan = plan["plan"]
+    for step in plan:
+        output_stream(f"Step: {step['step']}")
+        output_stream(f"execution tool: {step['tool']}")
+        output_stream(f"step purpose: {step['step purpose']}")
+        output_stream(f"---------------------------------")
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id)
@@ -104,7 +111,7 @@ def process_plan_execution(messages_history, plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         # if not step.get("tool_necessity", True):
-        print(f"\033[93m - Executing step: {step['step purpose']} - \033[0m\n")
+        output_stream(f"**Executing step: {step['step purpose']}...**")
         #     continue
         if step.get("executed", False):
             continue
@@ -181,10 +188,16 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             method_metadata = extract_json_from_str(step['data'])
             # print(f" - method_metadata: {method_metadata} - \n")
             if method_metadata['inputs']:
+                print(f"method_metadata: {method_metadata}")
                 for input in method_metadata['inputs']:
-                    if isinstance(input, dict):
-                        append_input_param = reply_json['extracted_arguments']['required_arguments'][input['name']]
-                        del append_input_param['value']
+                    
+                    try:
+                        if isinstance(input, dict):
+                            append_input_param = reply_json['extracted_arguments']['required_arguments'][input['name']]
+                            del append_input_param['value']
+                            input.update(append_input_param)
+                    except:
+                        append_input_param = {}
                         input.update(append_input_param)
                 step['data'] = method_metadata
             return {

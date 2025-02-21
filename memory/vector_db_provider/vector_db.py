@@ -26,3 +26,6 @@ def retrieve_memory(vector: list, namespace: str, top_k: int = 10):
         include_values=False,
     )
     return memories
+
+def delete_memory(id: str, namespace: str):
+    vector_db.delete(id, namespace)
