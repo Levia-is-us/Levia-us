@@ -62,6 +62,15 @@ def setup_driver():
 
         chrome_options.add_argument("--log-level=3")
         chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+        if visual == "T":
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            chrome_options.add_argument(
+                "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
+            )
+            chrome_options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
+            chrome_options.add_experimental_option("useAutomationExtension", False)
+            
         path = ChromeDriverManager().install()
         service = Service(path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
