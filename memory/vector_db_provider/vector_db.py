@@ -1,6 +1,6 @@
 from memory.vector_db_provider.pinecone.pinecone import PineconeDb
 from datetime import datetime
-
+import time
 vector_db = PineconeDb(index_name="levia")
 
 
@@ -14,8 +14,7 @@ def save_memory(id: str, vector: list, metadata: dict, namespace: str):
     try:
         vector_db.upsert([input_embedding], namespace)
     except Exception as e:
-        print(f"\033[91mError upserting memory: {str(e)}\033[0m")
-
+        raise Exception(f"Error saving memory: {str(e)}")
 
 def retrieve_memory(vector: list, namespace: str, top_k: int = 10):
     memories = vector_db.query(

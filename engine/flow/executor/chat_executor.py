@@ -11,7 +11,6 @@ registry = ToolRegistry()
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-print(f"registry project_root: {project_root}")
 tools_dir = os.path.join(project_root, "tools")
 registry.scan_directory(tools_dir)
 tool_caller_client = ToolCaller(registry)
