@@ -1,7 +1,13 @@
 import threading
 from memory.short_term_memory.short_term_memory_provider.local_context_store.local_context_store import (
-    LocalContextStore,
+    LocalContextStore
 )
+from memory.short_term_memory.short_term_memory_provider.redis_context_store.redis_context_store import (
+    RedisContextStore
+)
+
+import os
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
 
 
 class ShortTermMemory:
@@ -17,7 +23,10 @@ class ShortTermMemory:
 
     def _initialize(self, max_length: int):
         """Initialize the context store."""
-        self.context_store = LocalContextStore(max_length)
+        if ENVIRONMENT == "local":
+            self.context_store = LocalContextStore(max_length)
+        else:
+            self.context_store = RedisContextStore(max_length)
 
     def get_context(self, user_key: str = "local"):
         return self.context_store.get_context(user_key)

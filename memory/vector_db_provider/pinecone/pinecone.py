@@ -1,5 +1,6 @@
 import os
 from pinecone import Pinecone, QueryResponse, FetchResponse
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 class PineconeDb:
@@ -34,6 +35,11 @@ class PineconeDb:
     def update_metadata(self, id, metadata, namespace: str) -> None:
         self.index.update(id, metadata, namespace=namespace)
 
+    
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10)
+    )
     def query(
         self,
         namespace: str,
