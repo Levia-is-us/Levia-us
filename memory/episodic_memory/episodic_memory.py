@@ -1,5 +1,6 @@
 from memory.vector_db_provider.vector_db import save_memory, retrieve_memory, delete_memory
 from engine.llm_provider.llm import create_embedding 
+import time
 
 short_pass_namespace = "short_pass"
 long_pass_namespace = "long_pass"
@@ -63,7 +64,7 @@ def retrieve_long_pass_memory(
         return memories
     except Exception as e:
         print(f"\033[91mError retrieving long pass memory: {str(e)}\033[0m")
-        return []
+        raise Exception(f"Error retrieving long pass memory: {str(e)}")
     
 def delete_long_pass_memory(id: str, namespace: str = long_pass_namespace, uid: str = "levia"):
     delete_memory(id, namespace)

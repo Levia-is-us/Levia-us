@@ -15,5 +15,7 @@ def handle_reply_flow(chat_messages: list, engine_output: list) -> str:
     final_reply = chat_completion(
         prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.7}
     )
+    if final_reply ==  None or final_reply == "":
+        raise Exception("Final reply is None")
 
     return final_reply

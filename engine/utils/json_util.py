@@ -2,6 +2,9 @@ import json
 
 
 def extract_json_from_str(json_str):
+    if not isinstance(json_str, str):
+        return json_str   
+    
     try:
         if "```json" in json_str:
             start = json_str.find("```json") + len("```json")
@@ -18,7 +21,13 @@ def extract_json_from_str(json_str):
         else:
             return json.loads(json_str)
     except:
-        return eval(json_str)
+        try:
+            cleaned_str = json_str.strip().replace('\n', '').replace('    ', '')
+            return json.loads(cleaned_str)
+        except:
+            raise Exception("Failed to parse JSON string")
+
+
 
 
 def extract_code_breakdown_from_doc(doc):
