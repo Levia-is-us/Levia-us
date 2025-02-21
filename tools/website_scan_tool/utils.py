@@ -175,7 +175,7 @@ def get_all_content(links):
             if visual == "T":
                 smooth_scroll_to_bottom(driver)
         except Exception as e:
-            continue
+            raise Exception(e)
 
     driver.quit()
     if(len(results) == 0):
