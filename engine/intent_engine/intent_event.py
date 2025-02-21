@@ -3,6 +3,7 @@ from engine.flow.chat_handler_flow.chat_handler_flow import handle_chat_flow
 from memory.short_term_memory.short_term_memory import ShortTermMemory
 from engine.intent_engine.backup_reply import backup_reply
 from engine.flow.executor.task_manager import TaskManager
+from engine.utils.chat_formatter import create_chat_message
 
 short_term_memory = ShortTermMemory()
 
@@ -16,4 +17,7 @@ def event_chat(user_id, input_message):
     except Exception as e:
         print(f"event_chat error: {str(e)}")
         reply = backup_reply(short_term_memory.get_context(user_id))
+        short_term_memory.add_context(
+            create_chat_message("assistant", f"{reply}"), user_id
+        )
         return reply

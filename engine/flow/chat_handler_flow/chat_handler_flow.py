@@ -3,7 +3,6 @@ from engine.flow.handle_reply_flow.handle_reply_flow import handle_reply_flow
 from engine.utils.chat_formatter import create_chat_message
 from engine.utils.json_util import (
     extract_code_breakdown_from_doc,
-    extract_json_from_str,
     extract_str_from_doc,
 )
 from memory.short_term_memory.short_term_memory import ShortTermMemory
@@ -38,27 +37,21 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
         final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": response}])
-        short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}"), user_id
-        )
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         # print(f"plan_result: {plan_result}")
         final_reply = handle_reply_flow(chat_messages, plan_result)
-        short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}"), user_id
-        )
+        
     elif reply_info["type"] == "continue_execution":
         plan_result = handle_input_intent(user_id)
         final_reply = handle_reply_flow(chat_messages, plan_result)
-        short_term_memory.add_context(
-            create_chat_message("assistant", f"{final_reply}"), user_id
-        )
-
+        
     analysis = extract_code_breakdown_from_doc(final_reply)
     output_stream(f"{analysis}")
     final_reply = extract_str_from_doc(final_reply)
-
+    short_term_memory.add_context(
+        create_chat_message("assistant", f"{final_reply}"), user_id
+    )
     return final_reply
 
 

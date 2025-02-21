@@ -12,6 +12,7 @@ from engine.intent_engine.backup_reply import backup_reply
 import os
 
 from metacognitive.stream.stream import output_stream
+from engine.utils.chat_formatter import create_chat_message
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
@@ -68,5 +69,8 @@ def terminal_chat():
         except Exception as e:
             print(f"\033[91mError occurred: {str(e)}\033[0m")
             reply = backup_reply(short_term_memory.get_context("local-dev"))
+            short_term_memory.add_context(
+                create_chat_message("assistant", f"{reply}"), "local-dev"
+            )
             print(reply)
 

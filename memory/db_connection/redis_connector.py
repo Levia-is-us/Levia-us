@@ -1,211 +1,180 @@
 import redis
-from typing import Any, Optional, List, Dict, Union
+from typing import Any, Optional, Dict, List, Set
+from functools import wraps
 import json
-from datetime import timedelta
-import logging
+import time
+import ssl
 
-class ValueOperations:
-    def __init__(self, redis_client: redis.Redis):
-        self._redis = redis_client
-    
-    def set(self, key: str, value: Any, timeout: Optional[int] = None) -> bool:
+import os
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
+REDIS_DB = os.environ.get("REDIS_DB", "0")
+REDIS_MAX_CONNECTIONS = os.environ.get("REDIS_MAX_CONNECTIONS", 20)
+REDIS_SSL = os.environ.get("REDIS_SSL", "False")
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", "")
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
+
+
+class RedisUtils:
+    _pool = None
+    _default_config = {
+        'host': REDIS_HOST,
+        'port': REDIS_PORT,
+        'db': REDIS_DB,
+        'max_connections': 32,
+        'decode_responses': True,
+        'socket_timeout': 30,
+        'password': REDIS_PASSWORD
+    }
+
+    def __init__(self, **kwargs):
+        if ENVIRONMENT == "local":
+            return
+        self.config = {**self._default_config, **kwargs}
+        self.connect()
+
+    @classmethod
+    def get_pool(cls, config: Optional[Dict] = None) -> redis.ConnectionPool:
+        if cls._pool is None:
+            effective_config = config if config is not None else cls._default_config
+            if REDIS_SSL.lower() == 'true':
+                ssl_context = ssl.create_default_context()
+                effective_config['connection_class'] = redis.connection.SSLConnection
+                effective_config['ssl_cert_reqs'] = ssl.CERT_NONE
+            cls._pool = redis.ConnectionPool(**effective_config)
+        return cls._pool
+
+    def connect(self) -> redis.Redis:
         try:
-            if isinstance(value, (dict, list)):
-                value = json.dumps(value)
-            return self._redis.set(key, value, ex=timeout)
-        except Exception as e:
-            logging.error(f"Error in set: {str(e)}")
-            return False
-    
-    def get(self, key: str) -> Any:
-        try:
-            value = self._redis.get(key)
-            if value is None:
-                return None
+            self.client = redis.Redis(connection_pool=self.get_pool())
+            self.client.ping()
+        except redis.ConnectionError as e:
+            raise
+        return self.client
+
+    def retry_on_failure(max_retries: int = 3, delay: float = 1):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(self, *args, **kwargs):
+                retries = 0
+                while retries < max_retries:
+                    try:
+                        return func(self, *args, **kwargs)
+                    except (redis.ConnectionError, redis.TimeoutError) as e:
+                        retries += 1
+                        if retries == max_retries:
+                            raise
+                        time.sleep(delay)
+            return wrapper
+        return decorator
+
+    @retry_on_failure()
+    def set_value(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value)
+        result = self.client.set(key, value, ex=expire)
+        return result
+
+    @retry_on_failure()
+    def get_value(self, key: str) -> Optional[Any]:
+        value = self.client.get(key)
+        if value and (value.startswith('{') or value.startswith('[')):
             try:
                 return json.loads(value)
-            except (TypeError, json.JSONDecodeError):
-                return value
-        except Exception as e:
-            logging.error(f"Error in get: {str(e)}")
-            return None
-        
-    def increment(self, key: str, delta: int = 1) -> Optional[int]:
-        """
-        Increment the value of key by delta
-        
-        Args:
-            key: Redis key
-            delta: Increment amount (default: 1)
-            
-        Returns:
-            New value after increment or None if failed
-        """
-        try:
-            return self._redis.incrby(key, delta)
-        except Exception as e:
-            logging.error(f"Error in increment: {str(e)}")
-            return None
+            except json.JSONDecodeError:
+                pass
+        return value
 
-class HashOperations:
-    def __init__(self, redis_client: redis.Redis):
-        self._redis = redis_client
-    
-    def put(self, key: str, hash_key: str, value: Any) -> bool:
-        try:
-            if isinstance(value, (dict, list)):
-                value = json.dumps(value)
-            return bool(self._redis.hset(key, hash_key, value))
-        except Exception as e:
-            logging.error(f"Error in hash put: {str(e)}")
-            return False
-    
-    def get(self, key: str, hash_key: str) -> Any:
-        try:
-            value = self._redis.hget(key, hash_key)
-            if value is None:
-                return None
+    @retry_on_failure()
+    def delete(self, key: str) -> int:
+        result = self.client.delete(key)
+        return result
+
+    @retry_on_failure()
+    def list_push(self, key: str, *values: Any) -> int:
+        result = self.client.rpush(key, *values)
+        return result
+
+    @retry_on_failure()
+    def list_pop(self, key: str) -> Optional[str]:
+        value = self.client.lpop(key)
+        return value
+
+    @retry_on_failure()
+    def list_range(self, key: str, start: int = 0, end: int = -1) -> List[str]:
+        values = self.client.lrange(key, start, end)
+        return values
+
+    @retry_on_failure()
+    def hash_set(self, key: str, field: str, value: Any) -> int:
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value)
+        result = self.client.hset(key, field, value)
+        return result
+
+    @retry_on_failure()
+    def hash_get(self, key: str, field: str) -> Optional[Any]:
+        value = self.client.hget(key, field)
+        if value and (value.startswith('{') or value.startswith('[')):
             try:
                 return json.loads(value)
-            except (TypeError, json.JSONDecodeError):
-                return value
-        except Exception as e:
-            logging.error(f"Error in hash get: {str(e)}")
-            return None
-    
-    def entries(self, key: str) -> Dict[str, Any]:
-        try:
-            result = self._redis.hgetall(key)
-            return {k: self._parse_value(v) for k, v in result.items()}
-        except Exception as e:
-            logging.error(f"Error in entries: {str(e)}")
-            return {}
-    
-    def _parse_value(self, value: str) -> Any:
-        try:
-            return json.loads(value)
-        except (TypeError, json.JSONDecodeError):
-            return value
+            except json.JSONDecodeError:
+                pass
+        return value
 
-class ListOperations:
-    def __init__(self, redis_client: redis.Redis):
-        self._redis = redis_client
-    
-    def right_push(self, key: str, value: Any) -> Optional[int]:
-        try:
-            if isinstance(value, (dict, list)):
-                value = json.dumps(value)
-            return self._redis.rpush(key, value)
-        except Exception as e:
-            logging.error(f"Error in right push: {str(e)}")
-            return None
-    
-    def left_pop(self, key: str) -> Any:
-        try:
-            value = self._redis.lpop(key)
-            if value is None:
-                return None
-            try:
-                return json.loads(value)
-            except (TypeError, json.JSONDecodeError):
-                return value
-        except Exception as e:
-            logging.error(f"Error in left pop: {str(e)}")
-            return None
-    
-    def range(self, key: str, start: int = 0, end: int = -1) -> List[Any]:
-        try:
-            values = self._redis.lrange(key, start, end)
-            return [self._parse_value(v) for v in values]
-        except Exception as e:
-            logging.error(f"Error in range: {str(e)}")
-            return []
-    
-    def _parse_value(self, value: str) -> Any:
-        try:
-            return json.loads(value)
-        except (TypeError, json.JSONDecodeError):
-            return value
+    @retry_on_failure()
+    def hash_get_all(self, key: str) -> Dict[str, Any]:
+        values = self.client.hgetall(key)
+        for k, v in values.items():
+            if v and (v.startswith('{') or v.startswith('[')):
+                try:
+                    values[k] = json.loads(v)
+                except json.JSONDecodeError:
+                    pass
+        return values
 
-class SetOperations:
-    def __init__(self, redis_client: redis.Redis):
-        self._redis = redis_client
-    
-    def add(self, key: str, *values: Any) -> Optional[int]:
-        try:
-            processed_values = [
-                json.dumps(v) if isinstance(v, (dict, list)) else v
-                for v in values
-            ]
-            return self._redis.sadd(key, *processed_values)
-        except Exception as e:
-            logging.error(f"Error in set add: {str(e)}")
-            return None
-    
-    def members(self, key: str) -> List[Any]:
-        try:
-            values = self._redis.smembers(key)
-            return [self._parse_value(v) for v in values]
-        except Exception as e:
-            logging.error(f"Error in set members: {str(e)}")
-            return []
-    
-    def _parse_value(self, value: str) -> Any:
-        try:
-            return json.loads(value)
-        except (TypeError, json.JSONDecodeError):
-            return value
+    @retry_on_failure()
+    def set_add(self, key: str, *values: Any) -> int:
+        result = self.client.sadd(key, *values)
+        return result
 
-class RedisTemplate:
-    def __init__(
-        self,
-        host: str = "localhost",
-        port: int = 6379,
-        db: int = 0,
-        password: Optional[str] = None,
-        decode_responses: bool = True
-    ):
-        self._redis = redis.Redis(
-            host=host,
-            port=port,
-            db=db,
-            password=password,
-            decode_responses=decode_responses
-        )
-        self._value_ops = ValueOperations(self._redis)
-        self._hash_ops = HashOperations(self._redis)
-        self._list_ops = ListOperations(self._redis)
-        self._set_ops = SetOperations(self._redis)
-    
-    def opsForValue(self) -> ValueOperations:
-        return self._value_ops
-    
-    def opsForHash(self) -> HashOperations:
-        return self._hash_ops
-    
-    def opsForList(self) -> ListOperations:
-        return self._list_ops
-    
-    def opsForSet(self) -> SetOperations:
-        return self._set_ops
-    
-    def delete(self, key: str) -> bool:
-        try:
-            return bool(self._redis.delete(key))
-        except Exception as e:
-            logging.error(f"Error in delete: {str(e)}")
-            return False
-    
-    def hasKey(self, key: str) -> bool:
-        try:
-            return bool(self._redis.exists(key))
-        except Exception as e:
-            logging.error(f"Error in hasKey: {str(e)}")
-            return False
-    
-    def expire(self, key: str, timeout: int) -> bool:
-        try:
-            return bool(self._redis.expire(key, timeout))
-        except Exception as e:
-            logging.error(f"Error in expire: {str(e)}")
-            return False
+    @retry_on_failure()
+    def set_members(self, key: str) -> Set[str]:
+        members = self.client.smembers(key)
+        return members
+
+    def pipeline_execute(self, commands: List[callable]) -> List[Any]:
+        pipe = self.client.pipeline()
+        for cmd in commands:
+            cmd(pipe)
+        results = pipe.execute()
+        return results
+
+    def close(self):
+        if self._pool:
+            self._pool.disconnect()
+
+if __name__ == "__main__":
+    redis_tool = RedisUtils(host='localhost', port=6379, db=0)
+
+    redis_tool.set_value('user_id', 123, expire=60)
+    print(f"User ID: {redis_tool.get_value('user_id')}")
+
+    redis_tool.list_push('tasks', 'task1', 'task2')
+    print(f"Tasks: {redis_tool.list_range('tasks')}")
+
+    redis_tool.hash_set('user:1', 'name', 'Alice')
+    redis_tool.hash_set('user:1', 'data', {'age': 25})
+    print(f"User name: {redis_tool.hash_get('user:1', 'name')}")
+    print(f"User all: {redis_tool.hash_get_all('user:1')}")
+
+    redis_tool.set_add('tags', 'python', 'redis')
+    print(f"Tags: {redis_tool.set_members('tags')}")
+
+    results = redis_tool.pipeline_execute([
+        lambda p: p.set('pipe_key', 'pipe_value'),
+        lambda p: p.get('pipe_key')
+    ])
+    print(f"Pipeline results: {results}")
+
+    redis_tool.close()
