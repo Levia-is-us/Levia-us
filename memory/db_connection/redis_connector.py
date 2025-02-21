@@ -153,28 +153,3 @@ class RedisUtils:
     def close(self):
         if self._pool:
             self._pool.disconnect()
-
-if __name__ == "__main__":
-    redis_tool = RedisUtils(host='localhost', port=6379, db=0)
-
-    redis_tool.set_value('user_id', 123, expire=60)
-    print(f"User ID: {redis_tool.get_value('user_id')}")
-
-    redis_tool.list_push('tasks', 'task1', 'task2')
-    print(f"Tasks: {redis_tool.list_range('tasks')}")
-
-    redis_tool.hash_set('user:1', 'name', 'Alice')
-    redis_tool.hash_set('user:1', 'data', {'age': 25})
-    print(f"User name: {redis_tool.hash_get('user:1', 'name')}")
-    print(f"User all: {redis_tool.hash_get_all('user:1')}")
-
-    redis_tool.set_add('tags', 'python', 'redis')
-    print(f"Tags: {redis_tool.set_members('tags')}")
-
-    results = redis_tool.pipeline_execute([
-        lambda p: p.set('pipe_key', 'pipe_value'),
-        lambda p: p.get('pipe_key')
-    ])
-    print(f"Pipeline results: {results}")
-
-    redis_tool.close()
