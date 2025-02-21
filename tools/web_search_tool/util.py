@@ -424,13 +424,13 @@ def search_visual(keywords: list) -> list:
     Returns:
         A list of strings, each containing the URL and content of a search result.
     """
-    # Initialize the Chrome WebDriver
-    driver = init_driver()
-    # Set the explicit wait time
-    wait = WebDriverWait(driver, 30)
 
     content_list = []
     try:
+        # Initialize the Chrome WebDriver
+        driver = init_driver()
+        # Set the explicit wait time
+        wait = WebDriverWait(driver, 30)
         for keyword in keywords:
             try:
                 # Navigate to Google's homepage
@@ -458,8 +458,9 @@ def search_visual(keywords: list) -> list:
                 content_list.extend(contents)
             except Exception as err:
                 print(f"Extract google search output error for '{keyword}': {err}")
+    except Exception as e:
+        print(f"Init driver error: {str(e)}")
     finally:
         driver.quit()
 
     return content_list
-
