@@ -227,6 +227,7 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
 
 def execute_tool_operation(tool_config, reply_json):
     """Execute tool with provided arguments"""
+    print(f"tool_config: {tool_config}")
     args = {}
     required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
     for arg_name, arg_info in required_args.items():

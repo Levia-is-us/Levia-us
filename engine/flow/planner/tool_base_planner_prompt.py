@@ -19,7 +19,7 @@ Note that the realworld time is {date_time}
 
 Your task is to analyze the user's intent, determine if the available tools are sufficient to fulfill the request, and create a detailed plan if possible. Follow these steps:
 
-1. Analyze the user's intent thoroughly. Wrap your analysis inside <task_breakdown> tags, addressing the following points:
+1. Analyze the user's intent thoroughly. Do not output your analysis, just address the following points:
    a. Key phrases or keywords from the user's intent
    b. Main objectives that need to be accomplished
    c. Sub-tasks for each main objective
@@ -67,16 +67,14 @@ If the tools are sufficient:
       "tool": "Specific Tool for Step 1",
       "data": "Specific data of tool in tool_list for Step 1",
       "step purpose": "Purpose of step 1",
-      "description": "A general overview of the objective to be achieved by this tool in the first part of the task.",
-      "reason": "Why we need to do this step and why it requires this specific external tool or action."
+      "description": "A general overview of the objective to be achieved by this tool in the first part of the task."
     }},
     {{
       "step": "step 2",
       "tool": "Specific Tool for Step 2",
       "data": "Specific data of tool in tool_list for Step 2",
       "step purpose": "Purpose of step 2",
-      "description": "A general overview of the objective to be achieved by this tool in the next part of the task.",
-      "reason": "Why we need to do this step and why it requires this specific external tool or action."
+      "description": "A general overview of the objective to be achieved by this tool in the next part of the task."
     }}
   ]
 }}
