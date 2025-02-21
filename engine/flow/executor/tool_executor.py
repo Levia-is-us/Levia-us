@@ -19,7 +19,6 @@ def execute_tool(
     output_stream(f"**Running tool: {tool_name}...**")
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
-    print(f"execution_record: {execution_record}")
 
     try:
         result = tool_caller.call_tool(

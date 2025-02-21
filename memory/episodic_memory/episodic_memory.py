@@ -60,13 +60,13 @@ def retrieve_long_pass_memory(
 ):
     try:
         embedding = create_embedding(query)
-        for i in range(1):
+        for i in range(2):
             try:
                 memories = retrieve_memory(embedding, namespace)
                 if memories:
                     break
             except Exception as e:
-                print(f"\033[91mRetry {i+1}/3 failed: {str(e)}\033[0m")
+                print(f"\033[91mRetry {i+1}/1 failed: {str(e)}\033[0m")
                 time.sleep(5)
                 if i == 1:  # Last attempt failed
                     raise e

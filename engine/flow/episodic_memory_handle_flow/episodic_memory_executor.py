@@ -159,7 +159,6 @@ def execute_tool_operation(tool_config, args):
         tool_config['method'],
         args
     )
-    print(f"Tool execution result: {result}")
     return result
 
 def get_input_parameters(tool_config: dict, execution_outputs: list, messages_history: list, plan_steps: list) -> dict:
@@ -174,9 +173,7 @@ def get_input_parameters(tool_config: dict, execution_outputs: list, messages_hi
             execution_outputs
         )
         if param_value.get("status") == "failure":
-            print(f"get_tool_parameters_llm")
             res = get_tool_parameters_llm(tool_config, messages_history, plan_steps)
-            print(f"res: {res}")
             if res:
                 args = {}
                 required_args = res.get("extracted_arguments", {}).get("required_arguments", {})
@@ -215,7 +212,6 @@ def process_parameter_source(input_spec: dict, execution_outputs: list) -> dict:
         method = input_spec["method"]
         if method == "direct":
             output_value = find_output_value(source_type, execution_outputs)
-            print(f"output_value: {output_value}")
             return {"status": "success", "value": output_value}
 
             # return execution_outputs
@@ -234,20 +230,15 @@ def process_parameter_source(input_spec: dict, execution_outputs: list) -> dict:
             return {"status": "success", "value": "key_vault_value"}
             
         elif method_parameter and method_parameter.startswith("def"):
-            print(f"method_parameter: {method_parameter}")
             try:
                 local_namespace = {}
                 exec(method_parameter, {}, local_namespace)
                 
                 func_name = method_parameter[4:method_parameter.index('(')].strip()
-                print(f"func_name: {func_name}")
                 func = local_namespace[func_name]
-                print(f"func: {func}")
                 if len(execution_outputs) > 0:
                     input_value = execution_outputs[0]["output_value"]
-                    print(f"input_value: {input_value}")
                     result = func(input_value)
-                    print(f"result: {result}")
                     return {"status": "success", "value": result}
                 else:
                     return {

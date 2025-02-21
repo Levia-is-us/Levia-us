@@ -23,7 +23,6 @@ registry = ToolRegistry()
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-print(f"registry project_root: {project_root}")
 tools_dir = os.path.join(project_root, "tools")
 registry.scan_directory(tools_dir)
 tool_caller_client = ToolCaller(registry)
@@ -188,7 +187,6 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             method_metadata = extract_json_from_str(step['data'])
             # print(f" - method_metadata: {method_metadata} - \n")
             if method_metadata['inputs']:
-                print(f"method_metadata: {method_metadata}")
                 for input in method_metadata['inputs']:
                     
                     try:
@@ -227,7 +225,6 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
 
 def execute_tool_operation(tool_config, reply_json):
     """Execute tool with provided arguments"""
-    print(f"tool_config: {tool_config}")
     args = {}
     required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
     for arg_name, arg_info in required_args.items():
