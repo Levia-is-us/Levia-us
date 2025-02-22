@@ -333,7 +333,11 @@ def process_multiple_results(search_results):
         tuple: Lists of URLs and summaries
     """
     results = [extract_search_result(elem) for elem in search_results]
-    return zip(*[r for r in results if r[0]])
+    filtered_results = [r for r in results if r[0]]
+    if not filtered_results:
+        return [], []
+    urls, summaries = zip(*filtered_results)
+    return list(urls), list(summaries)
 
 
 def process_dual_results(search_results):
@@ -371,11 +375,14 @@ def process_single_result(search_result):
         tuple: Lists of URLs and summaries
     """
     try:
-        # Extract search tab and child divs
         search_tab = search_result.find_element(By.CSS_SELECTOR, "#kp-wp-tab-overview")
         child_divs = search_tab.find_elements(By.CSS_SELECTOR, ":scope > div")
         results = [extract_search_result(elem) for elem in child_divs]
-        return zip(*[r for r in results if r[0]])
+        filtered = [r for r in results if r[0]]
+        if not filtered:
+            return [], []
+        urls, summaries = zip(*filtered)
+        return list(urls), list(summaries)
     except Exception as e:
         print(f"Error processing single result: {e}")
         return [], []
@@ -426,6 +433,7 @@ def search_visual(keywords: list) -> list:
     """
 
     content_list = []
+    driver = None
     try:
         # Initialize the Chrome WebDriver
         driver = init_driver()
@@ -461,6 +469,9 @@ def search_visual(keywords: list) -> list:
     except Exception as e:
         print(f"Init driver error: {str(e)}")
     finally:
-        driver.quit()
-
+        if driver:
+            try:
+                driver.quit()
+            except Exception as e:
+                print(f"Driver quit error: {str(e)}")
     return content_list
