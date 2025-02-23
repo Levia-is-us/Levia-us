@@ -19,6 +19,10 @@ from engine.tool_framework import BaseTool
 from tools.create_gitbook_tool.gitbookapi import GitBookAPI
 from tools.create_gitbook_tool.fileManage import file_manage, get_top_title_with_hash
 
+gitbook_api_key = os.getenv("GITBOOK_API_KEY")
+azure_file_server_key = os.getenv("AZURE_FILE_SERVER_KEY")
+user_website_url = os.getenv("USER_WEBSITE_URL")
+
 _gitbook = None
 _file_manage = None
 
@@ -26,7 +30,7 @@ _file_manage = None
 @run_tool
 class SaveMarkdownToGitbook(BaseTool):
     """Tool for saving markdown content to GitBook"""
-    def save_markdown_to_gitbook(content, gitbook_api_key,azure_file_server_key,user_website_url):
+    def save_markdown_to_gitbook(content):
         global _gitbook
         global _file_manage
 

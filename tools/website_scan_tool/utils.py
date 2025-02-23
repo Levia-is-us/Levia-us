@@ -19,7 +19,7 @@ project_root = os.path.dirname(os.path.abspath(__file__))
 env_path = os.path.join(project_root, ".env")
 load_dotenv(env_path)
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
-
+visual = os.getenv("VISUAL")
 
 def remove_duplicate_links(links):
     seen_urls = set()
@@ -42,11 +42,10 @@ def is_absolute_url(url):
 
 
 def setup_driver():
-    visual = os.getenv("VISUAL")
     try:
         chrome_options = Options()
         chrome_options.add_argument("--start-maximized")
-        if visual != "T":
+        if visual != "True":
             chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
@@ -57,13 +56,13 @@ def setup_driver():
             "profile.managed_default_content_settings.images": 2,
             "plugins.plugins_disabled": ["Adobe Flash Player"],
         }
-        if visual != "T":
+        if visual != "True":
             chrome_options.add_experimental_option("prefs", prefs)
 
         chrome_options.add_argument("--log-level=3")
         chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-        if visual == "T":
+        if visual == "True":
             chrome_options.add_argument("--disable-blink-features=AutomationControlled")
             chrome_options.add_argument(
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
@@ -74,7 +73,7 @@ def setup_driver():
         path = ChromeDriverManager().install()
         service = Service(path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
-        driver.set_page_load_timeout(10)
+        driver.set_page_load_timeout(60)
         return driver
 
     except Exception as e:
@@ -127,7 +126,7 @@ def get_all_links(urls):
         links = get_Links(url)
         links_data.extend(links)
 
-    if visual == "T":
+    if visual == "True":
         try:
             driver.get(urls[0])
             smooth_scroll_to_bottom(driver)
@@ -172,7 +171,7 @@ def get_all_content(links):
             content = driver.find_element(By.TAG_NAME, "body").text
             link["content"] = content
             results.append(link)
-            if visual == "T":
+            if visual == "True":
                 smooth_scroll_to_bottom(driver)
         except Exception as e:
             raise Exception(e)
