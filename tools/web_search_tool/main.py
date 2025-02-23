@@ -34,6 +34,9 @@ class WebSearchTool(BaseTool):
         is_visual = os.getenv("VISUAL")
         if is_visual == "T":
             content_list = search_visual(keywords)
+            # If visual search fails, try non-visual search
+            if not content_list:
+                content_list = search_non_visual(keywords)
         else:
             content_list = search_non_visual(keywords)
 
