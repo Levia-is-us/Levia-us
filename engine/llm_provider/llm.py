@@ -67,7 +67,7 @@ def create_embedding(text, model="text-embedding", config={}):
     raise ValueError(f"Model {model} does not support embeddings")
 
 
-def chat_completion_2(messages, model=_default_model, config={}):
+def start_chat_completion(messages, model=_default_model, config={}):
     """
     Generate chat completion using either OpenAI or Anthropic models.
 
@@ -127,13 +127,13 @@ def chat_completion_2(messages, model=_default_model, config={}):
 
 def chat_completion(messages, model=_default_model, config={}):
     try:
-        res = chat_completion_2(messages, model=_default_model, config=config)
+        res = start_chat_completion(messages, model=_default_model, config=config)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res
     except:
         model = os.getenv("BACKUP_MODEL_NAME")
-        res = chat_completion_2(messages, model=model, config=config)
+        res = start_chat_completion(messages, model=model, config=config)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res
