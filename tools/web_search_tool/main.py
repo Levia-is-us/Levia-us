@@ -14,6 +14,7 @@ from tools.web_search_tool.util import (
     search_visual,
 )
 
+
 from engine.tool_framework import run_tool, BaseTool
 
 
@@ -32,7 +33,7 @@ class WebSearchTool(BaseTool):
 
         # Perform web search
         is_visual = os.getenv("VISUAL")
-        if is_visual == "T":
+        if is_visual == "True":
             content_list = search_visual(keywords)
             # If visual search fails, try non-visual search
             if not content_list:
