@@ -29,6 +29,7 @@ def execute_tool(
 
         status = verify_tool_execution(execution_record, result)
         record_tool_execution(tool_name, tool_method, tool_args, result)
+        print(f"tool_execution_result: {result}")
 
         return result, create_execution_record(
             tool_name, tool_method, tool_args, result, status

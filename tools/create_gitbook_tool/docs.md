@@ -1,37 +1,40 @@
 
 
 <code_breakdown>
-Identified function:
-- save_markdown_to_gitbook (method of SaveMarkdownToGitbook class decorated via @run_tool)
+The code contains one primary function exposed as a tool through the @run_tool class decorator:
+
+1. save_markdown_to_gitbook (static method in SaveMarkdownToGitbook class)
 
 Function signature:
-def save_markdown_to_gitbook(content, gitbook_api_key, azure_file_server_key, user_website_url)
+def save_markdown_to_gitbook(content):
 
 Parameters:
-1. content (no type hint) - required - markdown/text content to process
-2. gitbook_api_key (no type hint) - required - API key for GitBook access
-3. azure_file_server_key (no type hint) - required - Credentials for Azure file storage
-4. user_website_url (no type hint) - required - Base URL for constructed result
+- content: No explicit type hint, but implied to be string (markdown content). Required. Used as input content to process.
 
 Return value:
-- String containing final URL or error message (type: str)
+- Returns string (URL or error message). Type not explicitly declared but observable from returns.
 
-Purpose:
-Uploads markdown content to GitBook through a multi-step process involving Azure file storage upload, GitBook API interactions for content import, and change request management.
+Implementation summary:
+Processes markdown input by:
+1. Initializing GitBook and file management clients
+2. Validating input content
+3. Uploading markdown to Azure file storage
+4. Importing content to GitBook space
+5. Handling GitBook change requests
+6. Returning final URL or error messages
 
 Notable aspects:
-1. Uses global singleton instances for GitBookAPI and file_manage
-2. Implicit requirement for .env file configuration
-3. Relies on first organization/space from GitBook API responses
-4. Automatic cleanup of uploaded files on errors
-5. No explicit type validation for input parameters
+- Uses global singleton instances for API clients
+- Implicit string type handling without validation
+- Complex error handling with file cleanup
+- Relies on environment variables for configuration
+- Returns different string formats for success vs error cases
 
-Edge cases/issues:
-- Fails if user has no organizations/spaces in GitBook
-- Potential race conditions with global _gitbook/_file_manage
-- Assumes first item in organizations/spaces lists is correct
-- No retry mechanism for API calls
-- Return type inconsistency (URL string vs error message string)
+Edge cases:
+- Empty content input triggers immediate error
+- API call failures roll back file uploads
+- First organization/space selection might not be correct in multi-org accounts
+- File naming collisions from get_top_title_with_hash
 </code_breakdown>
 
 ```json
@@ -39,36 +42,18 @@ Edge cases/issues:
   "functions": [
     {
       "method": "save_markdown_to_gitbook",
-      "short_description": "Save markdown content to GitBook via API integration",
-      "detailed_description": "Processes markdown content by uploading to Azure storage, importing to GitBook through API calls, managing change requests, and returning the final URL. Handles error cleanup and API interactions with GitBook's organization/space structure.",
+      "short_description": "Save markdown content to GitBook and return published URL",
+      "detailed_description": "Processes markdown input by uploading to Azure file storage, importing into GitBook's first available space/organization, handling change requests, and returning the final published URL. Automatically cleans up uploaded files on failure.",
       "inputs": [
         {
           "name": "content",
           "type": "str",
           "required": true,
-          "description": "Markdown/text content to be saved, required for article creation"
-        },
-        {
-          "name": "gitbook_api_key",
-          "type": "str",
-          "required": true,
-          "description": "API key for GitBook authentication, obtained from environment configuration"
-        },
-        {
-          "name": "azure_file_server_key",
-          "type": "str",
-          "required": true,
-          "description": "Credentials for Azure file storage service, used for temporary content hosting"
-        },
-        {
-          "name": "user_website_url",
-          "type": "str",
-          "required": true,
-          "description": "Base URL prefix for the final published content location"
+          "description": "Markdown text content to publish, must include at least one header for title extraction"
         }
       ],
       "output": {
-        "description": "Final published URL string on success, error message string on failure",
+        "description": "Published URL string on success, error message string on failure",
         "type": "str"
       }
     }

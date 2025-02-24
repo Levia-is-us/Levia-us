@@ -30,12 +30,19 @@ class GetTokenInfoTool(BaseTool):
     """
     def get_token_info(self, token_address: str):
         pool = None
+        twitter_url = ''
         try:
             pool = get_token_pool_info(token_address)
+            if pool is None:
+                return 'not found token info'
         except Exception as e:
             return 'not found token info'
         
-        twitter_url = get_token_twitter_url(pool, pool['address'])
+        try:
+            twitter_url = get_token_twitter_url(pool, pool['address'])
+        except Exception as e:
+            pass
+
         return {
             "price_in_usd":pool['price_in_usd'],
             "fdv_in_usd":pool['fdv_in_usd'],

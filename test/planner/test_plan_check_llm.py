@@ -11,7 +11,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from checking_plan_prompt import check_plan_fittable_prompt
+from engine.flow.planner.checking_plan_prompt import check_plan_fittable_prompt
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 import json
