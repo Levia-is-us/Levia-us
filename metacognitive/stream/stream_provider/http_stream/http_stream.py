@@ -37,6 +37,23 @@ class HTTPStream(BaseStream):
             current_task = task_manager.get_current_task()
             res = jsonify({"status": "success", "current_task": current_task}), 200
             return res
+        
+        @self.app.route("/levia/chat", methods=["POST"])
+        def chat():
+            from engine.intent_engine.intent_event import event_chat
+            data = request.get_json()
+            user_id = data.get('user_id')
+            intent = data.get('intent')
+            
+            if not user_id or not intent:
+                return jsonify({"status": "error", "message": "Missing required parameters"}), 400
+            
+            reply = event_chat(user_id, intent)
+            return jsonify({
+                "status": "success",
+                "reply": reply
+            }), 200
+
 
     def start_server(self):
         def run_server():
