@@ -12,6 +12,7 @@ import os
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
 from engine.flow.executor.short_chain_executor import process_plan_execution
+import datetime
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
@@ -23,6 +24,8 @@ plan_context_memory = PlanContextMemory()
 def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
+    start_time = datetime.datetime.now().timestamp()
+    output_stream(log=f"Start time: {start_time}", user_id=user_id, type="start_time")
     chat_messages = short_term_memory.get_context(user_id)
     output_stream(log="Analyzing user's intent ...", user_id=user_id, type="steps")
     reply_info = handle_intent_flow(chat_messages, user_input, user_id)
@@ -52,6 +55,9 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     short_term_memory.add_context(
         create_chat_message("assistant", f"{final_reply}"), user_id
     )
+    output_stream(log=f"Final reply: {final_reply}", user_id=user_id, type="think")
+    end_time = datetime.datetime.now().timestamp()
+    output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time")
     return final_reply
 
 
