@@ -24,30 +24,30 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     """Handle the main chat flow logic"""
     # Get initial response
     chat_messages = short_term_memory.get_context(user_id)
-    output_stream(f"**Analyzing user's intent ...**")
-    reply_info = handle_intent_flow(chat_messages, user_input)
+    output_stream(log="Analyzing user's intent ...", user_id=user_id, type="steps")
+    reply_info = handle_intent_flow(chat_messages, user_input, user_id)
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
     )
     chat_messages = short_term_memory.get_context(user_id)
-    output_stream(f"{reply_info['intent']}")
+    output_stream(log=f"{reply_info['intent']}", user_id=user_id, type="think")
     
     final_reply = ""
     # Handle different response types
     if reply_info["type"] == "direct_answer":
         response = reply_info["response"]
-        final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": response}])
+        final_reply = handle_reply_flow(chat_messages, [{"normal_llm_reply": response}], user_id)
     elif reply_info["type"] == "call_tools":
         plan_result = handle_intent_summary(reply_info, chat_messages, user_id)
         # print(f"plan_result: {plan_result}")
-        final_reply = handle_reply_flow(chat_messages, plan_result)
+        final_reply = handle_reply_flow(chat_messages, plan_result, user_id)
         
     elif reply_info["type"] == "continue_execution":
         plan_result = handle_input_intent(user_id)
-        final_reply = handle_reply_flow(chat_messages, plan_result)
+        final_reply = handle_reply_flow(chat_messages, plan_result, user_id)
         
     analysis = extract_code_breakdown_from_doc(final_reply)
-    output_stream(f"{analysis}")
+    output_stream(log=f"Analysis: {analysis}", user_id=user_id, type="think")
     final_reply = extract_str_from_doc(final_reply)
     short_term_memory.add_context(
         create_chat_message("assistant", f"{final_reply}"), user_id

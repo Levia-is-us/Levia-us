@@ -29,7 +29,7 @@ def get_model_by_name(model_name):
     return models.get(model_name, None)
 
 
-def create_chat_completion(system_prompt, prompt, model=_default_model, config={}):
+def create_chat_completion(system_prompt, prompt, model=_default_model, config={}, user_id=""):
     model_obj = get_model_by_name(model)
     messages = []
     if model_obj["type"] == "reasoning":
@@ -44,7 +44,7 @@ def create_chat_completion(system_prompt, prompt, model=_default_model, config={
         ]
     
     
-    return chat_completion(messages, model, config)
+    return chat_completion(messages, model, config, user_id)
 
 
 def create_embedding(text, model="text-embedding", config={}):
@@ -67,7 +67,7 @@ def create_embedding(text, model="text-embedding", config={}):
     raise ValueError(f"Model {model} does not support embeddings")
 
 
-def start_chat_completion(messages, model=_default_model, config={}):
+def start_chat_completion(messages, model=_default_model, config={}, user_id=""):
     """
     Generate chat completion using either OpenAI or Anthropic models.
 
@@ -92,9 +92,9 @@ def start_chat_completion(messages, model=_default_model, config={}):
     models = _load_models()
 
     if models[model]["source"] == "openai" or models[model]["source"] == "azure-openai":
-        return chat_completion_openai(messages, model=models[model], config=config)
+        return chat_completion_openai(messages, model=models[model], config=config, user_id=user_id)
     elif models[model]["source"] == "deepseek":
-        return chat_completion_deepseek(messages, model=models[model], config=config)
+        return chat_completion_deepseek(messages, model=models[model], config=config, user_id=user_id)
     elif models[model]["source"] == "anthropic":
         # convert messages to anthropic format
         anthropic_messages = []
@@ -123,17 +123,17 @@ def start_chat_completion(messages, model=_default_model, config={}):
             anthropic_messages, model=models[model]["version"], config=config
         )
 
-    return chat_completion_openai(messages)
+    return chat_completion_openai(messages, user_id=user_id)
 
-def chat_completion(messages, model=_default_model, config={}):
+def chat_completion(messages, model=_default_model, config={}, user_id="Local-dev"):
     try:
-        res = start_chat_completion(messages, model=_default_model, config=config)
+        res = start_chat_completion(messages, model=_default_model, config=config, user_id=user_id)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res
     except:
         model = os.getenv("BACKUP_MODEL_NAME")
-        res = start_chat_completion(messages, model=model, config=config)
+        res = start_chat_completion(messages, model=model, config=config, user_id=user_id)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res

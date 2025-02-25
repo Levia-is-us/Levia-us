@@ -25,7 +25,7 @@ class WebsiteScanTool(BaseTool):
         """
         Scan websites and extract relevant information
         Args:
-            url_list: List of URLs to scan
+            url_list: List of URLs and their summaries to scan
             intent: The intent to guide the scanning
         Returns:
             Extracted information

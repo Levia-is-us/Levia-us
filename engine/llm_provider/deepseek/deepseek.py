@@ -12,7 +12,7 @@ from metacognitive.stream.stream import output_stream
 api_key = os.getenv("DEEPSEEK_API_KEY")
 base_url = os.getenv("DEEPSEEK_BASE_URL") or "https://api.deepseek.com"
 
-def print_buffer_to_stream(buffer, buffer_type):
+def print_buffer_to_stream(buffer, user_id, buffer_type):
     buffer = format_content(buffer)
     if not buffer or buffer == "":
         return
@@ -22,7 +22,7 @@ def print_buffer_to_stream(buffer, buffer_type):
     #     print("\033[31m" + buffer + "\033[0m")
     # else:
     #     print("\033[32m" + buffer + "\033[0m")
-    output_stream(f"{buffer}")
+    output_stream(log=f"{buffer}", user_id=user_id, type='think')
 def format_content(content):
     if not content or content == "":
         return ""
@@ -30,7 +30,7 @@ def format_content(content):
     content = content.replace("-", "")
     return content
 
-def chat_completion_deepseek(messages, model, config={}):
+def chat_completion_deepseek(messages, model, config={}, user_id=""):
     """
     Generate chat completion using OpenAI API.
 
@@ -75,14 +75,14 @@ def chat_completion_deepseek(messages, model, config={}):
             
             if buffer_new_line:
                 if print_stream:
-                    print_buffer_to_stream(buffer, buffer_type)
+                    print_buffer_to_stream(buffer, user_id, buffer_type)
                 buffer = ""
                 continue
 
             if buffer_end:
                 # output 
                 if print_stream:
-                    print_buffer_to_stream(buffer, buffer_type)
+                    print_buffer_to_stream(buffer, user_id, buffer_type)
                 buffer_type = ""
                 buffer = ""
                 print_stream = False

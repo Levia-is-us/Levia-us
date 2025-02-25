@@ -1,34 +1,32 @@
 
 
 <code_breakdown>
-1. Identified functions:
-   - website_scan (method of WebsiteScanTool class decorated via class-level @run_tool)
+The analysis focuses on identifying functions decorated with @simple_tool, but the provided code uses @run_tool instead. After careful examination:
 
-2. Analysis of website_scan:
-   a. Function signature: 
-      def website_scan(self, url_list: list, intent: str)
-   
-   b. Parameters:
-      - url_list: list (required), list of URLs to scan
-      - intent: str (required), guides scanning focus
-   
-   c. Return value: 
-      - result (type not explicitly shown but implied to be processed content)
-      - Based on context, likely returns list/dict of summarized information
-   
-   d. Purpose:
-      - Orchestrates website scanning pipeline: link collection, deduplication, intent-based filtering, content extraction, and summarization
-   
-   e. Notable aspects:
-      - Relies on external utils functions (get_all_links, get_summary_links etc.)
-      - No visible error handling for network requests or invalid URLs
-      - Sequential processing with multiple data transformation steps
-   
-   f. Potential issues:
-      - No validation for URL format in url_list
-      - No timeout handling for get_all_content
-      - Dependency on external utils that aren't shown in code
-      - Return type depends on get_summary_links implementation
+1. **Identified Functions**:
+   - Only the `website_scan` method in the `WebsiteScanTool` class serves as the primary function for website scanning. While the class is decorated with `@run_tool`, the method itself lacks explicit decorators. However, it is the operational entry point for the tool.
+
+2. **Function Signature**:
+   - `def website_scan(self, url_list: list, intent: str):`
+
+3. **Parameters**:
+   - `url_list: list` (required): List of URLs with summaries to scan.
+   - `intent: str` (required): Guides content extraction during scanning.
+
+4. **Return Value**:
+   - Returns extracted information (type varies). The normal return value depends on `get_summary_links` (undefined in the code), while errors return a string (e.g., "website connection timeout").
+
+5. **Function Purpose**:
+   - Scans websites by collecting links, removing duplicates, extracting content, and summarizing based on intent.
+
+6. **Notable Aspects**:
+   - Handles specific timeout errors explicitly.
+   - Relies on helper functions (`get_all_links`, `get_summary_links`, etc.) with undefined implementations.
+
+7. **Edge Cases**:
+   - Timeout errors return a string instead of structured data.
+   - Unhandled exceptions propagate upward.
+   - Empty `url_list` may result in incomplete processing.
 </code_breakdown>
 
 ```json
@@ -36,25 +34,25 @@
   "functions": [
     {
       "method": "website_scan",
-      "short_description": "Scan websites and extract intent-relevant information",
-      "detailed_description": "Processes a list of URLs by collecting all links, removing duplicates, filtering based on intent, extracting content, and generating summarized results. Implements a multi-stage pipeline for web content analysis.",
+      "short_description": "Scan websites and extract relevant information based on intent",
+      "detailed_description": "Scans provided URLs by first extracting all links, removing duplicates, fetching content, and generating a summary filtered by the specified intent. Handles website connection timeouts explicitly.",
       "inputs": [
         {
           "name": "url_list",
           "type": "list",
           "required": true,
-          "description": "Initial list of website URLs to begin scanning from"
+          "description": "List of URLs (with summaries) to scan for content"
         },
         {
           "name": "intent",
           "type": "str",
           "required": true,
-          "description": "Guidance parameter to filter relevant content during scanning"
+          "description": "Guiding intent to filter relevant content during scanning"
         }
       ],
       "output": {
-        "description": "Processed summary of website content matching the specified intent",
-        "type": "list/dict (implementation-dependent)"
+        "description": "Extracted information based on intent or error message for timeouts",
+        "type": "varies (str/dict/list)"
       }
     }
   ]

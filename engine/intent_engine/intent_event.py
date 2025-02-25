@@ -17,7 +17,7 @@ def event_chat(user_id, input_message):
         return reply
     except Exception as e:
         print(f"event_chat error: {str(e)}")
-        reply = backup_reply(short_term_memory.get_context(user_id))
+        reply = backup_reply(short_term_memory.get_context(user_id), user_id)
         short_term_memory.add_context(
             create_chat_message("assistant", f"{reply}"), user_id
         )
