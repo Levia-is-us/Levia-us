@@ -67,4 +67,5 @@ def retrieve_long_pass_memory(
         raise Exception(f"Error retrieving long pass memory: {str(e)}")
     
 def delete_long_pass_memory(id: str, namespace: str = long_pass_namespace, uid: str = "levia"):
-    delete_memory(id, namespace)
+    delete_memory_ids = [id]
+    delete_memory(delete_memory_ids, namespace)
