@@ -22,7 +22,7 @@ short_term_memory = ShortTermMemory()
 
 def init_stream():
     """Initialize stream"""
-    return output_stream("Initialized metacognitive stream.\n")
+    return output_stream(log="Initialized metacognitive stream.", user_id="local-dev", type="think")
 
 def init_short_term_memory():
     """Initialize short term memory"""

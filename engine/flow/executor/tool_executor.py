@@ -13,10 +13,10 @@ db_pool = MySQLPool()
 
 
 def execute_tool(
-    tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict
+    tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict, user_id: str
 ):
     """Execute tool and record results"""
-    output_stream(f"**Running tool: {tool_name}...**")
+    output_stream(log=f"Running tool: {tool_name}...", user_id=user_id, type="steps")
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 
@@ -39,7 +39,7 @@ def execute_tool(
         return {"status": "failure", "result": str(e)}, None
 
 
-def verify_tool_execution(execution_record: dict, result: dict) -> str:
+def verify_tool_execution(execution_record: dict, result: dict, user_id: str) -> str:
     """Verify tool execution result using LLM"""
     # if result["status"] == "failure":
     #     return "failure"
@@ -48,7 +48,7 @@ def verify_tool_execution(execution_record: dict, result: dict) -> str:
     )
 
     llm_confirmation = chat_completion(
-        llm_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}
+        llm_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id
     )
 
     llm_confirmation = extract_json_from_str(llm_confirmation)

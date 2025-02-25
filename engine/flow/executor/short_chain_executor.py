@@ -38,9 +38,9 @@ def execute_intent_chain(
     messages_history: list,
     user_id: str
 ):   
-    output_stream(f" - Do not have experience for {user_intent} - \n")
-    output_stream(f"**Creating new execution plan ...**")
-    plan = create_execution_plan(user_intent)
+    output_stream(log=f"No experience for {user_intent}...", user_id=user_id, type="thinkg")
+    output_stream(log="Creating new execution plan ...", user_id=user_id, type="steps")
+    plan = create_execution_plan(user_intent, user_id)
     return process_tool_execution_plan(
         plan, messages_history, user_id, user_intent
     )
@@ -61,26 +61,26 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     # Analyze each step and find appropriate tools
     found_tools = []
     for step in plan:
-        output_stream(f"**Finding appropriate tool for step: {step['intent']}**")
+        output_stream(log=f"Finding appropriate tool for step: {step['intent']}...", user_id=user_id, type="steps")
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
     found_tools = get_unique_tools(found_tools)
     if(len(found_tools) == 0):
         raise Exception("failed to find tools")
-    output_stream(f"**Making new plan based on current tools...**")
+    output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps")
     plan = tool_base_planner(user_intent, found_tools)
     # print(f"plan: {plan}")
             
     if(plan["status"] == "failed"):
-        output_stream(f"**Failed to make plan with current tools**")
+        output_stream(log="Failed to make plan with current tools...", user_id=user_id, type="think")
         return plan
     plan = plan["plan"]
     for step in plan:
-        output_stream(f"Step: {step['step']}")
-        output_stream(f"execution tool: {step['tool']}")
-        output_stream(f"step purpose: {step['step purpose']}")
-        output_stream(f"---------------------------------")
+        output_stream(log=f"Step: {step['step']}", user_id=user_id, type="think")
+        output_stream(log=f"execution tool: {step['tool']}", user_id=user_id, type="think")
+        output_stream(log=f"step purpose: {step['step purpose']}", user_id=user_id, type="think")
+        output_stream(log="---------------------------------", user_id=user_id, type="think")
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id)
@@ -110,7 +110,7 @@ def process_plan_execution(messages_history, plan_steps, user_id: str):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         # if not step.get("tool_necessity", True):
-        output_stream(f"**Executing step: {step['step purpose']}...**")
+        output_stream(log=f"Executing step: {step['step purpose']}...", user_id=user_id, type="steps")
         #     continue
         if step.get("executed", False):
             continue
@@ -213,14 +213,13 @@ def parse_tool_config(tool):
     tool_dict["tool"] = tool_name
     return tool_dict
 
-def validate_tool_parameters(tool_config, messages_history, plan_steps, step):
+def validate_tool_parameters(tool_config, messages_history, plan_steps, step, user_id):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0})
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id)
     reply_json = extract_json_from_str(reply)
-    output_stream(f" - {reply_json} - \n")
     return reply_json
 
 def execute_tool_operation(tool_config, reply_json):

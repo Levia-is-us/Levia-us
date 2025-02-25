@@ -24,7 +24,7 @@ def check_plan_sufficiency(intent: str, plan_intent: str, execution_records: lis
     memories_check_prompt = check_plan_fittable_prompt(intent, plan_intent, execution_records)
     
     result = chat_completion(memories_check_prompt, model="deepseek-chat", 
-                           config={"temperature": 0.7})
+                           config={"temperature": 0.7}, user_id="local-dev")
     print(f"result: {result}")
     print(f"type of result: {type(result)}")
     try:

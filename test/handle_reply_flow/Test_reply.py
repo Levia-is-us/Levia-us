@@ -16,11 +16,11 @@ from engine.llm_provider.llm import chat_completion
 
 
 
-def final_reply_flow(chat_messages: list, engine_output: list) -> str:
+def final_reply_flow(chat_messages: list, engine_output: list, user_id: str) -> str:
     """Handle final reply type response"""
     prompt = final_reply_prompt(chat_messages, engine_output)
     final_reply = chat_completion(
-        prompt, model="deepseek-r1", config={"temperature": 0.7}
+        prompt, model="deepseek-r1", config={"temperature": 0.7}, user_id=user_id
     )
 
     return final_reply
@@ -33,7 +33,7 @@ def main():
         {"role": "user", "content": "Hello, how are you?"}
         ]
     engine_output = []
-    result = final_reply_flow(chat_messages, engine_output)
+    result = final_reply_flow(chat_messages, engine_output, "local-dev")
     print(result)
 
 

@@ -9,26 +9,26 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
-def create_execution_plan(intent: str) -> str:
+def create_execution_plan(intent: str, user_id: str) -> str:
     """Create execution plan for given intent summary"""
     plan_maker_prompt = get_plan_maker_prompt(intent)
     prompt = [
         {"role": "user", "content": plan_maker_prompt},
     ]
     plan = chat_completion(
-        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5}
+        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5}, user_id=user_id
     )
     plan = extract_json_from_str(plan)
     for step in plan:
-        output_stream(f" - {step['step']}: {step['intent']} - \n")
-        output_stream(f" - Step Description: {step['description']} - \n")
-        output_stream(f" - Step Reason: {step['reason']} - \n")
-        output_stream(f"\033[95m--------------------------------\033[0m")
+        output_stream(log=f" - {step['step']}: {step['intent']} - \n", user_id=user_id, type="think")
+        output_stream(log=f" - Step Description: {step['description']} - \n", user_id=user_id, type="think")
+        output_stream(log=f" - Step Reason: {step['reason']} - \n", user_id=user_id, type="think")
+        output_stream(log="--------------------------------", user_id=user_id, type="think")
     return plan
 
 
 def check_plan_sufficiency(
-    intent: str, plan_intent: str, execution_records: list
+    intent: str, plan_intent: str, execution_records: list, user_id: str
 ) -> bool:
     """Check if existing plan is sufficient for current intent"""
     memories_check_prompt = check_plan_fittable_prompt(
@@ -36,7 +36,7 @@ def check_plan_sufficiency(
     )
 
     result = chat_completion(
-        memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}
+        memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id
     )
     result = extract_json_from_str(result)
     return result["solution_sufficient"]["result"] in [True, "true"]
