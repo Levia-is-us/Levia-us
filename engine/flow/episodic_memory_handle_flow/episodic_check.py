@@ -17,6 +17,7 @@ def episodic_check(user_intent, context, plan):
         result = result[:start_index] + result[end_index + len(end_tag):]
     try:
         result = extract_json_from_str(result)
+        print(f"episodic_check result: {result}")
     except:
         massage = "wrong format of episodic_check result: " + result
         raise Exception(massage)

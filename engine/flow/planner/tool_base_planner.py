@@ -12,6 +12,7 @@ def tool_base_planner(intent: str, tool_list: list):
     prompt = [
         {"role": "user", "content": tool_base_planner_prompt},
     ]
-    plan = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.5})
+    plan = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0.7})
     plan = extract_json_from_str(plan)
+    print(f"plan: {plan}")
     return plan
