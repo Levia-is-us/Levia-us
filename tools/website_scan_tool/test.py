@@ -26,7 +26,7 @@ def main():
         tool_name="WebsiteScanTool",
         method="website_scan",
         kwargs={
-            "url_list": ["https://leviaprotocol.gitbook.io/leviaprotocol"],
+            "url_list": [{'url': 'https://edition.cnn.com/', 'summary': 'Breaking news and latest updates (3 hours old) covering U.S., world, weather, entertainment, politics, and health from a globally recognized news authority.'}, {'url': 'https://www.bbc.com/news/world', 'summary': "International news updates (6 hours old) featuring Macron's remarks on Ukraine-Russia negotiations and European diplomacy, from a trusted global news source."}, {'url': 'https://news.yahoo.com/', 'summary': 'Breaking news (2 hours old) including U.S. diplomatic developments at the UN and critical health alerts about a deadly listeria outbreak linked to nutritional shakes.'}],
             "intent": "What is Levia,and how it works?"
         }
     )

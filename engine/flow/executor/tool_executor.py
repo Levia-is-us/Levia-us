@@ -27,7 +27,7 @@ def execute_tool(
         # if isinstance(result, dict):
         #     return {"status": "failure", "result": "tool execution result is invalid"}, None
 
-        status = verify_tool_execution(execution_record, result)
+        status = verify_tool_execution(execution_record, result, user_id)
         record_tool_execution(tool_name, tool_method, tool_args, result)
         print(f"tool_execution_result: {result}")
 
