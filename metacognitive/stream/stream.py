@@ -74,5 +74,5 @@ def output_stream(log: str, user_id: str = "levia", type: str = "info"):
     """
     global _stream
     if _stream is None:
-        _stream = Stream(stream_types=["remote_log"])
+        _stream = Stream(stream_types=["remote_log", "local"])
     _stream.output(log, user_id, type)
