@@ -69,7 +69,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     if(len(found_tools) == 0):
         raise Exception("failed to find tools")
     output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps")
-    plan = tool_base_planner(user_intent, found_tools)
+    plan = tool_base_planner(user_intent, found_tools, user_id)
     # print(f"plan: {plan}")
             
     if(plan["status"] == "failed"):
@@ -159,7 +159,8 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             tool_config,
             messages_history, 
             plan_steps,
-            step
+            step,
+            user_id
         )
         
         if not reply_json["can_proceed"]:
