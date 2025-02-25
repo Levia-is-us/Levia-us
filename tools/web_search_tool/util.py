@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from engine.llm_provider.llm import chat_completion
-
+from engine.utils.json_util import extract_json_from_str
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
@@ -113,13 +113,16 @@ After your evaluation, provide your final selection in the following JSON format
 
 [
   {{
-    "url": "selected_url_1"
+    "url": "selected_url_1",
+    "summary": "content summary"
   }},
   {{
     "url": "selected_url_2",
+    "summary": "content summary"
   }},
   {{
-    "url": "selected_url_3"
+    "url": "selected_url_3",
+    "summary": "content summary"
   }}
 ]
 
@@ -139,7 +142,7 @@ Please begin your evaluation now, followed by your final selection in the specif
         # Try to parse JSON directly from output
         try:
             # If output is a dictionary string containing JSON
-            result_dict = json.loads(output)
+            result_dict = extract_json_from_str(output)
             if isinstance(result_dict, dict) and "result" in result_dict:
                 return result_dict["result"]
         except json.JSONDecodeError:

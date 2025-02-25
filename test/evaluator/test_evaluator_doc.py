@@ -23,10 +23,10 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
-def evaluator_docgen_flow(code):
+def evaluator_docgen_flow(code, user_id):
     prompt = create_evaluator_docgen_prompt(code)
     result = chat_completion(
-        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
+        prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}, user_id=user_id
     )
     return result
 
@@ -34,4 +34,4 @@ def evaluator_docgen_flow(code):
 if __name__ == "__main__":
 
     code = """ code_file"""
-    print(evaluator_docgen_flow(code))
+    print(evaluator_docgen_flow(code, "local-dev"))

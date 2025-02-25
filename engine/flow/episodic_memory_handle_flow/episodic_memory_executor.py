@@ -32,7 +32,7 @@ def episodic_memory_executor(user_id: str, user_intent: str, chat_messages: list
     try:
         execution_records = top_memory["metadata"]["execution_records"]
         top_memory_id = top_memory["id"]
-        result = episodic_check(user_intent, chat_messages, execution_records)
+        result = episodic_check(user_intent, chat_messages, execution_records, user_id)
         if result.get("status") != "success":
             return False, result
         plan = result.get("plan")
@@ -66,7 +66,7 @@ def process_plan_execution(plan_steps, user_id: str, chat_messages: list, top_me
             continue
             
         # Process input parameters
-        input_params = get_input_parameters(tool_config, execution_outputs, chat_messages, plan_steps)
+        input_params = get_input_parameters(tool_config, execution_outputs, chat_messages, plan_steps, user_id)
         # print(f"input_params: {input_params}")
         
         if input_params.get("status") == "need_input":
@@ -125,7 +125,7 @@ def execute_step_tool(tool_config, plan_steps, user_id: str, step_index: int, ar
 
     def execute_with_config(args):
             
-        execution_result = execute_tool_operation(tool_config, args)
+        execution_result = execute_tool_operation(tool_config, args, user_id)
         # print(f"execution_result: {execution_result}")     
         if execution_result:
             # plan_context_memory.update_step_status_context(
@@ -154,17 +154,18 @@ def parse_tool_config(tool):
     tool_dict["tool"] = tool_name
     return tool_dict
 
-def execute_tool_operation(tool_config, args):
+def execute_tool_operation(tool_config, args, user_id):
     """Execute tool with provided arguments"""
     result,_ = execute_tool(
         tool_caller_client,
         tool_config['tool'],
         tool_config['method'],
-        args
+        args,
+        user_id
     )
     return result
 
-def get_input_parameters(tool_config: dict, execution_outputs: list, messages_history: list, plan_steps: list) -> dict:
+def get_input_parameters(tool_config: dict, execution_outputs: list, messages_history: list, plan_steps: list, user_id: str) -> dict:
     """Process and retrieve input parameters based on source rules"""
     
     input_specs = extract_input_specs(tool_config)
@@ -176,7 +177,7 @@ def get_input_parameters(tool_config: dict, execution_outputs: list, messages_hi
             execution_outputs
         )
         if param_value.get("status") == "failure":
-            res = get_tool_parameters_llm(tool_config, messages_history, plan_steps)
+            res = get_tool_parameters_llm(tool_config, messages_history, plan_steps, user_id)
             if res:
                 args = {}
                 required_args = res.get("extracted_arguments", {}).get("required_arguments", {})
@@ -274,7 +275,7 @@ def save_execution_state(execution_outputs: list, step_index: int, user_id: str)
         "user_id": user_id
     }
     print(f"Saving execution state: {state}")
-    output_stream(f"**Saving execution state...**")
+    output_stream(log="Saving execution state...", user_id=user_id, type="steps")
 
 def extract_input_specs(tool_config: dict) -> list[dict]:
     """Extract input specifications from tool configuration"""
@@ -284,12 +285,12 @@ def extract_input_specs(tool_config: dict) -> list[dict]:
         print(f"Error extracting input specs: {str(e)}")
         return []
     
-def get_tool_parameters_llm(tool_config, messages_history, plan_steps):
+def get_tool_parameters_llm(tool_config, messages_history, plan_steps, user_id):
     """Attempt to execute tool with current configuration"""
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0})
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id)
     reply_json = extract_json_from_str(reply)
     if not reply_json["can_proceed"]:
             return None

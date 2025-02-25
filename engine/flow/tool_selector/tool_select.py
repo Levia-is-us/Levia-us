@@ -7,10 +7,10 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
-def tool_select(plan, current_step, context, tools):
+def tool_select(plan, current_step, context, tools, user_id):
     prompt = tool_selector_prompt(plan, current_step, context, tools)
     result = chat_completion(
-        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}
+        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}, user_id=user_id
     )
     result = extract_json_from_str(result)
     # print(f"Tool selection result: {result}")

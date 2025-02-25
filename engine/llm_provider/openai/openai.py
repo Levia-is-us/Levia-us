@@ -22,6 +22,7 @@ def chat_completion_openai(
         "source": "azure-openai",
     },
     config={},
+    user_id=""
 ):
     """
     Generate chat completion using OpenAI API.
@@ -71,7 +72,7 @@ def chat_completion_openai(
         if model["type"] == "reasoning":
             if completion.choices[0].message.model_extra:
                 reasons = completion.choices[0].message.model_extra.reasoning_content
-                output_stream(reasons)
+                output_stream(log=reasons, user_id=user_id, type='think')
 
         # Extract the model reply
         return completion.choices[0].message.content

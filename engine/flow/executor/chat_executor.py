@@ -22,7 +22,7 @@ CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
 def chat_executor(user_id: str, user_intent: str, chat_messages: list):
-    output_stream("**Recalling similar scenes from episodic memory...**")
+    output_stream(log="Recalling similar scenes from episodic memory...", user_id=user_id, type="steps")
     task_in_process,res = episodic_memory_executor(user_id, user_intent, chat_messages)
     if task_in_process:
         return res
