@@ -18,12 +18,17 @@ class RemoteLogStream(BaseStream):
             "intent": log,
             "type": type
         }
-        
-        try:
-            response = requests.post(LOG_URL, json=payload)
-            response.raise_for_status()
-            return response.text
-        except requests.exceptions.RequestException as e:
-            print(f"send error: {str(e)}")
-            return None
+        def send_log():
+            try:
+                response = requests.post(LOG_URL, json=payload)
+                response.raise_for_status()
+                return response.text
+            except requests.exceptions.RequestException as e:
+                print(f"send error: {str(e)}")
+                return None
+                
+        import threading
+        thread = threading.Thread(target=send_log)
+        thread.daemon = True
+        thread.start()
         
