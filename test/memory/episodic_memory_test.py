@@ -14,9 +14,8 @@ sys.path.append(
 )
 
 from memory.episodic_memory.episodic_memory import (
-    store_short_pass_memory,
-    retrieve_short_pass_memory,
     store_long_pass_memory,
+    delete_long_pass_memory,
 )
 
 # store_short_pass_memory("test", "test", {"test": "test"}, namespace="test")
@@ -61,3 +60,6 @@ from memory.episodic_memory.episodic_memory import (
 ])
 def test_store_long_pass_memory(metadata):
     store_long_pass_memory(id='search news', memory='search news', metadata=metadata)
+    
+def test_delete_long_pass_memory():
+	delete_long_pass_memory('557491df-709d-4572-932f-d5ab39801470')
