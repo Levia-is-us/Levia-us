@@ -52,6 +52,7 @@ def handle_chat_flow(user_input: str, user_id: str) -> str:
     short_term_memory.add_context(
         create_chat_message("assistant", f"{final_reply}"), user_id
     )
+    output_stream(log=f"Final reply: {final_reply}", user_id=user_id, type="think")
     return final_reply
 
 
