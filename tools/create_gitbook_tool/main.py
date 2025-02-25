@@ -30,7 +30,7 @@ _file_manage = None
 @run_tool
 class SaveMarkdownToGitbook(BaseTool):
     """Tool for saving markdown content to GitBook"""
-    def save_markdown_to_gitbook(content):
+    def save_markdown_to_gitbook(self, content: str):
         global _gitbook
         global _file_manage
 
@@ -61,9 +61,9 @@ class SaveMarkdownToGitbook(BaseTool):
             spaces = _gitbook.get_spaces(organization_id)
             space_id = spaces["items"][0]["id"]
 
-            content = {"url": file_info["url"], "source": "markdown"}
+            gitbook_markdown_resource = {"url": file_info["url"], "source": "markdown"}
 
-            importContent = _gitbook.import_content(space_id, content)
+            importContent = _gitbook.import_content(space_id, gitbook_markdown_resource)
 
             if not importContent:
                 _file_manage.delete_file(file_info["name"])

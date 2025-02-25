@@ -101,7 +101,10 @@ def process_plan_execution(plan_steps, user_id: str, chat_messages: list, top_me
         else:
             step["executed"] = True
             if input_params.get("get_param_from_llm", False):
-                delete_long_pass_memory(top_memory_id, user_id)
+                try:
+                    delete_long_pass_memory(top_memory_id, user_id)
+                except:
+                    pass
 
 
 

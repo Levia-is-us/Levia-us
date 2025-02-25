@@ -27,44 +27,37 @@ def generate_search_keywords(intent: str) -> list:
     """
 
     # Generate search keywords through LLM
-    prompt = """
-    You will be given a user’s input as a string. Your task is to extract the most appropriate search keywords based on the given input. The output should be a list of keywords, and you should generate as few keywords as possible while ensuring they are concise and accurately reflect the user's need. 
+    prompt = """You are an advanced keyword extraction system designed to help users optimize their search queries. Your task is to analyze a given user input and generate 1-3 concise, relevant keywords that accurately reflect the user's search intent. These keywords should be suitable for use in search engines to find the most relevant information.
 
-    The keywords may consist of multiple related terms, but avoid unnecessary or redundant words.
+Here is the user's intent:
 
-    Examples:
+<user_intent>
+{USER_INTENT}
+</user_intent>
 
-    1. Input: The user wants to learn how to use MySQL.
-    Output: ["SQL usage guide"]
+Please follow these steps to generate the keywords:
 
+1. Analyze the user's input to identify the main topic and any specific attributes (such as time, location, or context).
+2. Extract the most relevant concepts and terms.
+3. Combine related terms and remove unnecessary words to create concise keywords.
+4. Ensure that the keywords accurately reflect the user's search intent.
+5. Generate between 1 and 3 keywords, with fewer being preferable if they can capture the essence of the query.
 
-    2. Input: The user wants to know about the economic trends in China for 2025.
-    Output: ["2025 China economic forecast"]
+Your final output should be a list of 1-3 keywords, each enclosed in quotes and surrounded by square brackets. For example:
 
+["keyword 1", "keyword 2", "keyword 3"]
 
-    3. Input: The user wants to learn how to analyze data with Python.
-    Output: ["Python data analysis"]
+or
 
+["single keyword"]
 
-    4. Input: The user wants to learn how to improve work efficiency.
-    Output: ["work efficiency"]
-
-
-    5. Input: The user wants to know about stock market trends and investment advice for 2025 in the U.S.
-    Output: ["2025 U.S. stock market trends"]
-
-
-    Your task:
-    - Extract only the most relevant and minimal keywords from the input.
-    - The keywords should accurately reflect the search query, and as few keywords as necessary to do so.
-    - Ensure clarity and avoid redundancy.
-    - The output should be only the list of keywords, no other text.
-    """
+Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine. Prioritize clarity, relevance, and conciseness in your keyword selection.
+"""
     try:
+        prompt = prompt.format(USER_INTENT=intent)
         output = chat_completion(
             [
-                {"role": "assistant", "content": prompt},
-                {"role": "user", "content": intent},
+                {"role": "user", "content": prompt},
             ],
             model=CHAT_MODEL_NAME,
             config={"temperature": 0.5},
@@ -94,37 +87,51 @@ def extract_relevance_url(intent: str, contents: str) -> list:
     Returns:
         The relevance URLs.
     """
-    prompt = """
-    Given a user intent and search results, select 1-3 most relevant URLs.
+    prompt = """You are an advanced search result curator tasked with selecting the most relevant URLs from a list of search results based on a given user intent. Your goal is to provide 1-3 high-quality, relevant results that best match the user's needs.
 
-    Requirements:
-    1. Analyze the relevance between each result and the user intent
-    2. Consider content freshness and authority
-    3. Select only the most relevant 1-3 URLs
-    4. Ignore results that are:
-        - Spam or low quality content
-        - Not directly related to the intent
-        - Duplicate information
-        - URLs from video/audio hosting sites (e.g. youtube.com, vimeo.com, soundcloud.com)
-    5. The output should be only the URL list, no other text ( eg. ["url1", "url2", "url3"])
+Here is the user's search intent:
+<user_intent>
+{USER_INTENT}
+</user_intent>
 
-    Input format:
-    intent: <user intent>
-    contents: url: <url1> content:<content1>
-            url: <url2> content:<content2>
-            url: <url3> content:<content3>
+And here is the list of search results:
+<search_results>
+{SEARCH_RESULTS}
+</search_results>
 
-    Output format:
-    ["url1", "url2", "url3"]
+Please follow these steps to select the most appropriate URLs:
+
+1. Analyze the relevance of each search result to the user intent.
+2. Consider the freshness and authority of the content.
+3. Select only the 1-3 most relevant URLs that meet the following criteria:
+   - Directly related to the user intent
+   - Not spam or low-quality content
+   - Not duplicate information
+   - Not from video/audio hosting sites (e.g., youtube.com, vimeo.com, soundcloud.com)
+
+After your evaluation, provide your final selection in the following JSON format:
+
+[
+  {{
+    "url": "selected_url_1"
+  }},
+  {{
+    "url": "selected_url_2",
+  }},
+  {{
+    "url": "selected_url_3"
+  }}
+]
+
+Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
+
+Please begin your evaluation now, followed by your final selection in the specified JSON format.
     """
     try:
+        prompt = prompt.format(USER_INTENT=intent, SEARCH_RESULTS=str(contents))
         output = chat_completion(
             [
-                {"role": "assistant", "content": prompt},
-                {
-                    "role": "user",
-                    "content": f"Intent: {intent}\nContents: {contents}",
-                },
+                {"role": "user", "content": prompt},
             ],
             model=CHAT_MODEL_NAME,
             config={"temperature": 0.7},
