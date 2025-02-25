@@ -3,8 +3,8 @@ from metacognitive.stream.stream_provider.base_stream import BaseStream
 import requests
 
 ENVIRONMENT=os.getenv("ENVIRONMENT", "local")
-LOG_URL=os.getenv("LEVIALOGSERVER", "")
-
+LOG_URL=os.getenv("LEVIA_LOG_SERVER", "")
+VISUAL = os.getenv("VISUAL", False)
 class RemoteLogStream(BaseStream):
     def __init__(self):
         pass
@@ -16,7 +16,8 @@ class RemoteLogStream(BaseStream):
         payload = {
             "user_id": user_id,
             "intent": log,
-            "type": type
+            "type": type,
+            "visual": VISUAL
         }
         def send_log():
             try:
