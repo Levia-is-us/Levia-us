@@ -3,6 +3,7 @@ from metacognitive.stream.stream_provider.base_stream import BaseStream
 from metacognitive.stream.stream_provider.log_stream.log_stream import LogStream
 from metacognitive.stream.stream_provider.http_stream.http_stream import HTTPStream
 from metacognitive.stream.stream_provider.local_stream.local_stream import LocalStream
+from metacognitive.stream.stream_provider.log_stream.remote_log_stream import RemoteLogStream
 from metacognitive.stream.stream_provider.websocket_stream.websocket_stream import (
     WebsocketStream,
 )
@@ -29,6 +30,8 @@ class Stream:
                 self.add_stream(LocalStream())
             elif stream_type == "websocket":
                 self.add_stream(WebsocketStream("ws://localhost:8765"))
+            elif stream_type == "remote_log":
+                self.add_stream(RemoteLogStream())
             else:
                 raise ValueError(f"Invalid stream type: {stream_type}")
 
@@ -44,7 +47,7 @@ class Stream:
         """
         self.streams.append(stream)
 
-    def output(self, log: str):
+    def output(self, log: str, user_id: str, type: str):
         """
         Output log message to all registered streams.
 
@@ -52,22 +55,24 @@ class Stream:
             log (str): Message to output
         """
         for stream in self.streams:
-            stream.output(log)
+            stream.output(log, user_id, type)
 
 
 # Global singleton instance
 _stream = None
 
 
-def output_stream(log: str):
+def output_stream(log: str, user_id: str = "levia", type: str = "info"):
     """
     Global function to output to stream singleton.
     Creates WebSocket stream instance if none exists.
 
     Args:
         log (str): Message to output
+        user_id (str): User identifier
+        type (str): Message type
     """
     global _stream
     if _stream is None:
-        _stream = Stream(stream_types=["websocket", "local", "http"])
-    _stream.output(log)
+        _stream = Stream(stream_types=["remote_log"])
+    _stream.output(log, user_id, type)
