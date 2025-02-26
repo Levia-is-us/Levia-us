@@ -67,7 +67,7 @@ Please follow these steps to analyze the current situation:
    }}
    ```
 
-Before providing your final JSON output, please conduct a thorough analysis of the arguments. Conduct this analysis inside <workflow_step_analysis> tags. In this analysis:
+Before providing your final JSON output, please conduct a thorough analysis of the arguments. Conduct this analysis inside <think> tags. In this analysis:
 1. List all arguments (required and optional) from the current step.
 2. For each argument:
    a. Identify its corresponding value from the context or previous steps.

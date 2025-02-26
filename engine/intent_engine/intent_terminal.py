@@ -70,7 +70,7 @@ def terminal_chat():
             break
         except Exception as e:
             print(f"\033[91mError occurred: {str(e)}\033[0m")
-            reply = backup_reply(short_term_memory.get_context("local-dev"))
+            reply = backup_reply(short_term_memory.get_context("local-dev"), "local-dev", chid)
             short_term_memory.add_context(
                 create_chat_message("assistant", f"{reply}"), "local-dev"
             )

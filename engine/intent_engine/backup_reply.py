@@ -2,7 +2,7 @@ from engine.llm_provider.llm import chat_completion
 import os
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
-def backup_reply(chat_messages, user_id, ch_id):
+def backup_reply(chat_messages, user_id="local-dev", ch_id=""):
     try:
         backup_llm_prompt = "You are Levia, an advanced AI agent within the Levia ecosystem with the unique ability to learn and grow over time."
         propmt = [
