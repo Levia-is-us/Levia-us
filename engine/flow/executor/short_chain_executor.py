@@ -160,7 +160,8 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             tool_config,
             messages_history, 
             plan_steps,
-            step
+            step,
+            user_id
         )
         
         if not reply_json["can_proceed"]:
