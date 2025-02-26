@@ -51,7 +51,7 @@ or
 
 ["single keyword"]
 
-Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine. Prioritize clarity, relevance, and conciseness in your keyword selection.
+Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine.
 """
     try:
         prompt = prompt.format(USER_INTENT=intent)
@@ -62,9 +62,10 @@ Remember, the goal is to create keywords that will help the user find the most r
             model=CHAT_MODEL_NAME,
             config={"temperature": 0.5},
         )
+        print(f"Generate search keywords output: {output}")
 
         try:
-            keywords = json.loads(output)
+            keywords = extract_json_from_str(output)
             if not isinstance(keywords, list):
                 print("Invalid keywords format: expected list")
                 return []
@@ -119,7 +120,7 @@ After your evaluation, provide your final selection in the following JSON format
 
 Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
 
-Please begin your evaluation now, followed by your final selection in the specified JSON format.
+Please begin your evaluation now, followed by your final selection in the specified JSON format without any other text.
     """
     try:
         prompt = prompt.format(USER_INTENT=intent, SEARCH_RESULTS=str(contents))

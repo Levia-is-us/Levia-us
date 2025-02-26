@@ -15,9 +15,10 @@ from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
 from engine.utils.json_util import extract_json_from_str
 
 def main():
-    input_messages = "who is the president of the United States?"
-    message = """I will provide you with a requirement request from Twitter, and I hope you can fulfill the user's request. if the query requires the execution of a 'call_tool' operation, add one more intent: the knowledge into a document and upload it to my **gitbook**.
-Twitter requirement: {input_messages}
+    input_messages = "panda: who is the president of the United States?"
+    message = """I will provide you a twitter user name with the user's request from Twitter, and I hope you can fulfill the user's request. if the query requires the execution of a 'call_tool' operation, add one more intent: the knowledge into a document and upload it to Levia's **gitbook**.
+ to Levia's **gitbook**.
+ Twitter requirement: {input_messages}
     """
     input_message = message.format(input_messages=input_messages)
     # chat_messages = input("Enter your message: ")

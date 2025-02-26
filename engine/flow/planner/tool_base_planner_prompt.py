@@ -22,7 +22,7 @@ You will be provided with the following information:
 
 Your task is to analyze the user's intent, determine if the available tools are sufficient to fulfill the request, and create a detailed plan if possible. Follow these steps:
 
-1. Analyze the user's intent thoroughly. Wrap your task breakdown inside <input_breakdown> tags, addressing the following points:
+1. Analyze the user's intent thoroughly. Wrap your task breakdown inside <think> tags, addressing the following points:
    a. List and categorize all tools from the tool_list
    b. Key phrases or keywords from the user's intent
    c. Main objectives that need to be accomplished
