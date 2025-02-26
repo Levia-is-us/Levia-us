@@ -121,6 +121,7 @@ def process_plan_execution(messages_history, plan_steps, user_id: str, ch_id: st
             step,
             plan_steps,
             user_id,
+            ch_id,
             step_index
         )
         step["tool_executed_result"] = tool_result["result"]
@@ -146,7 +147,7 @@ def resolve_tool_for_step(step):
         return False
     return memories["matches"]
 
-def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_index: int):
+def execute_step_tool(messages_history,step, plan_steps, user_id: str, ch_id: str, step_index: int):
     """
     Execute tool for a plan step
     
@@ -161,7 +162,8 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
             messages_history, 
             plan_steps,
             step,
-            user_id
+            user_id,
+            ch_id
         )
         
         if not reply_json["can_proceed"]:
@@ -171,7 +173,7 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
                 "status": "need_input"
             }
             
-        execution_result = execute_tool_operation(tool_config, reply_json, user_id)
+        execution_result = execute_tool_operation(tool_config, reply_json, user_id, ch_id)
         if execution_result == {"status": "failure"}:
             return {
                 "toolName": step["tool"],
@@ -215,31 +217,34 @@ def parse_tool_config(tool):
     tool_dict["tool"] = tool_name
     return tool_dict
 
-def validate_tool_parameters(tool_config, messages_history, plan_steps, step, user_id):
+def validate_tool_parameters(tool_config, messages_history, plan_steps, step, user_id, ch_id):
     """Attempt to execute tool with current configuration"""
+    print(f"tool_config: {tool_config}")
+    print(f"messages_history: {step}")
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id)
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
+    print(f"reply_json: {reply_json}")
     return reply_json
 
-def execute_tool_operation(tool_config, reply_json, user_id):
+def execute_tool_operation(tool_config, reply_json, user_id, ch_id):
     """Execute tool with provided arguments"""
     args = {}
     required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
     for arg_name, arg_info in required_args.items():
         args[arg_name] = arg_info.get("value", {})
-
     result,_ = execute_tool(
         tool_caller_client,
         tool_config['tool'],
         tool_config['method'],
         args,
-        user_id
+        user_id,
+        ch_id
     )
     
-    if verify_tool_execution(tool_config, result) == "success":
+    if verify_tool_execution(tool_config, result, user_id, ch_id) == "success":
         return result
     return {"status": "failure"}
 

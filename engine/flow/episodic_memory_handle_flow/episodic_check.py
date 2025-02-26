@@ -6,9 +6,9 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
-def episodic_check(user_intent, context, plan, user_id):
+def episodic_check(user_intent, context, plan, user_id, ch_id):
     prompt = episodic_check_prompt(user_intent, context, plan)
-    result = chat_completion(prompt, QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id)
+    result = chat_completion(prompt, QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
     start_tag = "<think>"
     end_tag = "</think>"
     start_index = result.find(start_tag)

@@ -28,7 +28,7 @@ def create_execution_plan(intent: str, user_id: str, ch_id: str = "") -> str:
 
 
 def check_plan_sufficiency(
-    intent: str, plan_intent: str, execution_records: list, user_id: str
+    intent: str, plan_intent: str, execution_records: list, user_id: str, ch_id: str = ""
 ) -> bool:
     """Check if existing plan is sufficient for current intent"""
     memories_check_prompt = check_plan_fittable_prompt(
@@ -36,7 +36,7 @@ def check_plan_sufficiency(
     )
 
     result = chat_completion(
-        memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id
+        memories_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id
     )
     result = extract_json_from_str(result)
     return result["solution_sufficient"]["result"] in [True, "true"]

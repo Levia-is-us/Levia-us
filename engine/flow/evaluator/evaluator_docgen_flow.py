@@ -15,6 +15,7 @@ def evaluator_docgen_flow(code):
         prompt = prompt.replace("{{PYTHON_CODE}}", code),
         model=QUALITY_MODEL_NAME,
         config={"temperature": 0, "max_tokens":8000},
-        user_id="local-dev"
+        user_id="local-dev",
+        ch_id=""
     )
     return result
