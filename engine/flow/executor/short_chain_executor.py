@@ -171,7 +171,7 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, step_inde
                 "status": "need_input"
             }
             
-        execution_result = execute_tool_operation(tool_config, reply_json)
+        execution_result = execute_tool_operation(tool_config, reply_json, user_id)
         if execution_result == {"status": "failure"}:
             return {
                 "toolName": step["tool"],
@@ -224,7 +224,7 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step, us
     reply_json = extract_json_from_str(reply)
     return reply_json
 
-def execute_tool_operation(tool_config, reply_json):
+def execute_tool_operation(tool_config, reply_json, user_id):
     """Execute tool with provided arguments"""
     args = {}
     required_args = reply_json.get("extracted_arguments", {}).get("required_arguments", {})
@@ -235,7 +235,8 @@ def execute_tool_operation(tool_config, reply_json):
         tool_caller_client,
         tool_config['tool'],
         tool_config['method'],
-        args
+        args,
+        user_id
     )
     
     if verify_tool_execution(tool_config, result) == "success":

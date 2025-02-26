@@ -16,5 +16,5 @@ sys.path.append(
 from engine.intent_engine.intent_event import event_chat
 
 def test_intent_event():
-    intent_event = event_chat(user_id="test", input_message="jack : 去北京的机票?")
+    intent_event = event_chat(user_id="test", input_message="jack : who are you?")
     # intent_event.run()
