@@ -13,10 +13,10 @@ db_pool = MySQLPool()
 
 
 def execute_tool(
-    tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict, user_id: str
+    tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict, user_id: str, ch_id: str
 ):
     """Execute tool and record results"""
-    output_stream(log=f"Running tool: {tool_name}...", user_id=user_id, type="steps")
+    output_stream(log=f"Running tool: {tool_name}...", user_id=user_id, type="steps", ch_id=ch_id)
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 
@@ -26,8 +26,7 @@ def execute_tool(
         )
         # if isinstance(result, dict):
         #     return {"status": "failure", "result": "tool execution result is invalid"}, None
-
-        status = verify_tool_execution(execution_record, result, user_id)
+        status = verify_tool_execution(execution_record, result, user_id, ch_id)
         record_tool_execution(tool_name, tool_method, tool_args, result)
         print(f"tool_execution_result: {result}")
 
@@ -39,7 +38,7 @@ def execute_tool(
         return {"status": "failure", "result": str(e)}, None
 
 
-def verify_tool_execution(execution_record: dict, result: dict, user_id: str) -> str:
+def verify_tool_execution(execution_record: dict, result: dict, user_id: str, ch_id: str) -> str:
     """Verify tool execution result using LLM"""
     # if result["status"] == "failure":
     #     return "failure"
@@ -48,7 +47,7 @@ def verify_tool_execution(execution_record: dict, result: dict, user_id: str) ->
     )
 
     llm_confirmation = chat_completion(
-        llm_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id
+        llm_check_prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id
     )
 
     llm_confirmation = extract_json_from_str(llm_confirmation)

@@ -123,12 +123,12 @@ def get_all_links(urls):
     driver = setup_driver()
 
     for url in urls:
-        links = get_Links(url["url"])
+        links = get_Links(url)
         links_data.extend(links)
 
     if visual == "True":
         try:
-            driver.get(urls[0]["url"])
+            driver.get(urls[0])
             smooth_scroll_to_bottom(driver)
         except Exception as e:
             pass

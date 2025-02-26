@@ -29,7 +29,7 @@ def get_model_by_name(model_name):
     return models.get(model_name, None)
 
 
-def create_chat_completion(system_prompt, prompt, model=_default_model, config={}, user_id=""):
+def create_chat_completion(system_prompt, prompt, model=_default_model, config={}, user_id="", ch_id=""):
     model_obj = get_model_by_name(model)
     messages = []
     if model_obj["type"] == "reasoning":
@@ -44,7 +44,7 @@ def create_chat_completion(system_prompt, prompt, model=_default_model, config={
         ]
     
     
-    return chat_completion(messages, model, config, user_id)
+    return chat_completion(messages, model, config, user_id, ch_id)
 
 
 def create_embedding(text, model="text-embedding", config={}):

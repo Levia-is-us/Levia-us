@@ -112,18 +112,9 @@ Please follow these steps to select the most appropriate URLs:
 After your evaluation, provide your final selection in the following JSON format:
 
 [
-  {{
-    "url": "selected_url_1",
-    "summary": "content summary"
-  }},
-  {{
-    "url": "selected_url_2",
-    "summary": "content summary"
-  }},
-  {{
-    "url": "selected_url_3",
-    "summary": "content summary"
-  }}
+  "selected_url_1",
+  "selected_url_2",
+  "selected_url_3"
 ]
 
 Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
