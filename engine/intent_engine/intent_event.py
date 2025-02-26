@@ -6,19 +6,18 @@ from engine.flow.executor.task_manager import TaskManager
 from engine.utils.chat_formatter import create_chat_message
 from metacognitive.stream.stream import output_stream
 import datetime
+import uuid
 short_term_memory = ShortTermMemory()
 
 task_manager = TaskManager()
 
 def event_chat(user_id, input_message):
-    start_time = datetime.datetime.now().timestamp()
-    output_stream(log=f"Start time: {start_time}", user_id=user_id, type="start_time")
+    chid = str(uuid.uuid4())
     try:
-        print("\033[93mWelcome to Levia Chat!\033[0m")
-        output_stream(input_message, user_id, "newtask")
-        reply = handle_chat_flow(input_message, user_id)
+        output_stream(input_message, user_id, "newtask", chid)
+        reply = handle_chat_flow(input_message, user_id, chid)
         end_time = datetime.datetime.now().timestamp()
-        output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time")
+        output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time", ch_id=chid)
         return reply
     except Exception as e:
         print(f"event_chat error: {str(e)}")
@@ -27,5 +26,5 @@ def event_chat(user_id, input_message):
             create_chat_message("assistant", f"{reply}"), user_id
         )
         end_time = datetime.datetime.now().timestamp()
-        output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time")
+        output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time", ch_id=chid)
         return reply

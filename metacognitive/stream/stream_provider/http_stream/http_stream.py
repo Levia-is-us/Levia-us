@@ -62,7 +62,7 @@ class HTTPStream(BaseStream):
         self.server_thread = threading.Thread(target=run_server, daemon=True)
         self.server_thread.start()
 
-    def output(self, log: str, user_id: str, type: str):
+    def output(self, log: str, user_id: str, type: str, child_id: str = ""):
         try:
             self.logs.append(log)
         except Exception as e:

@@ -51,7 +51,7 @@ class RedisContextStore(BaseContextStore):
         # If history exceeds max length, remove oldest entry
         self.auto_delete_context(user_key)
         
-        redis_tool.set_value(user_key, json.dumps(current_context))
+        redis_tool.set_value(user_key, json.dumps(current_context), expire=60*60*24*3)
 
     def delete_context(self, context: str, user_key: str = "local"):
         """

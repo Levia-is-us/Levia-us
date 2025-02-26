@@ -67,7 +67,7 @@ def create_embedding(text, model="text-embedding", config={}):
     raise ValueError(f"Model {model} does not support embeddings")
 
 
-def start_chat_completion(messages, model=_default_model, config={}, user_id=""):
+def start_chat_completion(messages, model=_default_model, config={}, user_id="", ch_id=""):
     """
     Generate chat completion using either OpenAI or Anthropic models.
 
@@ -92,9 +92,9 @@ def start_chat_completion(messages, model=_default_model, config={}, user_id="")
     models = _load_models()
 
     if models[model]["source"] == "openai" or models[model]["source"] == "azure-openai":
-        return chat_completion_openai(messages, model=models[model], config=config, user_id=user_id)
+        return chat_completion_openai(messages, model=models[model], config=config, user_id=user_id, ch_id=ch_id)
     elif models[model]["source"] == "deepseek":
-        return chat_completion_deepseek(messages, model=models[model], config=config, user_id=user_id)
+        return chat_completion_deepseek(messages, model=models[model], config=config, user_id=user_id, ch_id=ch_id)
     elif models[model]["source"] == "anthropic":
         # convert messages to anthropic format
         anthropic_messages = []
@@ -125,15 +125,15 @@ def start_chat_completion(messages, model=_default_model, config={}, user_id="")
 
     return chat_completion_openai(messages, user_id=user_id)
 
-def chat_completion(messages, model=_default_model, config={}, user_id="Local-dev"):
+def chat_completion(messages, model=_default_model, config={}, user_id="Local-dev", ch_id=""):
     try:
-        res = start_chat_completion(messages, model=_default_model, config=config, user_id=user_id)
+        res = start_chat_completion(messages, model=_default_model, config=config, user_id=user_id, ch_id=ch_id)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res
     except:
         model = os.getenv("BACKUP_MODEL_NAME")
-        res = start_chat_completion(messages, model=model, config=config, user_id=user_id)
+        res = start_chat_completion(messages, model=model, config=config, user_id=user_id, ch_id=ch_id)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res
