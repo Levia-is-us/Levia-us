@@ -9,7 +9,7 @@ class RemoteLogStream(BaseStream):
     def __init__(self):
         pass
 
-    def output(self, log: str, user_id: str, type: str):
+    def output(self, log: str, user_id: str, type: str, ch_id: str):
         if ENVIRONMENT == "local" or (not log or not log.strip() or "Initialized metacognitive stream." in log):
             return
         
@@ -17,7 +17,8 @@ class RemoteLogStream(BaseStream):
             "user_id": user_id,
             "intent": log,
             "type": type,
-            "visual": VISUAL
+            "visual": VISUAL,
+            "chid": ch_id
         }
         def send_log():
             try:

@@ -47,7 +47,7 @@ class Stream:
         """
         self.streams.append(stream)
 
-    def output(self, log: str, user_id: str, type: str):
+    def output(self, log: str, user_id: str, type: str, ch_id: str):
         """
         Output log message to all registered streams.
 
@@ -55,14 +55,14 @@ class Stream:
             log (str): Message to output
         """
         for stream in self.streams:
-            stream.output(log, user_id, type)
+            stream.output(log, user_id, type, ch_id)
 
 
 # Global singleton instance
 _stream = None
 
 
-def output_stream(log: str, user_id: str = "levia", type: str = "info"):
+def output_stream(log: str, user_id: str = "levia", type: str = "info", ch_id: str = ""):
     """
     Global function to output to stream singleton.
     Creates WebSocket stream instance if none exists.
@@ -71,8 +71,9 @@ def output_stream(log: str, user_id: str = "levia", type: str = "info"):
         log (str): Message to output
         user_id (str): User identifier
         type (str): Message type
+        ch_id (str): channel identifier (current dialog id
     """
     global _stream
     if _stream is None:
         _stream = Stream(stream_types=["remote_log", "local"])
-    _stream.output(log, user_id, type)
+    _stream.output(log, user_id, type, ch_id)

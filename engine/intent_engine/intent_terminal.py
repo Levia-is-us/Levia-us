@@ -13,6 +13,7 @@ import os
 
 from metacognitive.stream.stream import output_stream
 from engine.utils.chat_formatter import create_chat_message
+import uuid
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
@@ -22,7 +23,7 @@ short_term_memory = ShortTermMemory()
 
 def init_stream():
     """Initialize stream"""
-    return output_stream(log="Initialized metacognitive stream.", user_id="local-dev", type="think")
+    return output_stream(log="Initialized metacognitive stream.", user_id="local-dev", type="think", ch_id="")
 
 def init_short_term_memory():
     """Initialize short term memory"""
@@ -59,8 +60,9 @@ def terminal_chat():
 
             if not user_input:
                 continue
+            chid = str(uuid.uuid4())
 
-            reply = handle_chat_flow(user_input, "local-dev")
+            reply = handle_chat_flow(user_input, "local-dev", chid)
             print("\033[92mLevia:\033[0m: ", reply)
             print("\n")
         except KeyboardInterrupt:

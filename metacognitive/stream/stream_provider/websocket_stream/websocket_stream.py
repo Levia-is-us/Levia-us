@@ -37,7 +37,7 @@ class WebsocketStream(BaseStream):
             print(f"WebsocketStream server error: {e}")
             self.server = None
 
-    def output(self, log: str, user_id: str, type: str):
+    def output(self, log: str, user_id: str, type: str, child_id: str = ""):
         try:
             if self.server and self.clients:
 

@@ -36,16 +36,17 @@ INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 def execute_intent_chain(
     user_intent: str,
     messages_history: list,
-    user_id: str
+    user_id: str,
+    ch_id: str
 ):   
-    output_stream(log=f"No experience for {user_intent}...", user_id=user_id, type="thinkg")
-    output_stream(log="Creating new execution plan ...", user_id=user_id, type="steps")
-    plan = create_execution_plan(user_intent, user_id)
+    output_stream(log=f"No experience for {user_intent}...", user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log="Creating new execution plan ...", user_id=user_id, type="steps", ch_id=ch_id)
+    plan = create_execution_plan(user_intent, user_id, ch_id)
     return process_tool_execution_plan(
-        plan, messages_history, user_id, user_intent
+        plan, messages_history, user_id, user_intent, ch_id
     )
 
-def process_tool_execution_plan(plan, messages_history: list, user_id: str, user_intent: str):
+def process_tool_execution_plan(plan, messages_history: list, user_id: str, user_intent: str, ch_id: str):
     """
     Handle execution of new tools based on the plan
     
@@ -61,29 +62,29 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     # Analyze each step and find appropriate tools
     found_tools = []
     for step in plan:
-        output_stream(log=f"Finding appropriate tool for step: {step['intent']}...", user_id=user_id, type="steps")
+        output_stream(log=f"Finding appropriate tool for step: {step['intent']}...", user_id=user_id, type="steps", ch_id=ch_id)
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
     found_tools = get_unique_tools(found_tools)
     if(len(found_tools) == 0):
         raise Exception("failed to find tools")
-    output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps")
-    plan = tool_base_planner(user_intent, found_tools)
+    output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps", ch_id=ch_id)
+    plan = tool_base_planner(user_intent, found_tools, user_id, ch_id)
     # print(f"plan: {plan}")
             
     if(plan["status"] == "failed"):
-        output_stream(log="Failed to make plan with current tools...", user_id=user_id, type="think")
+        output_stream(log="Failed to make plan with current tools...", user_id=user_id, type="think", ch_id=ch_id)
         return plan
     plan = plan["plan"]
     for step in plan:
-        output_stream(log=f"Step: {step['step']}", user_id=user_id, type="think")
-        output_stream(log=f"execution tool: {step['tool']}", user_id=user_id, type="think")
-        output_stream(log=f"step purpose: {step['step purpose']}", user_id=user_id, type="think")
-        output_stream(log="---------------------------------", user_id=user_id, type="think")
+        output_stream(log=f"Step: {step['step']}", user_id=user_id, type="think", ch_id=ch_id)
+        output_stream(log=f"execution tool: {step['tool']}", user_id=user_id, type="think", ch_id=ch_id)
+        output_stream(log=f"step purpose: {step['step purpose']}", user_id=user_id, type="think", ch_id=ch_id)
+        output_stream(log="---------------------------------", user_id=user_id, type="think", ch_id=ch_id)
 
     # Execute tools for each plan step
-    process_plan_execution(messages_history, plan, user_id)
+    process_plan_execution(messages_history, plan, user_id, ch_id)
     all_steps_executed = all(step.get("executed", False) for step in plan)
     if all_steps_executed:
         plan_context = copy.deepcopy(plan)
@@ -106,11 +107,11 @@ def get_unique_tools(found_tools):
             unique_tools.append(tool)
     return unique_tools
 
-def process_plan_execution(messages_history, plan_steps, user_id: str):
+def process_plan_execution(messages_history, plan_steps, user_id: str, ch_id: str = ""):
     # tool_results = []
     for step_index, step in enumerate(plan_steps):
         # if not step.get("tool_necessity", True):
-        output_stream(log=f"Executing step: {step['step purpose']}...", user_id=user_id, type="steps")
+        output_stream(log=f"Executing step: {step['step purpose']}...", user_id=user_id, type="steps", ch_id=ch_id)
         #     continue
         if step.get("executed", False):
             continue
