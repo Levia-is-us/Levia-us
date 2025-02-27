@@ -52,6 +52,8 @@ or
 ["single keyword"]
 
 Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine.
+
+Now, please output your keywords list without any other text below:
 """
     try:
         prompt = prompt.format(USER_INTENT=intent)
