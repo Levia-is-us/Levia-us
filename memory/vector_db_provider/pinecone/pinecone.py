@@ -7,8 +7,8 @@ class PineconeDb:
     def __init__(self, index_name: str):
         api_key = os.getenv("PINECONE_API_KEY")
         host = os.getenv("PINECONE_HOST")
-        self.pc = Pinecone(api_key=api_key, host=host)
-        self.index = self.pc.Index(index_name)
+        self.pc = Pinecone(api_key=api_key)
+        self.index = self.pc.Index(index_name, host=host)
 
     def set_index(self, index_name: str) -> None:
         """
