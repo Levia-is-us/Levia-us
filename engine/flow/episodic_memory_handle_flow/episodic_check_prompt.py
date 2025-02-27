@@ -57,6 +57,7 @@ Please follow these steps to complete your task:
    - For each component, explain how it relates to the user intent
 
 3. Attempt to fill in the plan with information from the context:
+   - value of "step" should be a step + number, not a step name
    - Focus on inputs where "source": "context"
    - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
