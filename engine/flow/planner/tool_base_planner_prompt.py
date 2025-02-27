@@ -1,6 +1,6 @@
 import datetime
 def get_tool_base_planner_prompt(intent: str, tool_list: list):
-    date_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     prompt = f"""You are an advanced task planning system designed to analyze user intents and create structured plans of actions that require external tools. Your goal is to break down complex tasks into specific, tool-dependent steps.
 
 You will be provided with the following information:
