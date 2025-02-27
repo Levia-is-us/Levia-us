@@ -1,6 +1,6 @@
 import datetime
 def episodic_check_prompt(user_intent, context, plan):
-    date_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     episodic_check_prompt = f"""You are an AI assistant tasked with analyzing user intents, contexts, and plan structures to determine if a given intent can be achieved using the provided plan. Your primary goal is to evaluate the feasibility of the plan and provide appropriate output based on your analysis.
 
 Here is the user's intent:
