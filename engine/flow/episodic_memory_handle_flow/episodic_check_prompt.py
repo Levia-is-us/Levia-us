@@ -61,6 +61,7 @@ Please follow these steps to complete your task:
    - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
    - If the information is available in the context, fill in the "value" field with the appropriate information
+   - If the information can not found in the context, leave the "value" field empty
    - Provide a confidence level (high, medium, low) for each piece of information filled in
    - Note any missing information
 
