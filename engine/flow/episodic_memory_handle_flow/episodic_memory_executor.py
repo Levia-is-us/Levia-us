@@ -199,7 +199,7 @@ def process_parameter_source(input_spec: dict, execution_outputs: list) -> dict:
     """Process individual parameter based on its source configuration"""
     try:
         # If value is already provided
-        if "value" in input_spec and input_spec["value"] is not None:
+        if "value" in input_spec and input_spec["value"] is not None and input_spec["value"] != "":
             value = input_spec["value"]
             type_str = input_spec.get("type", "str")
             if "str" in type_str:
