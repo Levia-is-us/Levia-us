@@ -1,12 +1,14 @@
 import os
 import sys
 
+
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(project_root)
 from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
+from utils import remove_markdown
 
 
 def main():
@@ -19,16 +21,9 @@ def main():
     # Create ToolCaller instance
     caller = ToolCaller(registry)
 
-    markdown_text = """
-        # TITLE111
-
-        This is a **bold1111** text.
-
-        - List item 1
-        - List item 2
-        """
+    markdown_text =  "\n```"
     
-    
+
     result = caller.call_tool(tool_name="SaveMarkdownToGitbook", method="save_markdown_to_gitbook", kwargs={"content":markdown_text})
     
     if result:
