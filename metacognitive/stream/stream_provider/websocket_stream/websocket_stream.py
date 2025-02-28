@@ -20,10 +20,7 @@ class WebsocketStream(BaseStream):
         from engine.intent_engine.intent_event import event_chat
         import json
         import asyncio
-        
-        # 创建线程池
-        executor = ThreadPoolExecutor(max_workers=10)
-        
+        executor = ThreadPoolExecutor(max_workers=100)
         try:
             async for message in websocket:
                 try:
@@ -37,7 +34,6 @@ class WebsocketStream(BaseStream):
                     
                     if user_id:
                         self.clients[user_id] = websocket
-                        # 创建新任务异步处理消息
                         asyncio.create_task(
                             self.process_message(user_id, content, executor)
                         )
