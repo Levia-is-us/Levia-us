@@ -16,7 +16,7 @@ def create_execution_plan(intent: str, user_id: str, ch_id: str = "") -> str:
         {"role": "user", "content": plan_maker_prompt},
     ]
     plan = chat_completion(
-        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5}, user_id=user_id, ch_id=ch_id
+        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5, "max_tokens": 2000}, user_id=user_id, ch_id=ch_id
     )
     plan = extract_json_from_str(plan)
     log_str = ""
