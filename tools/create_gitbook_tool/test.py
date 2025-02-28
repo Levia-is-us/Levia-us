@@ -8,7 +8,6 @@ project_root = os.path.dirname(
 sys.path.append(project_root)
 from engine.tool_framework.tool_registry import ToolRegistry
 from engine.tool_framework.tool_caller import ToolCaller
-from utils import remove_markdown
 
 
 def main():
