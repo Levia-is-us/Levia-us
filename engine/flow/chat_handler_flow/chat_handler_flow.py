@@ -46,8 +46,6 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str) -> str:
         plan_result = handle_input_intent(user_id, chid)
         final_reply = handle_reply_flow(chat_messages, plan_result, user_id, chid)
         
-    analysis = extract_code_breakdown_from_doc(final_reply)
-    output_stream(log=f"Analysis: {analysis}", user_id=user_id, type="think", ch_id=chid)
     final_reply = extract_str_from_doc(final_reply)
     short_term_memory.add_context(
         create_chat_message("assistant", f"{final_reply}"), user_id
