@@ -57,13 +57,13 @@ Please follow these steps to complete your task:
    - For each component, explain how it relates to the user intent
 
 3. Attempt to fill in the plan with information from the context:
-   - value of "step" should be a step + number, not a step name
+   - value of "step" should be a step + space + number, not a step name
    - Focus on inputs where "source": "context"
    - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
    - If the information is available in the context, fill in the "value" field with the appropriate information
    - If the information can not found in the context, leave the "value" field empty
-   - Provide a confidence level (high, medium, low) for each piece of information filled in
+   - if the input source comes from previous step, fill in the "source" with the "step" value of the previous step, such as "step 1"
    - Note any missing information
 
 4. Evaluate the feasibility of the plan to achieve the user's intent:
