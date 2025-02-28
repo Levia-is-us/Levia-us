@@ -30,6 +30,7 @@ Before providing your final response, wrap your analysis inside <analysis> tags.
 - How does the engine output relate to the user's intent and the context?
 - What insights can you draw from combining your base knowledge, the context, and the engine output?
 - How can you demonstrate your self-learning capabilities in your response?
+- do not make fake urls which is not in the context or the tool output.
 
 In your analysis:
 - Quote relevant parts of the context and engine output.
