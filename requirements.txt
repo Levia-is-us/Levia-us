@@ -19,3 +19,4 @@ azure.storage.blob
 tiktoken
 Flask
 redis
+python-redis-lock

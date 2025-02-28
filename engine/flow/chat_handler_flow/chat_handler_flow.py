@@ -20,16 +20,16 @@ short_term_memory = ShortTermMemory()
 plan_context_memory = PlanContextMemory()
 
 
-def handle_chat_flow(user_input: str, user_id: str, chid: str) -> str:
+def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str = "") -> str:
     """Handle the main chat flow logic"""
     # Get initial response
-    chat_messages = short_term_memory.get_context(user_id)
+    chat_messages = short_term_memory.get_context(user_id, session_id)
     output_stream(log="Analyzing user's intent ...", user_id=user_id, type="steps", ch_id=chid)
     reply_info = handle_intent_flow(chat_messages, user_input, user_id, chid)
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
     )
-    chat_messages = short_term_memory.get_context(user_id)
+    chat_messages = short_term_memory.get_context(user_id, session_id)
     output_stream(log=f"{reply_info['intent']}", user_id=user_id, type="think", ch_id=chid)
     
     final_reply = ""
@@ -43,7 +43,7 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str) -> str:
         final_reply = handle_reply_flow(chat_messages, plan_result, user_id, chid)
         
     elif reply_info["type"] == "continue_execution":
-        plan_result = handle_input_intent(user_id, chid)
+        plan_result = handle_input_intent(chat_messages, user_id, chid)
         final_reply = handle_reply_flow(chat_messages, plan_result, user_id, chid)
         
     analysis = extract_code_breakdown_from_doc(final_reply)
@@ -63,8 +63,8 @@ def handle_intent_summary(reply_info: dict, chat_messages: list, user_id: str, c
     
 
 
-def handle_input_intent(user_id: str, chid: str) -> str:
+def handle_input_intent(chat_messages, user_id: str, chid: str) -> str:
     """Handle intent summary type response"""
-    chat_messages = short_term_memory.get_context(user_id)
+    # chat_messages = short_term_memory.get_context(user_id)
     plan_context = plan_context_memory.get_current_plan_context(user_id)
     return process_plan_execution(chat_messages, plan_context, user_id=user_id, ch_id=chid)

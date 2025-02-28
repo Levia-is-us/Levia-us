@@ -6,6 +6,7 @@ import time
 import ssl
 
 import os
+import redis_lock
 REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
 REDIS_DB = os.environ.get("REDIS_DB", "0")
@@ -16,6 +17,7 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
 
 
 class RedisUtils:
+    _instance = None
     _pool = None
     _default_config = {
         'host': REDIS_HOST,
@@ -27,11 +29,23 @@ class RedisUtils:
         'password': REDIS_PASSWORD
     }
 
+    def __new__(cls, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self, **kwargs):
-        if ENVIRONMENT == "local":
+        if self._initialized:
             return
+            
+        if ENVIRONMENT == "local":
+            self._initialized = True
+            return
+            
         self.config = {**self._default_config, **kwargs}
         self.connect()
+        self._initialized = True
 
     @classmethod
     def get_pool(cls, config: Optional[Dict] = None) -> redis.ConnectionPool:
@@ -153,3 +167,6 @@ class RedisUtils:
     def close(self):
         if self._pool:
             self._pool.disconnect()
+
+    def get_lock(self, name: str, expire: int = 1800) -> redis_lock.Lock:
+         return redis_lock.Lock(redis_client=self.client, name=name, expire=expire)
