@@ -77,8 +77,8 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
         output_stream(log="Failed to make plan with current tools...", user_id=user_id, type="think", ch_id=ch_id)
         return plan
     plan = plan["plan"]
-    for step in plan:
-        output_stream(log=f"Step: {step['step']}\nexecution tool: {step['tool']}\nstep purpose: {step['step purpose']}", user_id=user_id, type="think", ch_id=ch_id)
+    execution_steps = "\n".join([f"execution tool: {step['tool']}\nstep purpose: {step['step purpose']}" for step in plan])
+    output_stream(log=execution_steps, user_id=user_id, type="think", ch_id=ch_id)
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id, ch_id)
