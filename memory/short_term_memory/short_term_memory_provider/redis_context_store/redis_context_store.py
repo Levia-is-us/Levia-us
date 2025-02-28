@@ -15,13 +15,13 @@ class RedisContextStore(BaseContextStore):
         """
         self.max_length = max_length
 
-    def get_context(self, user_key: str = "local", session_id: str = "local"):
+    def get_context(self, user_key: str = "local"):
         """
         Get current conversation context formatted as string.
         :param user_key: Key to identify user's context
         :return: Current conversation context
         """
-        context = redis_tool.get_value(user_key + session_id)
+        context = redis_tool.get_value(user_key)
         if not context:
             return []
 
