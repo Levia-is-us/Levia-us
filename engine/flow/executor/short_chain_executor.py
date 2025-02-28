@@ -224,7 +224,7 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step, us
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
+    reply = chat_completion(prompt, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
     print(f"reply_json: {reply_json}")
     return reply_json

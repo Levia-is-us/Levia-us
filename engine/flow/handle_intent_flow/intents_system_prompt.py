@@ -112,7 +112,7 @@ Ensure that your final output is strictly in the JSON format specified above, wi
 
 
 def intents_system_prompt(input_messages):
-    time_now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    time_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     prompt = [
         {"role": "user", "content": prompt_v2.format(input_messages=input_messages, time_now=time_now)}
     ]

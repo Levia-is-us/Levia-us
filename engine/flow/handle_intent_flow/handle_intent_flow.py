@@ -7,7 +7,7 @@ QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
-def handle_intent_flow(chat_messages: list, input_message: str, user_id: str, ch_id: str) -> dict:
+def handle_intent_flow(chat_messages: list, input_message: str, user_id: str="local-dev", ch_id: str = "") -> dict:
     """Get initial response from LLM"""
     prompt = intents_system_prompt(input_message)
     messages = chat_messages + prompt
