@@ -67,21 +67,8 @@ Please follow these steps to analyze the current situation:
    }}
    ```
 
-Before providing your final JSON output, please conduct a thorough analysis of the arguments. Conduct this analysis inside <think> tags. In this analysis:
-1. List all arguments (required and optional) from the current step.
-2. For each argument:
-   a. Identify its corresponding value from the context or previous steps.
-   b. State whether it's satisfied (for required arguments) or needed (for optional arguments).
-   c. Specify its source (context, input, or previous step number).
-   d. Explicitly state the method for obtaining the argument, including Python code snippets when applicable.
-   e. Provide a brief explanation of your decision-making process for this argument.
-3. Summarize your findings, including:
-   a. Which required arguments are satisfied and which are missing.
-   b. Which optional arguments are needed and available, and which are missing but necessary.
-   c. Your overall assessment of whether the step can proceed.
+After completing your analysis, provide JSON output directly do not include any other text.
 
-It's OK for this section to be quite long, as a thorough analysis is crucial for determining if the step can proceed.
-
-After completing your analysis, provide the appropriate JSON output based on your findings.
+please give your json output below:
 """
     return prompt_template
