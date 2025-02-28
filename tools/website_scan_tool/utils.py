@@ -164,6 +164,7 @@ def get_all_content(links):
     visual = os.getenv("VISUAL")
     results = []
     driver = setup_driver()
+    error = ''
     for link in links:
         try:
             url = link["url"]
@@ -174,9 +175,10 @@ def get_all_content(links):
             if visual == "True":
                 smooth_scroll_to_bottom(driver)
         except Exception as e:
-            raise Exception(e)
+            error = e
+            pass
 
     driver.quit()
     if(len(results) == 0):
-       raise Exception("website connection timeout")
+       raise Exception(error)
     return results

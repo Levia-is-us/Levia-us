@@ -6,10 +6,15 @@ def extract_json_from_str(json_str):
         return json_str   
     
     try:
+        try:
+            cleaned_str = json_str.strip().replace('\n', '').replace('    ', '')
+        except:
+            pass
         if "```json" in json_str:
             start = json_str.find("```json") + len("```json")
-            end = json_str.find("```", start)
-            json_str = json_str[start:end].strip()
+            end = json_str.rfind("```")
+            if end > start:
+                json_str = json_str[start:end].strip()
             try:
                 return json.loads(json_str)
             except:
@@ -26,9 +31,6 @@ def extract_json_from_str(json_str):
             return json.loads(cleaned_str)
         except:
             raise Exception("Failed to parse JSON string")
-
-
-
 
 def extract_code_breakdown_from_doc(doc):
     start = doc.find("<code_breakdown>") + len("<code_breakdown>")
