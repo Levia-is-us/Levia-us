@@ -14,7 +14,7 @@ redis_tool = RedisUtils()
 
 def event_chat(user_id, input_message, session_id: str = ""):
     chid = str(uuid.uuid4())
-    lock = redis_tool.get_lock(user_id + session_id, 1800)
+    lock = redis_tool.get_lock("levia_chat_lock_" + user_id + session_id, 1800)
     try:
         if lock.acquire(blocking=False):
             try:
