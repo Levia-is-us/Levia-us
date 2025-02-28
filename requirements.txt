@@ -20,3 +20,5 @@ tiktoken
 Flask
 redis
 python-redis-lock
+aipolabs
+webscout
