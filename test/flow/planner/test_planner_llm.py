@@ -24,7 +24,7 @@ if __name__ == "__main__":
     """put your intent here"""
     intent = input("Enter your intent: ")
     # plan = create_execution_plan(intent) + context
-    plan = create_execution_plan(intent)
+    plan = create_execution_plan(intent, user_id="local")
     print(f"plan: {plan}")
 
 

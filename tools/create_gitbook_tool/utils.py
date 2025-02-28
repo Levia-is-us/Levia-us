@@ -37,4 +37,3 @@ def clean_string(text: str) -> str:
                 cleaned_text = cleaned_text[len(prefix):].strip()
 
     return cleaned_text
-
