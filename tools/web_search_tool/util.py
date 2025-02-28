@@ -1,18 +1,21 @@
 import json
+import random
 import re
 import time
 import os
 from aipolabs import Aipolabs
 from aipolabs.types.functions import FunctionExecutionResult
-from aipolabs._exceptions import ServerError
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from webscout import WEBS
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
+
+
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
@@ -51,7 +54,7 @@ or
 
 ["single keyword"]
 
-Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine. Prioritize clarity, relevance, and conciseness in your keyword selection.
+Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine.
 """
     try:
         prompt = prompt.format(USER_INTENT=intent)
@@ -62,9 +65,10 @@ Remember, the goal is to create keywords that will help the user find the most r
             model=CHAT_MODEL_NAME,
             config={"temperature": 0.5},
         )
+        print(f"Generate search keywords output: {output}")
 
         try:
-            keywords = json.loads(output)
+            keywords = extract_json_from_str(output)
             if not isinstance(keywords, list):
                 print("Invalid keywords format: expected list")
                 return []
@@ -119,7 +123,7 @@ After your evaluation, provide your final selection in the following JSON format
 
 Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
 
-Please begin your evaluation now, followed by your final selection in the specified JSON format.
+Please begin your evaluation now, followed by your final selection in the specified JSON format without any other text.
     """
     try:
         prompt = prompt.format(USER_INTENT=intent, SEARCH_RESULTS=str(contents))
@@ -155,6 +159,36 @@ Please begin your evaluation now, followed by your final selection in the specif
         return []
 
 
+def retry_on_server_error(retries: int = 3, delay: int = 1):
+    """
+    Decorator: Retries the function when a ServerError exception occurs.
+
+    Args:
+        retries (int): Maximum number of retries.
+        delay (int): Number of seconds to wait before each retry.
+    """
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            attempt = 0
+            while attempt < retries:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempt += 1
+                    if attempt < retries:
+                        print(f"Error occurred: {e}. Retrying... ({attempt}/{retries})")
+                        time.sleep(delay)
+                    else:
+                        print(f"Max retries reached. Error: {e}")
+                        raise
+
+        return wrapper
+
+    return decorator
+
+
+@retry_on_server_error()
 def aipolabs_search(client: Aipolabs, keyword: str) -> FunctionExecutionResult:
     """
     Function to search for a given keyword using the Aipolabs client, with retry logic in case of errors.
@@ -166,28 +200,28 @@ def aipolabs_search(client: Aipolabs, keyword: str) -> FunctionExecutionResult:
     Returns:
         FunctionExecutionResult: The result of the function execution, containing the search results or any errors.
     """
-    retries = 3  # Maximum number of retries
-    attempt = 0  # Track the number of attempts
+    # Execute the search function using the Aipolabs client
+    result: FunctionExecutionResult = client.functions.execute(
+        function_name="TAVILY__SEARCH", function_parameters={"body": {"query": keyword}}
+    )
 
-    while attempt < retries:
-        try:
-            # Execute the search function using the Aipolabs client
-            result: FunctionExecutionResult = client.functions.execute(
-                function_name="TAVILY__SEARCH",
-                function_parameters={"body": {"query": keyword}},
-            )
+    return result
 
-            return result
 
-        except ServerError as e:
-            # Handle known errors by retrying up to 3 times
-            attempt += 1
-            if attempt < retries:
-                print(f"Error occurred: {e}. Retrying... ({attempt}/{retries})")
-                time.sleep(1)  # Wait for 1 second before retrying
-            else:
-                print(f"Max retries reached. Error: {e}")
-                raise  # Reraise the error after max retries
+@retry_on_server_error()
+def webs_search(keyword: str) -> dict:
+    """
+    Function to perform a web search using the WEBS client, with retry logic in case of errors.
+
+    Args:
+        keyword (str): The search term or keyword to be used in the search query.
+
+    Returns:
+        dict: The search results from the web search.
+    """
+
+    ret = WEBS().text(keyword, max_results=5)
+    return ret
 
 
 def search_non_visual(keywords: list) -> list:
@@ -199,22 +233,17 @@ def search_non_visual(keywords: list) -> list:
     Returns:
         A list of URLs and content that match the intent.
     """
-    # Initialize search engine
-    client = Aipolabs(api_key=os.environ.get("AIPOLABS_API_KEY"))
 
     content_list = []
     for keyword in keywords:
         try:
             # Search for each keyword
-            result: FunctionExecutionResult = aipolabs_search(client, keyword)
+            rets = webs_search(keyword)
             # Extract content from search results
-            contents = [
-                f'url: {result["url"]} content: {result["content"]}'
-                for result in result.data["results"]
-            ]
+            contents = [f'url: {ret["href"]} content: {ret["body"]}' for ret in rets]
             content_list.extend(contents)
         except Exception as e:
-            print(f"Aipolabs search error: {str(e)}")
+            print(f"Search non-visual error: {str(e)}")
 
     return content_list
 
@@ -435,44 +464,39 @@ def search_visual(keywords: list) -> list:
 
     content_list = []
     driver = None
-    try:
-        # Initialize the Chrome WebDriver
-        driver = init_driver()
-        # Set the explicit wait time
-        wait = WebDriverWait(driver, 30)
-        for keyword in keywords:
-            try:
-                # Navigate to Google's homepage
-                driver.get("https://www.google.com")
-                # Wait until the search box is clickable
-                search_box = wait.until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, "#APjFqb"))
-                )
-                # Type keyword in the search box
-                search_box.click()
-                search_box.send_keys(keyword)
-                search_box.send_keys(Keys.RETURN)
-                # Wait for the search results container to be visible
-                search_rets = wait.until(
-                    EC.visibility_of_element_located((By.ID, "rso"))
-                )
-                # Scroll down to simulate user browsing behavior
-                scroll_to_bottom(driver)
-                # Retrieve individual search result elements
-                search_results = search_rets.find_elements(
-                    By.CSS_SELECTOR, ":scope > div"
-                )
-                # Extract URLs and content from search results
-                contents = handle_search_results(search_results)
-                content_list.extend(contents)
-            except Exception as err:
-                print(f"Extract google search output error for '{keyword}': {err}")
-    except Exception as e:
-        print(f"Init driver error: {str(e)}")
-    finally:
-        if driver:
-            try:
-                driver.quit()
-            except Exception as e:
-                print(f"Driver quit error: {str(e)}")
+    for keyword in keywords:
+        try:
+            # Initialize the Chrome WebDriver
+            driver = init_driver()
+            # Set the explicit wait time
+            wait = WebDriverWait(driver, 30)
+            # Navigate to Google's homepage
+            driver.get("https://www.google.com")
+            # Wait until the search box is clickable
+            search_box = wait.until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "#APjFqb"))
+            )
+            # Type keyword in the search box
+            search_box.click()
+            search_box.send_keys(keyword)
+            search_box.send_keys(Keys.RETURN)
+            # Wait for the search results container to be visible
+            search_rets = wait.until(EC.visibility_of_element_located((By.ID, "rso")))
+            # Scroll down to simulate user browsing behavior
+            scroll_to_bottom(driver)
+            # Retrieve individual search result elements
+            search_results = search_rets.find_elements(By.CSS_SELECTOR, ":scope > div")
+            # Extract URLs and content from search results
+            contents = handle_search_results(search_results)
+            content_list.extend(contents)
+        except Exception as err:
+            print(f"Extract google search output error for '{keyword}': {err}")
+        finally:
+            if driver:
+                try:
+                    driver.quit()
+                    # Wait randomly between 0.5-1 seconds before next search
+                    time.sleep(random.uniform(0.5, 1))
+                except Exception as e:
+                    print(f"Driver quit error: {str(e)}")
     return content_list

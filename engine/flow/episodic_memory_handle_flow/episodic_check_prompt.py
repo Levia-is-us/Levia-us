@@ -1,6 +1,6 @@
 import datetime
 def episodic_check_prompt(user_intent, context, plan):
-    date_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     episodic_check_prompt = f"""You are an AI assistant tasked with analyzing user intents, contexts, and plan structures to determine if a given intent can be achieved using the provided plan. Your primary goal is to evaluate the feasibility of the plan and provide appropriate output based on your analysis.
 
 Here is the user's intent:
@@ -57,10 +57,12 @@ Please follow these steps to complete your task:
    - For each component, explain how it relates to the user intent
 
 3. Attempt to fill in the plan with information from the context:
+   - value of "step" should be a step + number, not a step name
    - Focus on inputs where "source": "context"
    - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
    - If the information is available in the context, fill in the "value" field with the appropriate information
+   - If the information can not found in the context, leave the "value" field empty
    - Provide a confidence level (high, medium, low) for each piece of information filled in
    - Note any missing information
 
