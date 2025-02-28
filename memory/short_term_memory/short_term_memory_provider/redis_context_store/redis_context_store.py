@@ -21,7 +21,7 @@ class RedisContextStore(BaseContextStore):
         :param user_key: Key to identify user's context
         :return: Current conversation context
         """
-        context = redis_tool.get_value(user_key)
+        context = redis_tool.get_value("levia_chat_context_" + user_key)
         if not context:
             return []
 
@@ -51,7 +51,7 @@ class RedisContextStore(BaseContextStore):
         # If history exceeds max length, remove oldest entry
         self.auto_delete_context(user_key)
         
-        redis_tool.set_value(user_key, json.dumps(current_context), expire=60*60*24*3)
+        redis_tool.set_value("levia_chat_context_" + user_key, json.dumps(current_context), expire=60*60*24*3)
 
     def delete_context(self, context: str, user_key: str = "local"):
         """
@@ -62,7 +62,7 @@ class RedisContextStore(BaseContextStore):
         current_context = self.get_context(user_key)
         if current_context:
             current_context = [h for h in current_context if h["user"] != context]
-            redis_tool.delete(user_key, json.dumps(current_context))
+            redis_tool.delete("levia_chat_context_" + user_key, json.dumps(current_context))
 
     def auto_delete_context(self, user_key: str = "local"):
         """
@@ -75,4 +75,4 @@ class RedisContextStore(BaseContextStore):
 
         while num_tokens_from_messages(context) > self.max_length:
             context.pop(1)  # Pop the second element (index 1) instead of first element (index 0)
-            redis_tool.delete(user_key)
+            redis_tool.delete("levia_chat_context_" + user_key)
