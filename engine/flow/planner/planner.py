@@ -19,11 +19,10 @@ def create_execution_plan(intent: str, user_id: str, ch_id: str = "") -> str:
         prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5}, user_id=user_id, ch_id=ch_id
     )
     plan = extract_json_from_str(plan)
+    log_str = ""
     for step in plan:
-        output_stream(log=f" - {step['step']}: {step['intent']} - \n", user_id=user_id, type="think", ch_id=ch_id)
-        output_stream(log=f" - Step Description: {step['description']} - \n", user_id=user_id, type="think", ch_id=ch_id)
-        output_stream(log=f" - Step Reason: {step['reason']} - \n", user_id=user_id, type="think", ch_id=ch_id)
-        output_stream(log="--------------------------------", user_id=user_id, type="think", ch_id=ch_id)
+        log_str += f" {step['intent']} - \n - Step Description: {step['description']} - \n - Step Reason: {step['reason']}\n"
+    output_stream(log=log_str, user_id=user_id, type="think", ch_id=ch_id)
     return plan
 
 
