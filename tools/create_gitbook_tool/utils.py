@@ -1,6 +1,7 @@
 
 def get_markdown_title(text):
-    text = text.replace('```', '').replace('#', '').replace(':', '')
+    text = clean_string(text)
+
     words = [word for word in text.split() if word.strip()] 
     result = []
     
@@ -25,3 +26,15 @@ def get_markdown_title(text):
         result = words[:3]
     
     return '_'.join(result)
+
+def clean_string(text: str) -> str:
+    prefixes = ['\n', '```', 'markdown', '#', 'Title',":"]
+    cleaned_text = text.strip()
+
+    while any(cleaned_text.startswith(prefix) for prefix in prefixes):
+        for prefix in prefixes:
+            if cleaned_text.startswith(prefix):
+                cleaned_text = cleaned_text[len(prefix):].strip()
+
+    return cleaned_text
+
