@@ -70,7 +70,7 @@ def chat_completion_deepseek(messages, model, config={}, user_id="", ch_id=""):
             full_response += content
             buffer_end = re.search("</([^>]+)|</()", content)
             buffer_start = re.search("<([^>]+)", content)
-            buffer_new_line = re.search("\n", content) or re.search("-", content)
+            buffer_new_line = re.search("\n", content) or re.search("- ", content)
             content = format_content(content)
             
             if buffer_new_line:
