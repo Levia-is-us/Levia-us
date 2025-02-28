@@ -7,6 +7,7 @@ import requests
 from dotenv import load_dotenv
 
 
+
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
@@ -17,7 +18,8 @@ load_dotenv(env_path)
 from engine.tool_framework import run_tool
 from engine.tool_framework import BaseTool
 from tools.create_gitbook_tool.gitbookapi import GitBookAPI
-from tools.create_gitbook_tool.fileManage import file_manage, get_top_title_with_hash
+from tools.create_gitbook_tool.fileManage import file_manage
+from tools.create_gitbook_tool.utils import get_markdown_title
 
 gitbook_api_key = os.getenv("GITBOOK_API_KEY")
 azure_file_server_key = os.getenv("AZURE_FILE_SERVER_KEY")
@@ -44,7 +46,7 @@ class SaveMarkdownToGitbook(BaseTool):
             print("Please input markdown or string content!", file=sys.stderr)
             return "Please input markdown or string content!"
 
-        article_title = get_top_title_with_hash(content)
+        article_title = get_markdown_title(content)
         markdown_content = markdown.markdown(content)
     
         file_info = _file_manage.upload_file(markdown_content, article_title)
