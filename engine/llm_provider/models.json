@@ -82,5 +82,11 @@
     "version": "gpt-4.5-preview",
     "type": "chat",
     "source": "openai"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "version": "gpt-4o-mini",
+    "type": "chat",
+    "source": "openai"
   }
 ]
