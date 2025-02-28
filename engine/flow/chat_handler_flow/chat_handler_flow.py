@@ -23,13 +23,13 @@ plan_context_memory = PlanContextMemory()
 def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str = "") -> str:
     """Handle the main chat flow logic"""
     # Get initial response
-    chat_messages = short_term_memory.get_context(user_id, session_id)[-6:]
+    chat_messages = short_term_memory.get_context(user_id + session_id)[-6:]
     output_stream(log="Analyzing user's intent ...", user_id=user_id, type="steps", ch_id=chid)
     reply_info = handle_intent_flow(chat_messages, user_input, user_id, chid)
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
     )
-    chat_messages = short_term_memory.get_context(user_id, session_id)[-7:]
+    chat_messages = short_term_memory.get_context(user_id + session_id)[-7:]
     output_stream(log=f"{reply_info['intent']}", user_id=user_id, type="think", ch_id=chid)
     
     final_reply = ""
