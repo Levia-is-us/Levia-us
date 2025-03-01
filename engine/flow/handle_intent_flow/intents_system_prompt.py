@@ -32,7 +32,7 @@ Please follow these steps to process the input and generate an appropriate respo
    - For direct answers: Provide a clear, concise response to the user's query.
    - For intent summaries: Summarize the user's goal or request in a way that can be acted upon by an external system.
 
-Before generating your final output, wrap your thoughts inside <input_breakdown> tags. Consider the following:
+Before generating your final output, consider the following:
 - What is the main topic or request in the input? List out key elements.
 - Can you answer this directly with your current knowledge? Consider arguments for both options.
 - If not, what key points should be included in an intent summary?

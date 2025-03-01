@@ -15,8 +15,18 @@ from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
 from engine.utils.json_util import extract_json_from_str
 
 def main():
-    input_messages = "panda: who is the president of the United States now?"
-    message = """This is a requirement from Twitter: {input_messages}. Answer Twitter requests with your process. If you answer with a 'call_tool' operation, save the knowledge into a document and upload it to **gitbook**.
+    input_messages = "panda: Will BTC going up in the flowing days?"
+    message = """Please help me answer this tweet: 
+<tweet>
+{input_messages}
+</tweet>
+If your result contains 'call_tool' operation, also save the knowledge into a document and upload it to **gitbook**.
+<output_example>
+{{
+"result": "The president of the United States is Joe Biden.",
+"call_tool": "User ask about the president of the United States and want to save the knowledge into a document and upload it to **gitbook**."
+}}
+</output_example>
     """
     input_message = message.format(input_messages=input_messages)
     # chat_messages = input("Enter your message: ")
