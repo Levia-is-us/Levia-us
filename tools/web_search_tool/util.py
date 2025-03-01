@@ -115,16 +115,16 @@ Please follow these steps to select the most appropriate URLs:
    - Not from video/audio hosting sites (e.g., youtube.com, vimeo.com, soundcloud.com)
 
 After your evaluation, provide your final selection in the following JSON format:
-
+```json
 [
   "selected_url_1",
   "selected_url_2",
   "selected_url_3"
 ]
-
+```
 Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
 
-Please begin your evaluation now, followed by your final selection in the specified JSON format without any other text.
+Please give your json result below.
     """
     try:
         prompt = prompt.format(USER_INTENT=intent, SEARCH_RESULTS=str(contents))

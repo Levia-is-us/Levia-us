@@ -11,6 +11,7 @@ Summarize the content from all pages together translate it into a detailed summa
 The title needs to be accurate
 The summary needs to be detailed and fully explained
 The summary needs to according to the structure
+The summary should short and concise
 If it is a news website, please record the input time after the title in the format of (YYYY/MM/DD)
 
 Return the output in Markdown format:

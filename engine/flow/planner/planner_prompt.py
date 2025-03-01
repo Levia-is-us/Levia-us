@@ -26,7 +26,7 @@ For each step in your plan, include the following in JSON format:
 - "reason": An explanation of why this step is necessary in the overall plan and why it requires the specified external tool or action.
 
 Present your final output in the following JSON format:
-
+```json
 {
   [
     {
@@ -45,7 +45,7 @@ Present your final output in the following JSON format:
     }
   ]
 }
-
+```
 Remember to keep your plan as concise as possible, using only the steps necessary to accomplish the user's intent that require external tools or actions. Do not include any analysis or summary steps in your final output.
 
 Now, please begin by analyzing the user's intent and then create your plan.
