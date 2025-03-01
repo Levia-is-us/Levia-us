@@ -150,6 +150,9 @@ def smooth_scroll_to_bottom(driver, duration=2.0):
 
 
 def get_all_content(links):
+    if(len(links) == 0):
+       raise Exception("No links found")
+
     visual = os.getenv("VISUAL")
     results = []
     driver = setup_driver()
