@@ -46,15 +46,16 @@ Please follow these steps to generate the keywords:
 4. Ensure that the keywords accurately reflect the user's search intent.
 5. Generate between 1 and 3 keywords, with fewer being preferable if they can capture the essence of the query.
 
-Your final output should be a list of 1-3 keywords, each enclosed in quotes and surrounded by square brackets. For example:
-
+Your final output should be only a list of 1-3 keywords without any other text, each enclosed in quotes and surrounded by square brackets. For example:
+<example>
 ["keyword 1", "keyword 2", "keyword 3"]
-
+</example>
 or
-
+<example>
 ["single keyword"]
+</example>
 
-Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine.
+now, output your keywords list below:
 """
     try:
         prompt = prompt.format(USER_INTENT=intent)
@@ -276,7 +277,7 @@ def init_driver() -> webdriver.Chrome:
     return driver
 
 
-def scroll_to_bottom(driver, duration=5.0) -> None:
+def scroll_to_bottom(driver, duration=2.0) -> None:
     """
     Scroll the page to the bottom; duration specifies the total scroll time.
 
@@ -464,12 +465,14 @@ def search_visual(keywords: list) -> list:
 
     content_list = []
     driver = None
-    for keyword in keywords:
+    if keywords:
+        # Use the first keyword for the search
+        keyword = keywords[0]
         try:
             # Initialize the Chrome WebDriver
             driver = init_driver()
             # Set the explicit wait time
-            wait = WebDriverWait(driver, 30)
+            wait = WebDriverWait(driver, 20)
             # Navigate to Google's homepage
             driver.get("https://www.google.com")
             # Wait until the search box is clickable
@@ -495,8 +498,8 @@ def search_visual(keywords: list) -> list:
             if driver:
                 try:
                     driver.quit()
-                    # Wait randomly between 0.5-1 seconds before next search
-                    time.sleep(random.uniform(0.5, 1))
+                    # Wait randomly between 0.1-0.3 seconds before next search
+                    time.sleep(random.uniform(0.1, 0.3))
                 except Exception as e:
                     print(f"Driver quit error: {str(e)}")
     return content_list

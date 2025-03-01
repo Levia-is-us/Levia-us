@@ -1,7 +1,6 @@
 def check_tools_result_prompt(tool_execution, tool_output):
     messages = []
-    prompt = f"""
-You are an expert system analyst tasked with interpreting the results of tool executions in a complex software environment. Your job is to analyze the output of a tool execution and provide a concise assessment of its status.
+    prompt = f"""You are an expert system analyst tasked with interpreting the results of tool executions in a complex software environment. Your job is to analyze the output of a tool execution and provide a concise assessment of its status.
 
 Here is the information about the tool execution:
 
@@ -22,7 +21,7 @@ Your task is to analyze this information and determine the execution status of t
 3. Categorize the status as either "success" or "failure".
 4. Provide a brief explanation for your determination.
 
-Before generating the final JSON response, conduct a detailed analysis of the tool execution and output. Wrap your analysis inside <tool_execution_analysis> tags, covering these key points:
+As chain of thought, conduct a detailed analysis of the tool execution and output.
 
 1. Tool execution command: Is it correct? Are all required parameters present? Quote relevant parts.
 2. Tool output: Does it indicate success or errors? Quote relevant parts.

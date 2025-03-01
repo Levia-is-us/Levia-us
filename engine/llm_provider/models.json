@@ -18,6 +18,12 @@
     "source": "openai"
   },
   {
+    "model": "o1-preview",
+    "version": "2024-10-21",
+    "type": "reasoning",
+    "source": "openai"
+  },
+  {
     "model": "claude-3-5-sonnet",
     "version": "claude-3-5-sonnet-20241022",
     "type": "reasoning",
@@ -42,6 +48,12 @@
     "source": "deepseek"
   },
   {
+    "model": "claude-3-7-sonnet-20250219",
+    "version": "claude-3-7-sonnet-20250219",
+    "type": "reasoning",
+    "source": "anthropic"
+  },
+  {
     "model": "deepseek-chat",
     "version": "deepseek-chat",
     "type": "chat",
@@ -64,5 +76,23 @@
     "version": "deepseek-v3",
     "type": "chat",
     "source": "deepseek"
+  },
+  {
+    "model": "gpt-4.5-preview",
+    "version": "gpt-4.5-preview",
+    "type": "chat",
+    "source": "openai"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "version": "gpt-4o-mini",
+    "type": "chat",
+    "source": "openai"
+  },
+  {
+    "model": "gpt-4o",
+    "version": "gpt-4o",
+    "type": "chat",
+    "source": "openai"
   }
 ]

@@ -28,8 +28,8 @@ class ShortTermMemory:
         else:
             self.context_store = RedisContextStore(max_length)
 
-    def get_context(self, user_key: str = "local", session_id: str = "local"):
-        return self.context_store.get_context(user_key, session_id)
+    def get_context(self, user_key: str = "local"):
+        return self.context_store.get_context(user_key)
 
     def add_context(self, context: dict, user_key: str = "local"):
         self.context_store.add_context(context, user_key)
