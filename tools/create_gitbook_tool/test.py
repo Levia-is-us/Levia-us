@@ -38,11 +38,11 @@ For more detailed insights, you can check out the compiled document here: [Key P
 
 Feel free to reach out if you need anything else or further information on specific topics!
 """
-
     result = caller.call_tool(tool_name="SaveMarkdownToGitbook", method="save_markdown_to_gitbook", kwargs={"content":markdown_text})
     
     if result:
         if "error" in result:
+
             print(f"Tool execution error: {result['error']}")
         else:
             print(f"response info: {result}")
