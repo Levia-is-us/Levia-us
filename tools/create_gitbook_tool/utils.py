@@ -62,6 +62,5 @@ def format_text_for_url(text):
     text = text.strip('"')
     text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     text = ' '.join(text.split())
-    text = text.replace(' ', '-')
     text = text.lower()
     return text
