@@ -1,7 +1,7 @@
 from typing import Optional
 import json
 import os
-from memory.key_vault.main import KeyVault
+from memory.key_vault.key_vault import KeyVault
 
 
 class LocalKeyVault(KeyVault):
