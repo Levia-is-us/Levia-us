@@ -1,9 +1,14 @@
 import datetime
-def get_tool_base_planner_prompt(intent: str, tool_list: list):
+def get_tool_base_planner_prompt(intent: str, tool_list: list, context: list):
     date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     prompt = f"""You are an advanced task planning system designed to analyze user intents and create structured plans of actions that require external tools. Your goal is to break down complex tasks into specific, tool-dependent steps.
 
 You will be provided with the following information:
+
+1. context with the user:
+<context>
+{str(context)}
+</context>
 
 1. A list of available tools:
 <tool_list>
@@ -30,6 +35,7 @@ Your task is to analyze the user's intent, determine if the available tools are 
    c. Provide a concise description and reason for each step, emphasizing how the chosen tool will be used
    d. Make the plan as concise as possible, combining steps where logical
    e. Exclude any steps that can be performed by an AI language model
+   f. The pupos of plan should be only focus on the <user_intent>, but think about the context.
 
 3. Format your output as a JSON object with the following structure:
 
