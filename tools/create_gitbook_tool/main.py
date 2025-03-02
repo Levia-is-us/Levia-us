@@ -19,7 +19,7 @@ from engine.tool_framework import run_tool
 from engine.tool_framework import BaseTool
 from tools.create_gitbook_tool.gitbookapi import GitBookAPI
 from tools.create_gitbook_tool.fileManage import file_manage
-from tools.create_gitbook_tool.utils import get_markdown_title
+from tools.create_gitbook_tool.utils import get_markdown_title, replace_space_with_dash
 
 gitbook_api_key = os.getenv("GITBOOK_API_KEY")
 azure_file_server_key = os.getenv("AZURE_FILE_SERVER_KEY")
@@ -33,25 +33,31 @@ _file_manage = None
 class SaveMarkdownToGitbook(BaseTool):
     """Tool for saving markdown content to GitBook"""
     def save_markdown_to_gitbook(self, content: str):
-        global _gitbook
-        global _file_manage
-
-        if _gitbook is None:
-            _gitbook = GitBookAPI(gitbook_api_key)
-
-        if _file_manage is None:
-            _file_manage = file_manage(azure_file_server_key)
-
-        if not content:
-            print("Please input markdown or string content!", file=sys.stderr)
-            return "Please input markdown or string content!"
-
-        article_title = get_markdown_title(content)
-        markdown_content = markdown.markdown(content)
-    
-        file_info = _file_manage.upload_file(markdown_content, article_title)
-
         try:
+            global _gitbook
+            global _file_manage
+
+            if _gitbook is None:
+                _gitbook = GitBookAPI(gitbook_api_key)
+
+            if _file_manage is None:
+                _file_manage = file_manage(azure_file_server_key)
+
+            if not content:
+                print("Please input markdown or string content!", file=sys.stderr)
+                return "Please input markdown or string content!"
+
+            article_title = get_markdown_title(content)
+
+            gitbook_title = replace_space_with_dash(article_title)
+
+            # add title to the content
+            content = f"##{article_title}\n {content}"
+
+            markdown_content = markdown.markdown(content)
+        
+            file_info = _file_manage.upload_file(markdown_content, gitbook_title)
+
             organizations = _gitbook.get_organizations()
             organization_id = organizations["items"][0]["id"]
 
@@ -80,15 +86,17 @@ class SaveMarkdownToGitbook(BaseTool):
             # 4. merge change request
             merge_result = _gitbook.merge_change_request(space_id, change_request["id"])
 
-            if not merge_result:
+            if merge_result:
                 _file_manage.delete_file(file_info["name"])
+                return user_website_url + gitbook_title
+            else:
                 return "Merge change request failed!"
-
-            return user_website_url + article_title
-
+        
         except requests.exceptions.RequestException as e:
             _file_manage.delete_file(file_info["name"])
             print(f"Error occurred: {e},file_info: {file_info}", file=sys.stderr)
+            return "gitbook api error!"
         except json.JSONDecodeError as e:
             _file_manage.delete_file(file_info["name"])
             print(f"JSON decode error: {e},file_info: {file_info}", file=sys.stderr)
+            return "gitbook api error!"

@@ -127,7 +127,7 @@ def start_chat_completion(messages, model=_default_model, config={}, user_id="",
 
 def chat_completion(messages, model=_default_model, config={}, user_id="Local-dev", ch_id=""):
     try:
-        res = start_chat_completion(messages, model=_default_model, config=config, user_id=user_id, ch_id=ch_id)
+        res = start_chat_completion(messages, model, config=config, user_id=user_id, ch_id=ch_id)
         if res ==  "" or res == None:
             raise Exception("No response from model")
         return res

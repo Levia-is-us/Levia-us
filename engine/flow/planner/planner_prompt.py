@@ -10,25 +10,7 @@ Here is the user's intent:
 
 Your task is to analyze this intent and create a single, coherent chain of tasks required to fulfill the user's objective. The plan must be a sequential chain where each step logically leads to the next, and must be presented in JSON format.
 
-First, analyze the user's intent thoroughly. Wrap your task planning process inside <task_analysis> tags, addressing the following points:
-
-1. List key phrases or keywords from the user's intent.
-2. Identify the main objectives that need to be accomplished.
-3. Break down the main objectives into smaller sub-tasks.
-4. For each sub-task, determine if it requires an external tool or action (i.e., cannot be performed by an AI language model). If so, specify which tool or type of tool would be needed.
-5. Identify any potential challenges or considerations for each main objective.
-6. Estimate the complexity and time requirement for each main objective.
-7. Identify potential dependencies between tasks.
-8. List potential stakeholders or parties involved in fulfilling the user's intent.
-9. Identify any potential ethical considerations or risks.
-10. For each main objective, list specific tools or resources that might be needed to accomplish it.
-11. Consider and briefly describe at least one alternative approach to accomplishing the user's intent.
-12. Estimate a rough timeline for completing the entire task chain.
-13. Outline a high-level approach for creating the task chain, explaining why you chose this approach over alternatives.
-14. Consider any potential constraints or limitations that might affect the execution of the plan.
-15. Prioritize tasks based on their importance and urgency.
-
-After completing your analysis, create your task plan focusing only on tasks that require external tools or actions. Follow these guidelines:
+Create your task plan focusing only on tasks that require external tools or actions. Follow these guidelines:
 
 1. Each step should be logically connected to the previous and next steps.
 2. Assign exactly one specific external tool to each step. Be as precise as possible in identifying the tool needed.
@@ -44,7 +26,7 @@ For each step in your plan, include the following in JSON format:
 - "reason": An explanation of why this step is necessary in the overall plan and why it requires the specified external tool or action.
 
 Present your final output in the following JSON format:
-
+```json
 {
   [
     {
@@ -63,7 +45,7 @@ Present your final output in the following JSON format:
     }
   ]
 }
-
+```
 Remember to keep your plan as concise as possible, using only the steps necessary to accomplish the user's intent that require external tools or actions. Do not include any analysis or summary steps in your final output.
 
 Now, please begin by analyzing the user's intent and then create your plan.

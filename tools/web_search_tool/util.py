@@ -46,15 +46,16 @@ Please follow these steps to generate the keywords:
 4. Ensure that the keywords accurately reflect the user's search intent.
 5. Generate between 1 and 3 keywords, with fewer being preferable if they can capture the essence of the query.
 
-Your final output should be a list of 1-3 keywords, each enclosed in quotes and surrounded by square brackets. For example:
-
+Your final output should be only a list of 1-3 keywords without any other text, each enclosed in quotes and surrounded by square brackets. For example:
+<example>
 ["keyword 1", "keyword 2", "keyword 3"]
-
+</example>
 or
-
+<example>
 ["single keyword"]
+</example>
 
-Remember, the goal is to create keywords that will help the user find the most relevant information when used in a search engine.
+now, output your keywords list below:
 """
     try:
         prompt = prompt.format(USER_INTENT=intent)
@@ -114,16 +115,16 @@ Please follow these steps to select the most appropriate URLs:
    - Not from video/audio hosting sites (e.g., youtube.com, vimeo.com, soundcloud.com)
 
 After your evaluation, provide your final selection in the following JSON format:
-
+```json
 [
   "selected_url_1",
   "selected_url_2",
   "selected_url_3"
 ]
-
+```
 Note that you may select fewer than 3 URLs if there aren't enough high-quality, relevant results that meet the criteria. The minimum is 1 URL, and the maximum is 3 URLs.
 
-Please begin your evaluation now, followed by your final selection in the specified JSON format without any other text.
+Please give your json result below.
     """
     try:
         prompt = prompt.format(USER_INTENT=intent, SEARCH_RESULTS=str(contents))

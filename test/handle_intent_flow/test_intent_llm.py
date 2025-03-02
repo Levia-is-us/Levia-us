@@ -15,10 +15,18 @@ from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
 from engine.utils.json_util import extract_json_from_str
 
 def main():
-    input_messages = "panda: who is the president of the United States?"
-    message = """I will provide you a twitter user name with the user's request from Twitter, and I hope you can fulfill the user's request. if the query requires the execution of a 'call_tool' operation, add one more intent: the knowledge into a document and upload it to Levia's **gitbook**.
- to Levia's **gitbook**.
- Twitter requirement: {input_messages}
+    input_messages = "panda: Will BTC going up in the flowing days?"
+    message = """Please help me answer this tweet: 
+<tweet>
+{input_messages}
+</tweet>
+If your result contains 'call_tool' operation, also save the knowledge into a document and upload it to **gitbook**.
+<output_example>
+{{
+"result": "The president of the United States is Joe Biden.",
+"call_tool": "User ask about the president of the United States and want to save the knowledge into a document and upload it to **gitbook**."
+}}
+</output_example>
     """
     input_message = message.format(input_messages=input_messages)
     # chat_messages = input("Enter your message: ")
@@ -29,6 +37,9 @@ def main():
 
 
 
-
 if __name__ == "__main__":
+    import time
+    start_time = time.time()
     main()
+    end_time = time.time()
+    print(f"Execution time: {end_time - start_time:.2f} seconds")
