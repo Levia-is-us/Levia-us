@@ -118,22 +118,11 @@ def get_Links(url):
 
 
 def get_all_links(urls):
-    visual = os.getenv("VISUAL")
     links_data = []
-    driver = setup_driver()
 
     for url in urls:
         links = get_Links(url)
         links_data.extend(links)
-
-    if visual == "True":
-        try:
-            driver.get(urls[0])
-            smooth_scroll_to_bottom(driver)
-        except Exception as e:
-            pass
-    else:
-        driver.quit()
 
     return links_data
 
@@ -161,6 +150,9 @@ def smooth_scroll_to_bottom(driver, duration=2.0):
 
 
 def get_all_content(links):
+    if(len(links) == 0):
+       raise Exception("No links found")
+
     visual = os.getenv("VISUAL")
     results = []
     driver = setup_driver()

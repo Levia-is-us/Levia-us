@@ -29,18 +29,8 @@ class file_manage:
     def delete_file(self,blob_name):
         blob_client = self.container_client.get_blob_client(blob_name)
         blob_client.delete_blob()
-        print(f"Deleted {blob_name}",file=sys.stderr)
 
 
-
-def get_top_title_with_hash(markdown_content):
-    lines = markdown_content.split('\n')
-    for line in lines:
-        line = line.strip()
-        if line.startswith('#'):
-            return line.replace('#', '').strip()
-    
-    return ""
 
 
 

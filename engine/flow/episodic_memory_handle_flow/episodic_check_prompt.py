@@ -71,7 +71,7 @@ Please follow these steps to complete your task:
    - Create a clear list of cons (arguments against the plan's feasibility)
    - Weigh the pros and cons to reach a conclusion
 
-Wrap your reasoning for each step inside <input_breakdown> tags. After your analysis, provide your conclusion in one of the following formats:
+After your analysis, provide your conclusion in one of the following formats:
 
 a) If the plan can be completed with available information and is sufficient to achieve the user intent, output the filled plan as a JSON array. Example:
 {{
