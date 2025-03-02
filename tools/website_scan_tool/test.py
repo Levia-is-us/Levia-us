@@ -26,6 +26,8 @@ def main():
         tool_name="WebsiteScanTool",
         method="website_scan",
         kwargs={
+            "url_list":['https://ustr.gov/sites/default/files/The%20Presidents%202024%20Trade%20Policy%20Agenda%20and%202023%20Annual%20Report.pdf'],
+            "intent": "get the summary of the website"
         }
     )
 

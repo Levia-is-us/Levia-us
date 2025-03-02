@@ -25,7 +25,7 @@ class WebSearchTool(BaseTool):
     Args:
         intent (str): The intent of the user.
     Returns:
-        A list of URLs that match the intent.
+        A list of URLs.
     """
 
     def web_search(self, intent: str):
