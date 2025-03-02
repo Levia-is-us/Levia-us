@@ -52,8 +52,8 @@ Please follow these steps to analyze the current situation:
      "can_proceed": true,
      "extracted_arguments": {{
        "required_arguments": {{
-         "<argument-name>": {{"source": "<source_of_the_value>", "method": "<method_to_get_the_value>", "value": "<the_real_value_can_be_used_directly>"}},
-         "<argument-name>": {{"source": "<source_of_the_value>", "method": "<method_to_get_the_value>", "value": "<the_real_value_can_be_used_directly>"}},
+         "<argument-name>": {{"source": "<source_of_the_value>", "method": "<method_to_get_the_value>", "value": "<actual argument value>"}},
+         "<argument-name>": {{"source": "<source_of_the_value>", "method": "<method_to_get_the_value>", "value": "<actual argument value>"}},
          ...
        }}
      }}

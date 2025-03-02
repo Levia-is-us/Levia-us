@@ -118,11 +118,18 @@ def get_Links(url):
 
 
 def get_all_links(urls):
+    visual = os.getenv("VISUAL")
     links_data = []
+    driver = setup_driver()
 
     for url in urls:
         links = get_Links(url)
         links_data.extend(links)
+
+    if visual == "True":
+        pass
+    else:
+        driver.quit()
 
     return links_data
 
