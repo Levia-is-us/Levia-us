@@ -251,7 +251,13 @@ def search_non_visual(keywords: list) -> list:
 
 def init_driver() -> webdriver.Chrome:
     """Initialize and return a configured Chrome WebDriver"""
+    is_visual = os.getenv("VISUAL")
     chrome_options = Options()
+    chrome_options.add_argument("--start-maximized")
+    if is_visual != "True":
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument(
@@ -273,7 +279,6 @@ def init_driver() -> webdriver.Chrome:
             """
         },
     )
-    driver.maximize_window()
     return driver
 
 
