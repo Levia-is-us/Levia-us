@@ -84,32 +84,35 @@ class RemoteLogStream(BaseStream):
                 print(f"Cleaned up {len(to_remove)} unused locks. Current locks: {len(self.locks)}")
 
     def output(self, log: str, user_id: str, type: str, ch_id: str):
-        if ENVIRONMENT == "local" or (not log or not log.strip() or "Initialized metacognitive stream." in log):
-            return
+        try:
+            if ENVIRONMENT == "local" or (not log or not log.strip() or "Initialized metacognitive stream." in log):
+                return
 
-        # Replace - with /n
-        log = log.replace(" - ", "\n")
-        # Remove extra \n and spaces
-        log = log.strip()
-        # Replace multiple consecutive newlines with a single newline
-        while "\n\n" in log or "  " in log:
-            log = log.replace("\n\n", "\n")
-            log = log.replace("  ", " ")
-        log = log.strip()
-        
-        if log == "":
-            return
-        
-        payload = {
-            "user_id": user_id,
-            "intent": log,
-            "type": type,
-            "visual": VISUAL,
-            "chid": ch_id
-        }
-        
-        # Submit task to thread pool instead of creating new thread
-        self.executor.submit(self._send_log, payload, ch_id)
+            # Replace - with /n
+            log = log.replace(" - ", "\n")
+            # Remove extra \n and spaces
+            log = log.strip()
+            # Replace multiple consecutive newlines with a single newline
+            while "\n\n" in log or "  " in log:
+                log = log.replace("\n\n", "\n")
+                log = log.replace("  ", " ")
+            log = log.strip()
+            
+            if log == "":
+                return
+            
+            payload = {
+                "user_id": user_id,
+                "intent": log,
+                "type": type,
+                "visual": VISUAL,
+                "chid": ch_id
+            }
+            
+            # Submit task to thread pool instead of creating new thread
+            self.executor.submit(self._send_log, payload, ch_id)
+        except Exception as e:
+            print(f"Error sending log: {str(e)}")
         
     def _send_log(self, payload, ch_id):
         # Get or create lock for this chid
