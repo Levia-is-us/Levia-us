@@ -230,7 +230,7 @@ class HTTPStream(BaseStream):
                 
                 # Create log message
                 message = json.dumps({
-                    "type": "log",
+                    "type": "stream",
                     "data": {
                         "content": log,
                         "type": type,

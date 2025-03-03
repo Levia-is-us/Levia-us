@@ -2,6 +2,8 @@
 
 This document outlines the HTTP Stream API that provides real-time communication capabilities using Server-Sent Events (SSE) for chat applications.
 
+For a complete implementation example, see `example_http_client.py`.
+
 ## Overview
 
 The HTTP Stream API enables clients to:
@@ -104,7 +106,7 @@ Streams the chat response in real-time using Server-Sent Events (SSE).
 Server-Sent Events stream with event data in the following format:
 
 ```
-data: {"type": "log", "data": {"content": "string", "type": "string", "ch_id": "string"}}
+data: {"type": "stream", "data": {"content": "string", "type": "string", "ch_id": "string"}}
 
 data: {"type": "complete", "data": {"reply": "string"}}
 
@@ -112,7 +114,7 @@ data: {"type": "error", "data": {"error": "string"}}
 ```
 
 **Event Types:**
-- `log`: Intermediate log messages during processing
+- `stream`: Intermediate log messages during processing
 - `complete`: Final response message
 - `error`: Error message if processing fails
 
