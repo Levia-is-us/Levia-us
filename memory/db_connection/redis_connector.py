@@ -1,11 +1,12 @@
 import redis
-from typing import Any, Optional, Dict, List, Set
+from typing import Any, Optional, Dict, List, Set, Union
 from functools import wraps
 import json
 import time
 import ssl
 
 import os
+import redis.client
 import redis_lock
 REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
@@ -88,7 +89,7 @@ class RedisUtils:
             value = json.dumps(value)
         result = self.client.set(key, value, ex=expire)
         return result
-
+    
     @retry_on_failure()
     def get_value(self, key: str) -> Optional[Any]:
         value = self.client.get(key)
@@ -170,3 +171,71 @@ class RedisUtils:
 
     def get_lock(self, name: str, expire: int = 1800) -> redis_lock.Lock:
          return redis_lock.Lock(redis_client=self.client, name=name, expire=expire)
+
+    @retry_on_failure()
+    def publish(self, channel: str, message: Any) -> int:
+        """
+        Publish a message to the specified channel
+        """
+        if isinstance(message, (dict, list)):
+            message = json.dumps(message)
+        return self.client.publish(channel, message)
+    
+    def pubsub(self) -> redis.client.PubSub:
+        if ENVIRONMENT == "local":
+            return None
+        return self.client.pubsub(ignore_subscribe_messages=True)
+
+    def subscribe(self, channels: Union[str, List[str]]) -> redis.client.PubSub:
+        """
+        Subscribe to one or more channels
+        Returns a PubSub object that can be used to listen for messages
+        """
+        pubsub = self.client.pubsub()
+        pubsub.subscribe(channels)
+        return pubsub
+
+    def pattern_subscribe(self, patterns: Union[str, List[str]]) -> redis.client.PubSub:
+        """
+        Subscribe to channels using pattern matching
+        Example: 'channel.*' will match all channels starting with 'channel.'
+        """
+        pubsub = self.client.pubsub()
+        pubsub.psubscribe(patterns)
+        return pubsub
+
+    def unsubscribe(self, pubsub: redis.client.PubSub, channels: Union[str, List[str]] = None) -> None:
+        """
+        Unsubscribe from specified channels
+        If channels is None, unsubscribe from all channels
+        """
+        if channels is None:
+            pubsub.unsubscribe()
+        else:
+            pubsub.unsubscribe(channels)
+
+    def pattern_unsubscribe(self, pubsub: redis.client.PubSub, patterns: Union[str, List[str]] = None) -> None:
+        """
+        Unsubscribe from pattern subscriptions
+        If patterns is None, unsubscribe from all patterns
+        """
+        if patterns is None:
+            pubsub.punsubscribe()
+        else:
+            pubsub.punsubscribe(patterns)
+
+    @retry_on_failure()
+    def setex(self, key: str, time: int, value: Any) -> bool:
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value)
+        return self.client.setex(key, time, value)
+
+    @retry_on_failure()
+    def exists(self, key: str) -> bool:
+        return bool(self.client.exists(key))
+
+    @retry_on_failure()
+    def expire(self, key: str, time: int) -> bool:
+        return bool(self.client.expire(key, time))
+
+
