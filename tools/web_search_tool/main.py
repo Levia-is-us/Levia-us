@@ -25,21 +25,15 @@ class WebSearchTool(BaseTool):
     Args:
         intent (str): The intent of the user.
     Returns:
-        A list of URLs that match the intent.
+        A list of URLs.
     """
+
     def web_search(self, intent: str):
         # Generate search keywords
         keywords = generate_search_keywords(intent)
 
         # Perform web search
-        is_visual = os.getenv("VISUAL")
-        if is_visual == "True":
-            content_list = search_visual(keywords)
-            # If visual search fails, try non-visual search
-            if not content_list:
-                content_list = search_non_visual(keywords)
-        else:
-            content_list = search_non_visual(keywords)
+        content_list = search_visual(keywords)
 
         if not content_list:
             return "No results found."
@@ -50,4 +44,3 @@ class WebSearchTool(BaseTool):
             if not relevance_urls:
                 return "No results found."
             return relevance_urls
-

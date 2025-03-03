@@ -52,7 +52,7 @@ def verify_tool_execution(execution_record: dict, result: dict, user_id: str, ch
 
     llm_confirmation = extract_json_from_str(llm_confirmation)
     # todo: add error handling
-    return "success" if llm_confirmation["status"] == "success" else "failure"
+    return "failure" if llm_confirmation["status"] == "failure" else "success"
 
 
 def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: dict):

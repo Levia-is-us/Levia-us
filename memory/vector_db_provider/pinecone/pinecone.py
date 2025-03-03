@@ -4,11 +4,23 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 class PineconeDb:
+    _instance = None
+    _lock = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(PineconeDb, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, index_name: str):
+        if self._lock:
+            return
+            
         api_key = os.getenv("PINECONE_API_KEY")
         host = os.getenv("PINECONE_HOST")
         self.pc = Pinecone(api_key=api_key)
         self.index = self.pc.Index(index_name, host=host)
+        self._lock = True
 
     def set_index(self, index_name: str) -> None:
         """

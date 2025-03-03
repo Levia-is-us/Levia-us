@@ -15,6 +15,7 @@ from memory.plan_memory.plan_memory import PlanContextMemory
 from metacognitive.stream.stream import output_stream
 from engine.flow.planner.tool_base_planner import tool_base_planner
 from memory.episodic_memory.episodic_memory import store_long_pass_memory
+from engine.flow.executor.tool_executor import verify_tool_execution
 import uuid
 import copy
 
@@ -69,7 +70,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     if(len(found_tools) == 0):
         raise Exception("failed to find tools")
     output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps", ch_id=ch_id)
-    plan = tool_base_planner(user_intent, found_tools, user_id, ch_id)
+    plan = tool_base_planner(user_intent, found_tools, user_id, ch_id, messages_history)
     # print(f"plan: {plan}")
             
     if(plan["status"] == "failed"):
@@ -220,7 +221,7 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step, us
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]
     
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 8000}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
     print(f"reply_json: {reply_json}")
     return reply_json
@@ -240,10 +241,10 @@ def execute_tool_operation(tool_config, reply_json, user_id, ch_id):
         ch_id
     )
     
-    # if verify_tool_execution(tool_config, result, user_id, ch_id) == "success":
-    #     return result
-    # return {"status": "failure"}
-    return {"status": "success"}
+    if verify_tool_execution(tool_config, result, user_id, ch_id) == "success":
+        return result
+    return {"status": "failure"}
+    # return {"status": "success"}
 
 def handle_user_input(user_id: str):
     """Handle failed tool execution by requesting user input"""
