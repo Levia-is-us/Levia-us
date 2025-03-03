@@ -25,7 +25,7 @@ class Stream:
         self.streams = []
         for stream_type in stream_types:
             if stream_type == "http":
-                self.add_stream(HTTPStream(8081))
+                self.add_stream(HTTPStream(7072))
             elif stream_type == "local":
                 self.add_stream(LocalStream())
             elif stream_type == "websocket":
@@ -75,5 +75,5 @@ def output_stream(log: str, user_id: str = "levia", type: str = "info", ch_id: s
     """
     global _stream
     if _stream is None:
-        _stream = Stream(stream_types=["remote_log", "local", "websocket"])
+        _stream = Stream(stream_types=["remote_log", "local", "http"])
     _stream.output(log, user_id, type, ch_id)
