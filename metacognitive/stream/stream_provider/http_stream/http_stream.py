@@ -37,10 +37,8 @@ class HTTPStream(BaseStream):
                         "message": "Missing user_id parameter"
                     }), 400
                 
-                # 生成新的会话ID
                 session_id = str(uuid.uuid4())
                 
-                # 将会话ID保存到Redis中，设置30分钟过期时间
                 session_key = f"chat:session:{user_id}"
                 redis_tool.setex(key=session_key, value=session_id, time=259200)
                 
@@ -67,7 +65,6 @@ class HTTPStream(BaseStream):
             if not user_id or not intent or not session_id:
                 return jsonify({"status": "error", "message": "Missing required parameters"}), 400
             
-            # 验证session_id的合法性
             session_key = f"chat:session:{user_id}"
             stored_session_id = redis_tool.get_value(session_key)
             

@@ -196,7 +196,6 @@ def main():
         # Keep the main thread alive while the stream is processing
         print("\nAll steps completed. The stream will continue to receive messages until completion.")
         
-        # 等待stream线程完成
         while stream_thread.is_alive():
             time.sleep(0.1)
             
