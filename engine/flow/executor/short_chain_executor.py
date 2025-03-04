@@ -16,6 +16,7 @@ from metacognitive.stream.stream import output_stream
 from engine.flow.planner.tool_base_planner import tool_base_planner
 from memory.episodic_memory.episodic_memory import store_long_pass_memory
 from engine.flow.executor.tool_executor import verify_tool_execution
+from engine.flow.executor.transform_code import transform_code
 import uuid
 import copy
 
@@ -216,14 +217,13 @@ def parse_tool_config(tool):
 
 def validate_tool_parameters(tool_config, messages_history, plan_steps, step, user_id, ch_id):
     """Attempt to execute tool with current configuration"""
-    print(f"tool_config: {tool_config}")
-    print(f"messages_history: {step}")
+    print(f"plan_steps: {plan_steps}")
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
-    prompt = [{"role": "user", "content": next_step_content}]
-    
+    prompt = [{"role": "user", "content": next_step_content}]  
     reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 8000}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
     print(f"reply_json: {reply_json}")
+    reply_json = transform_code(plan_steps, reply_json, user_id, ch_id)
     return reply_json
 
 def execute_tool_operation(tool_config, reply_json, user_id, ch_id):

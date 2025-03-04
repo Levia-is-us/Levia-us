@@ -11,6 +11,7 @@ from engine.flow.episodic_memory_handle_flow.episodic_check import episodic_chec
 from engine.flow.executor.next_step_prompt import next_step_prompt
 from engine.llm_provider.llm import chat_completion
 from memory.episodic_memory.episodic_memory import retrieve_long_pass_memory, delete_long_pass_memory
+from engine.flow.executor.transform_code import transform_code
 registry = ToolRegistry()
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -296,4 +297,5 @@ def get_tool_parameters_llm(tool_config, messages_history, plan_steps, user_id, 
     reply_json = extract_json_from_str(reply)
     if not reply_json["can_proceed"]:
             return None
+    reply_json = transform_code(plan_steps, reply_json, user_id, ch_id)
     return reply_json
