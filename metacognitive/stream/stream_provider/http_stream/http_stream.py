@@ -9,7 +9,20 @@ from memory.db_connection.redis_connector import RedisUtils
 redis_tool = RedisUtils()
 
 class HTTPStream(BaseStream):
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls, port: int = 7072):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super().__new__(cls)
+                cls._instance._initialized = False
+            return cls._instance
+    
     def __init__(self, port: int = 7072):
+        if self._initialized:
+            return
+            
         self.port = port
         self.app = Flask(__name__)
         
@@ -22,6 +35,8 @@ class HTTPStream(BaseStream):
         # Generate unique node ID to identify the current server instance
         self.node_id = str(uuid.uuid4())
         print(f"Node {self.node_id} started")
+        
+        self._initialized = True
 
     def setup_routes(self):
 
@@ -208,11 +223,13 @@ class HTTPStream(BaseStream):
                 }), 404
 
     def start_server(self):
-        def run_server():
-            self.app.run(host="127.0.0.1", port=self.port, threaded=True)
-
-        self.server_thread = threading.Thread(target=run_server, daemon=True)
-        self.server_thread.start()
+        import os
+        if os.environ.get('INTERACTION_MODE') != 'server':
+            def run_server():
+                self.app.run(host="0.0.0.0", port=self.port, threaded=True)
+            
+            self.server_thread = threading.Thread(target=run_server, daemon=True)
+            self.server_thread.start()
 
     def output(self, log: str, user_id: str, type: str, ch_id: str = ""):
         try:
