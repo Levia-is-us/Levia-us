@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webscout import WEBS
+from googlesearch import SearchResult, search
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
 
@@ -160,7 +161,7 @@ Please give your json result below.
         return []
 
 
-def retry_on_server_error(retries: int = 3, delay: int = 1):
+def retry_on_server_error(retries: int = 1, delay: int = 1):
     """
     Decorator: Retries the function when a ServerError exception occurs.
 
@@ -225,6 +226,24 @@ def webs_search(keyword: str) -> dict:
     return ret
 
 
+@retry_on_server_error()
+def google_search(keyword: str) -> list[SearchResult]:
+    """
+    Function to perform a Google search using the googlesearch library, with retry logic in case of errors.
+
+    Args:
+        keyword (str): The search term or keyword to be used in the search query.
+
+    Returns:
+        list[SearchResult]: The search results from the Google search.
+    """
+
+    results = search(keyword, num_results=6, advanced=True)
+    rets = [ret for ret in results]
+
+    return rets
+
+
 def search_non_visual(keywords: list) -> list:
     """
     This function is used to perform non-visual web searches for information.
@@ -239,9 +258,9 @@ def search_non_visual(keywords: list) -> list:
     for keyword in keywords:
         try:
             # Search for each keyword
-            rets = webs_search(keyword)
+            rets = google_search(keyword)
             # Extract content from search results
-            contents = [f'url: {ret["href"]} content: {ret["body"]}' for ret in rets]
+            contents = [f"url: {ret.url} content: {ret.description}" for ret in rets]
             content_list.extend(contents)
         except Exception as e:
             print(f"Search non-visual error: {str(e)}")
@@ -251,12 +270,9 @@ def search_non_visual(keywords: list) -> list:
 
 def init_driver() -> webdriver.Chrome:
     """Initialize and return a configured Chrome WebDriver"""
-    is_visual = os.getenv("VISUAL")
+
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
-    if is_visual != "True":
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")

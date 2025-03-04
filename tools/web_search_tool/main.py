@@ -32,8 +32,16 @@ class WebSearchTool(BaseTool):
         # Generate search keywords
         keywords = generate_search_keywords(intent)
 
-        # Perform web search
-        content_list = search_visual(keywords)
+        is_visual = os.getenv("VISUAL")
+        if is_visual == "True":
+            # Perform visual search
+            content_list = search_visual(keywords)
+            if not content_list:
+                # If no visual content found, perform non-visual web search
+                content_list = search_non_visual(keywords)
+        else:
+            # Perform web search
+            content_list = search_non_visual(keywords)
 
         if not content_list:
             return "No results found."
