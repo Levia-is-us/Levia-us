@@ -3,7 +3,7 @@ import random
 import re
 import time
 import os
-from aipolabs import Aipolabs
+from aipolabs import ACI
 from aipolabs.types.functions import FunctionExecutionResult
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -190,7 +190,7 @@ def retry_on_server_error(retries: int = 3, delay: int = 1):
 
 
 @retry_on_server_error()
-def aipolabs_search(client: Aipolabs, keyword: str) -> FunctionExecutionResult:
+def aipolabs_search(client: ACI, keyword: str) -> FunctionExecutionResult:
     """
     Function to search for a given keyword using the Aipolabs client, with retry logic in case of errors.
 
