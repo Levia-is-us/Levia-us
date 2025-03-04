@@ -6,6 +6,7 @@ import inspect
 class BaseTool(ABC):
     """Base class for all tools"""
     description = "Base tool class"
+    timeout = 180 
 
     def __init__(self):
         self._name = self.__class__.__name__

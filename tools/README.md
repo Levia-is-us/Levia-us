@@ -22,6 +22,10 @@
 - When importing files from within a tool's folder, use the full path format. For example:
   `from tools.your_folder.your_file import your_method`
 
+## 5. Timeout
+- The default timeout value is 180 seconds.
+- If the tool needs more time to complete, you can set a different timeout value in the `timeout` attribute of the tool class.
+
 ## `main.py` file example:
 ```
 import os
@@ -41,6 +45,7 @@ from tools.your_folder.your_file import your_method
 # Entry method with the @run_tool annotation
 @run_tool
 class ToolName:
+    timeout = 180 # This value is optional, if not set, the default timeout value is 180 seconds
     def your_tool_method(self):
         """Implement your tool's functionality here"""
         return your_output
