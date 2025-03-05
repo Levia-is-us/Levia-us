@@ -29,7 +29,9 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str =
     short_term_memory.add_context(
         create_chat_message("user", user_input), user_id
     )
+    print("chat_messages1: ,user_id: ", user_id, "session_id: ", session_id, "chat_messages: ", chat_messages)
     chat_messages = short_term_memory.get_context(user_id + session_id)[-7:]
+    print("chat_messages2: ,user_id: ", user_id, "session_id: ", session_id, "chat_messages: ", chat_messages)
     output_stream(log=f"{reply_info['intent']}", user_id=user_id, type="think", ch_id=chid)
     
     final_reply = ""
