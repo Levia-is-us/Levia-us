@@ -2,7 +2,6 @@ FROM python:3.11
 
 WORKDIR /workspace
 
-# 安装基本依赖
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -25,32 +24,27 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     libasound2
 
-# 安装Google Chrome
-RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.198-1_amd64.deb \
-    && apt-get install -y ./google-chrome-stable_114.0.5735.198-1_amd64.deb \
-    && rm google-chrome-stable_114.0.5735.198-1_amd64.deb
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable
 
-# 安装固定版本的ChromeDriver
-RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
-    && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
-    && rm chromedriver_linux64.zip \
-    && chmod +x /usr/local/bin/chromedriver
+RUN pip install selenium \
+    webdriver-manager \
+    gunicorn \
+    waitress
 
-# 显示版本信息以验证
-RUN google-chrome --version && chromedriver --version
-
-# 复制项目文件
 COPY . .
 RUN python install_requirements.py
 
-# 设置环境变量
 ENV PYTHONUNBUFFERED=1
 ENV DISPLAY=:99
 ENV INTERACTION_MODE=server
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV CHROME_PATH=/usr/bin/google-chrome
+ENV WDM_LOG_LEVEL=0
+ENV WDM_CACHE_PATH=/usr/local/bin
 
 EXPOSE 7072
 
-# 启动Xvfb和应用
 CMD Xvfb :99 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset & python main.py
