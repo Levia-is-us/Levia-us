@@ -105,7 +105,7 @@ a) If the plan can be completed with available information and is sufficient to 
   ]
 }}
 
-b) If any required information is missing, output a JSON object in this format:
+b) If any required input argument is missing to execute the tool, output a JSON object in this format:
 {{
   "status": "missing input",
   "name": ["list", "of", "missing", "value", "names"]

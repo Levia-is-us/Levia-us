@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,7 +32,7 @@ def main():
     result = caller.call_tool(
         tool_name="WebSearchTool",
         method="web_search",
-        kwargs={"intent": "Tell me today's weather"},
+        kwargs={"intent": "Tell me today's news"},
     )
 
     if result:
