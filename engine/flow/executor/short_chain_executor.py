@@ -220,7 +220,7 @@ def validate_tool_parameters(tool_config, messages_history, plan_steps, step, us
     print(f"plan_steps: {plan_steps}")
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]  
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 8000}, user_id=user_id, ch_id=ch_id)
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
     print(f"reply_json: {reply_json}")
     reply_json = transform_code(plan_steps, reply_json, user_id, ch_id)
