@@ -20,5 +20,5 @@ tiktoken
 Flask
 redis
 python-redis-lock
-aipolabs
+aipolabs==0.0.1b4
 webscout

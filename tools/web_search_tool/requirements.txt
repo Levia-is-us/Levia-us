@@ -1,4 +1,4 @@
-aipolabs
+aipolabs==0.0.1b4
 selenium
 webscout
 googlesearch-python
