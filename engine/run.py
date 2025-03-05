@@ -7,7 +7,6 @@ from metacognitive.stream.stream_provider.http_stream.http_stream import HTTPStr
 
 http_stream = HTTPStream(port=7072)
 
-# 获取 Flask 应用实例
 app = http_stream.app
 
 INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
