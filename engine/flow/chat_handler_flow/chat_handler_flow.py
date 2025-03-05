@@ -27,7 +27,7 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str =
     output_stream(log="Analyzing user's intent ...", user_id=user_id, type="steps", ch_id=chid)
     reply_info = handle_intent_flow(chat_messages, user_input, user_id, chid)
     short_term_memory.add_context(
-        create_chat_message("user", user_input), user_id
+        create_chat_message("user", user_input), user_id + session_id
     )
     print("chat_messages1: ,user_id: ", user_id, "session_id: ", session_id, "chat_messages: ", chat_messages)
     chat_messages = short_term_memory.get_context(user_id + session_id)[-7:]
@@ -50,7 +50,7 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str =
         
     final_reply = extract_str_from_doc(final_reply)
     short_term_memory.add_context(
-        create_chat_message("assistant", f"{final_reply}"), user_id
+        create_chat_message("assistant", f"{final_reply}"), user_id + session_id
     )
     output_stream(log=f"Final reply: {final_reply}", user_id=user_id, type="think", ch_id=chid)
     return final_reply

@@ -33,7 +33,7 @@ def event_chat(user_id, input_message, session_id: str = ""):
         reply = backup_reply(short_term_memory.get_context(user_id), user_id, chid)
         output_stream(log=f"Final reply: {reply}", user_id=user_id, type="think", ch_id=chid)
         short_term_memory.add_context(
-            create_chat_message("assistant", f"{reply}"), user_id
+            create_chat_message("assistant", f"{reply}"), user_id + session_id
         )
         end_time = datetime.datetime.now().timestamp()
         output_stream(log=f"End time: {end_time}", user_id=user_id, type="end_time", ch_id=chid)

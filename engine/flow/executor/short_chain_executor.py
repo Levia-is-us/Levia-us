@@ -246,10 +246,10 @@ def execute_tool_operation(tool_config, reply_json, user_id, ch_id):
     return {"status": "failure"}
     # return {"status": "success"}
 
-def handle_user_input(user_id: str):
+def handle_user_input(user_id: str, session_id: str):
     """Handle failed tool execution by requesting user input"""
     user_input = input("Please input required arguments to continue: ")
     if not user_input:
         return False
-    short_term_memory.add_context(create_chat_message("user", user_input), user_id)
+    short_term_memory.add_context(create_chat_message("user", user_input), user_id + session_id)
     return True
