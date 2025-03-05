@@ -11,7 +11,7 @@ The HTTP Stream API provides real-time communication capabilities between client
 All API endpoints are relative to the base URL:
 
 ```
-http://api.levia.us
+https://api.levia.us
 ```
 
 ## Authentication
