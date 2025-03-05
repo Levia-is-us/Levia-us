@@ -44,6 +44,7 @@ RUN echo "\nAfter installing Python dependencies:" && ls -la
 RUN echo "\nBefore copying project files:" && ls -la
 
 COPY . .
+RUN python install_requirements.py
 
 RUN echo "\nFinal workspace contents:" && ls -la
 
