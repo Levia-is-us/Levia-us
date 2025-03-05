@@ -6,6 +6,17 @@ This documentation describes the API endpoints provided by the HTTP Stream servi
 
 The HTTP Stream API provides real-time communication capabilities between clients and the server. It allows creating chat sessions, sending messages, and receiving responses in real-time through Server-Sent Events (SSE).
 
+### User ID
+
+The `user_id` parameter is a crucial concept in this API:
+
+*   Each `user_id` represents a unique individual user in the developer's application
+*   Levia uses the `user_id` to store and differentiate chat contexts between different users
+*   Developers are responsible for generating and managing unique user IDs for their user base
+*   Each user's conversation history and context is isolated based on their `user_id`
+*   The same `user_id` should be used consistently across sessions for the same user to maintain context
+
+
 ## Base URL
 
 All API endpoints are relative to the base URL:
