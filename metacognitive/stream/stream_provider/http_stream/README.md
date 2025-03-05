@@ -1,30 +1,36 @@
 # HTTP Stream API Documentation
 
-This document outlines the HTTP Stream API that provides real-time communication capabilities using Server-Sent Events (SSE) for chat applications.
-
-For a complete implementation example, see `example_http_client.py`.
+This documentation describes the API endpoints provided by the HTTP Stream service.
 
 ## Overview
 
-The HTTP Stream API enables clients to:
-- Create new chat sessions
-- Send chat messages and receive streaming responses
-- Reconnect to active streams in case of disconnection
-- Retrieve session and request information
-
-All communication is based on HTTP, with streaming responses delivered through Server-Sent Events (SSE).
+The HTTP Stream API provides real-time communication capabilities between clients and the server. It allows creating chat sessions, sending messages, and receiving responses in real-time through Server-Sent Events (SSE).
 
 ## Base URL
 
-All API endpoints share the base URL:
+All API endpoints are relative to the base URL:
 
 ```
-http://127.0.0.1:7072/levia
+http://api.levia.us
 ```
 
 ## Authentication
 
-Session management is handled through session IDs. A valid session ID must be obtained through the session creation endpoint and included in subsequent requests.
+Authentication for this API requires an API key that must be included in the header of all requests.
+
+### API Key Authentication
+
+1. Register a developer account on the developer platform
+2. Obtain an API key from your developer dashboard
+3. Include the API key in the request header as follows:
+
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+All requests without a valid API key will be rejected with a `401 Unauthorized` response.
+
+---
 
 ## Endpoints
 
@@ -32,16 +38,23 @@ Session management is handled through session IDs. A valid session ID must be ob
 
 Creates a new chat session for a user.
 
-**Endpoint:** `POST /chat/create`
+**URL**: `/levia/chat/create`
 
-**Request Body:**
+**Method**: `POST`
+
+**Request Body**:
+
 ```json
 {
-  "user_id": "string"
+  "user_id": "string" // Required: Unique identifier for the user
 }
 ```
 
-**Response:**
+**Success Response**:
+
+- **Code**: `201 CREATED`
+- **Content**:
+
 ```json
 {
   "status": "success",
@@ -50,110 +63,22 @@ Creates a new chat session for a user.
 }
 ```
 
-**Status Codes:**
-- `201`: Session created successfully
-- `400`: Missing required parameters
-- `500`: Server error
+**Error Response**:
 
-**Notes:**
-- Session IDs are valid for 72 hours (259200 seconds)
-- Each user can have only one active session at a time
+- **Code**: `400 BAD REQUEST`
+- **Content**:
 
-### Send Chat Message
-
-Sends a chat message and initiates a streaming response.
-
-**Endpoint:** `POST /chat`
-
-**Request Body:**
 ```json
 {
-  "user_id": "string",
-  "intent": "string",
-  "session_id": "uuid-string"
+  "status": "error",
+  "message": "Missing user_id parameter"
 }
 ```
 
-**Response:**
-```json
-{
-  "status": "success",
-  "request_id": "uuid-string",
-  "message": "Processing started, connect to /levia/chat/stream/{request_id} for updates"
-}
-```
+OR
 
-**Status Codes:**
-- `202`: Request accepted for processing
-- `400`: Missing required parameters
-- `401`: Invalid or expired session ID
-- `500`: Server error
-
-**Notes:**
-- The `request_id` returned should be used to connect to the streaming endpoint
-- Processing occurs asynchronously
-
-### Stream Chat Response
-
-Streams the chat response in real-time using Server-Sent Events (SSE).
-
-**Endpoint:** `GET /chat/stream/{request_id}`
-
-**Parameters:**
-- `request_id`: UUID string obtained from the `/chat` endpoint
-
-**Response:**
-Server-Sent Events stream with event data in the following format:
-
-```
-data: {"type": "stream", "data": {"content": "string", "type": "string", "ch_id": "string"}}
-
-data: {"type": "complete", "data": {"reply": "string"}}
-
-data: {"type": "error", "data": {"error": "string"}}
-```
-
-**Event Types:**
-- `stream`: Intermediate log messages during processing
-- `complete`: Final response message
-- `error`: Error message if processing fails
-
-**Notes:**
-- The stream automatically closes after receiving a `complete` or `error` event
-- Stream reconnection is supported and will replay any missed log messages
-- Cached results are available for 5 minutes after completion
-
-### Get User's Active Request
-
-Retrieves the current active request ID for a user.
-
-**Endpoint:** `GET /chat/request/{user_id}`
-
-**Parameters:**
-- `user_id`: The user's unique identifier
-
-**Response:**
-```json
-{
-  "status": "success",
-  "request_id": "uuid-string"
-}
-```
-
-**Status Codes:**
-- `200`: Request ID found
-- `404`: No active request found for the user
-- `500`: Server error
-
-## Data Retention
-
-- Session IDs: 72 hours
-- Request processing data: 30 minutes
-- Result cache: 5 minutes after completion
-
-## Error Handling
-
-All errors are returned with appropriate HTTP status codes and a JSON response body:
+- **Code**: `500 INTERNAL SERVER ERROR`
+- **Content**:
 
 ```json
 {
@@ -162,37 +87,196 @@ All errors are returned with appropriate HTTP status codes and a JSON response b
 }
 ```
 
-## SSE Connection Management
+**Notes**:
 
-Clients should implement appropriate reconnection logic for the SSE stream. The server supports reconnection by:
-- Maintaining logs of previous messages
-- Providing cached results for completed requests
-- Handling connection timeouts gracefully
+- Session IDs are automatically generated using UUID4
+- Sessions expire after 72 hours (259200 seconds)
 
-## Usage Examples
+---
 
-### Complete Chat Flow
+### Send Chat Message
 
-1. Create a session:
-```bash
-curl -X POST http://127.0.0.1:7072/levia/chat/create \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "user123"}'
+Processes a chat message and returns a request ID for streaming the response.
+
+**URL**: `/levia/chat`
+
+**Method**: `POST`
+
+**Request Body**:
+
+```json
+{
+  "user_id": "string",     // Required: Unique identifier for the user
+  "intent": "string",      // Required: The message or intent to process
+  "session_id": "string"   // Required: Valid session ID from create chat endpoint
+}
 ```
 
-2. Send a chat message:
-```bash
-curl -X POST http://127.0.0.1:7072/levia/chat \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "user123", "intent": "Hello, how are you?", "session_id": "received-session-id"}'
+**Success Response**:
+
+- **Code**: `202 ACCEPTED`
+- **Content**:
+
+```json
+{
+  "status": "success",
+  "request_id": "uuid-string",
+  "message": "Processing started, connect to /levia/chat/stream/{request_id} for updates"
+}
 ```
 
-3. Connect to the SSE stream:
-```bash
-curl -N http://127.0.0.1:7072/levia/chat/stream/received-request-id
+**Error Response**:
+
+- **Code**: `401 UNAUTHORIZED`
+- **Content**:
+
+```json
+{
+  "status": "error",
+  "message": "Session ID does not exist or has expired"
+}
 ```
 
-4. Check active request (optional):
-```bash
-curl http://127.0.0.1:7072/levia/chat/request/user123
+OR
+
+- **Code**: `401 UNAUTHORIZED`
+- **Content**:
+
+```json
+{
+  "status": "error",
+  "message": "Session ID does not belong to this user"
+}
 ```
+
+**Notes**:
+
+- The returned `request_id` should be used to connect to the streaming endpoint
+- Processing occurs asynchronously in a background thread
+- Request processing status is stored in Redis with a 30-minute (1800 seconds) TTL
+
+---
+
+### Stream Chat Response
+
+Streams the real-time response to a chat message using Server-Sent Events (SSE).
+
+**URL**: `/levia/chat/stream/{request_id}`
+
+**Method**: `GET`
+
+**URL Parameters**:
+
+- `request_id`: The UUID returned by the chat endpoint
+
+**Response**:
+
+The response is a Server-Sent Events (SSE) stream with `text/event-stream` content type.
+
+**Event Data Formats**:
+
+1. **Stream Update**:
+```json
+{
+  "type": "stream",
+  "data": {
+    "content": "string",
+    "type": "string",
+    "ch_id": "string"
+  }
+}
+```
+
+2. **Completion Event**:
+```json
+{
+  "type": "complete",
+  "data": {
+    "reply": "string"
+  }
+}
+```
+
+3. **Error Event**:
+```json
+{
+  "type": "error",
+  "data": {
+    "error": "Error description"
+  }
+}
+```
+
+**Notes**:
+
+- The connection stays open until a `complete` or `error` event is received
+- Upon connection, any existing logs for the request will be sent first
+- If the request ID is invalid or expired, an error event will be sent
+- Completed responses are cached for 5 minutes (300 seconds) for reconnections
+
+---
+
+### Get User's Active Request
+
+Returns the active request ID for a specific user.
+
+**URL**: `/levia/chat/request/{user_id}`
+
+**Method**: `GET`
+
+**URL Parameters**:
+
+- `user_id`: The unique identifier for the user
+
+**Success Response**:
+
+- **Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "status": "success",
+  "request_id": "uuid-string"
+}
+```
+
+**Error Response**:
+
+- **Code**: `404 NOT FOUND`
+- **Content**:
+
+```json
+{
+  "status": "error",
+  "message": "No active request found for this user"
+}
+```
+
+**Notes**:
+
+- This endpoint is useful for clients that need to reconnect to an ongoing request
+
+---
+
+## Data Lifecycle
+
+1. Session data is stored for 72 hours (259200 seconds)
+2. Request processing data has a TTL of 30 minutes (1800 seconds)
+3. Result cache is stored for 5 minutes (300 seconds)
+4. Logs for each request are stored for 30 minutes (1800 seconds)
+
+## Error Handling
+
+The API returns appropriate HTTP status codes and error messages in JSON format:
+
+- `400`: Bad Request - Missing or invalid parameters
+- `401`: Unauthorized - Invalid or expired session
+- `404`: Not Found - Resource not available
+- `500`: Internal Server Error - Server-side error
+
+## Implementation Notes
+
+- Uses Redis for pub/sub messaging, data storage, and caching
+- Implements a singleton pattern to ensure only one server instance per port
+- Generates unique node IDs for server instances
+- Handles reconnection scenarios by caching logs and results
