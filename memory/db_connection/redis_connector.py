@@ -238,4 +238,16 @@ class RedisUtils:
     def expire(self, key: str, time: int) -> bool:
         return bool(self.client.expire(key, time))
 
-
+    @retry_on_failure()
+    def ismember(self, key: str, value: Any) -> bool:
+        """
+        Check if value is a member of the set stored at key
+        
+        Args:
+            key: The Redis key of the set
+            value: The value to check for membership
+            
+        Returns:
+            bool: True if the value is a member of the set, False otherwise
+        """
+        return bool(self.client.sismember(key, value))

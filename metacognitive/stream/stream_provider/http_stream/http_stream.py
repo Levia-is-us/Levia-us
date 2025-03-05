@@ -54,8 +54,17 @@ class HTTPStream(BaseStream):
                 
                 session_id = str(uuid.uuid4())
                 
-                session_key = f"chat:session:{user_id}"
-                redis_tool.setex(key=session_key, value=session_id, time=259200)
+                # Store session info with its own TTL
+                session_info_key = f"chat:session:{session_id}"
+                redis_tool.setex(key=session_info_key, value=user_id, time=259200)
+                
+                # Add to user's session set without updating its TTL
+                user_sessions_key = f"chat:sessions:{user_id}"
+                if not redis_tool.exists(user_sessions_key):
+                    redis_tool.set_add(user_sessions_key, session_id)
+                    redis_tool.expire(user_sessions_key, 259200)
+                else:
+                    redis_tool.set_add(user_sessions_key, session_id)
                 
                 return jsonify({
                     "status": "success",
@@ -77,16 +86,19 @@ class HTTPStream(BaseStream):
             intent = data.get('intent')
             session_id = data.get('session_id')
             
-            if not user_id or not intent or not session_id:
-                return jsonify({"status": "error", "message": "Missing required parameters"}), 400
+            session_key = f"chat:session:{session_id}"
+            user_sessions_key = f"chat:sessions:{user_id}"
             
-            session_key = f"chat:session:{user_id}"
-            stored_session_id = redis_tool.get_value(session_key)
-            
-            if not stored_session_id or (stored_session_id.decode('utf-8') if isinstance(stored_session_id, bytes) else stored_session_id) != session_id:
+            if not redis_tool.exists(session_key):
                 return jsonify({
                     "status": "error",
-                    "message": "Invalid or expired session ID"
+                    "message": "Session ID does not exist or has expired"
+                }), 401
+            
+            if not redis_tool.ismember(user_sessions_key, session_id):
+                return jsonify({
+                    "status": "error",
+                    "message": "Session ID does not belong to this user"
                 }), 401
             
             # Generate unique request ID
@@ -147,7 +159,7 @@ class HTTPStream(BaseStream):
 
                 cached_result = redis_tool.get_value(key=result_key)
                 if cached_result:
-                    # If there's a cached result, return it and end the stream
+                    cached_result = cached_result if isinstance(cached_result, str) else cached_result.decode('utf-8')
                     yield f"data: {cached_result}\n\n"
                     return
                 
@@ -161,7 +173,14 @@ class HTTPStream(BaseStream):
                     logs_key = f"chat:logs:{request_id}"
                     existing_logs = redis_tool.list_range(logs_key, 0, -1)
                     for log in existing_logs:
-                        yield f"data: {log if isinstance(log, str) else log.decode('utf-8')}\n\n"
+                        log_str = log if isinstance(log, str) else log.decode('utf-8')
+                        yield f"data: {log_str}\n\n"
+                        try:
+                            log_data = json.loads(log_str)
+                            if log_data.get('type') in ['complete', 'error']:
+                                return
+                        except:
+                            pass
                     
                     # Check if the request is still being processed
                     processing_key = f"chat:processing:{request_id}"
@@ -232,6 +251,8 @@ class HTTPStream(BaseStream):
             self.server_thread.start()
 
     def output(self, log: str, user_id: str, type: str, ch_id: str = ""):
+        if type == "end_time" or "Final reply:" in log:
+            return
         try:
             self.logs.append(log)
             
