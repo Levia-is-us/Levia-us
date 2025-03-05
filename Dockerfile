@@ -57,4 +57,4 @@ RUN echo "Files in workspace:" && ls -la
 
 EXPOSE 7072
 
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
