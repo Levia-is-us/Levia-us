@@ -48,7 +48,7 @@ def chat_completion_deepseek(messages, model, config={}, user_id="", ch_id=""):
         completion_params = {
             "model": model["model"],
             "messages": messages,
-            "max_tokens": 8000,
+            "max_tokens": 4000,
             "stream": True,
         }
         # Update with any additional config parameters

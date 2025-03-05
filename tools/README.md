@@ -47,6 +47,11 @@ from tools.your_folder.your_file import your_method
 class ToolName:
     timeout = 180 # This value is optional, if not set, the default timeout value is 180 seconds
     def your_tool_method(self):
+    """
+    edit your tool's description here
+    edit your tool's parameters description here
+    edit your tool's return description here
+    """
         """Implement your tool's functionality here"""
         return your_output
 ```
