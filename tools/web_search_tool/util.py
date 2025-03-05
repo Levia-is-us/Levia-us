@@ -11,7 +11,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from webscout import WEBS
 from googlesearch import SearchResult, search
 from engine.llm_provider.llm import chat_completion
 from engine.utils.json_util import extract_json_from_str
@@ -208,22 +207,6 @@ def aipolabs_search(client: ACI, keyword: str) -> FunctionExecutionResult:
     )
 
     return result
-
-
-@retry_on_server_error()
-def webs_search(keyword: str) -> dict:
-    """
-    Function to perform a web search using the WEBS client, with retry logic in case of errors.
-
-    Args:
-        keyword (str): The search term or keyword to be used in the search query.
-
-    Returns:
-        dict: The search results from the web search.
-    """
-
-    ret = WEBS().text(keyword, max_results=5)
-    return ret
 
 
 @retry_on_server_error()
