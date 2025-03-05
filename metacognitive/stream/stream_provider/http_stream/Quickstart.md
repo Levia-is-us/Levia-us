@@ -2,6 +2,17 @@
 
 This quick start guide walks through the key steps to integrate and use the Levia HTTP Stream API.
 
+For complete API documentation, refer to the [Levia API Documentation](https://github.com/Levia-is-us/Levia-us/tree/main/metacognitive/stream/stream_provider/http_stream).
+
+### User ID
+The `user_id` parameter is a crucial concept in this API:
+
+*   Each `user_id` represents a unique individual user in the developer's application
+*   Levia uses the `user_id` to store and differentiate chat contexts between different users
+*   Developers are responsible for generating and managing unique user IDs for their user base
+*   Each user's conversation history and context is isolated based on their `user_id`
+*   The same `user_id` should be used consistently across sessions for the same user to maintain context
+
 ## Step 1: Register and Get API Key
 
 1. Register for a developer account on the Levia developer platform
@@ -291,5 +302,3 @@ if __name__ == "__main__":
 - Create a user interface to display streaming responses
 - Implement user authentication in your application
 - Explore advanced features and configurations
-
-For complete API documentation, refer to the [Levia API Documentation](https://github.com/Levia-is-us/Levia-us/tree/main/metacognitive/stream/stream_provider/http_stream).
