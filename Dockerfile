@@ -26,20 +26,14 @@ RUN apt-get update && apt-get install -y \
     libasound2
 
 # 安装Google Chrome
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable
+RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.198-1_amd64.deb \
+    && apt-get install -y ./google-chrome-stable_114.0.5735.198-1_amd64.deb \
+    && rm google-chrome-stable_114.0.5735.198-1_amd64.deb
 
-# 获取已安装的Chrome版本
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | awk -F. '{print $1}') \
-    && echo "Chrome version: $CHROME_VERSION" \
-    && wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" -O chrome_driver_version \
-    && CHROMEDRIVER_VERSION=$(cat chrome_driver_version) \
-    && echo "ChromeDriver version: $CHROMEDRIVER_VERSION" \
-    && wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" \
+# 安装固定版本的ChromeDriver
+RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
     && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
-    && rm chromedriver_linux64.zip chrome_driver_version \
+    && rm chromedriver_linux64.zip \
     && chmod +x /usr/local/bin/chromedriver
 
 # 显示版本信息以验证
