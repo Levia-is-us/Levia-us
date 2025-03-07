@@ -1,10 +1,9 @@
 from engine.llm_provider.llm import chat_completion
 from memory.episodic_memory.episodic_memory import retrieve_short_pass_memory
-from engine.flow.executor.tool_executor import execute_tool
-from engine.flow.planner.planner import create_execution_plan
+from engine.flow.executor.execute_tool_flow import execute_tool
+from engine.flow.planner.make_general_plan_flow import create_execution_plan
 from engine.utils.json_util import extract_json_from_str
 from engine.tool_framework.tool_caller import ToolCaller
-from engine.flow.tool_selector.step_necessity_validator import step_tool_check
 from engine.flow.executor.next_step_prompt import next_step_prompt
 import os
 from memory.short_term_memory.short_term_memory import ShortTermMemory
@@ -13,10 +12,10 @@ from engine.tool_framework.tool_caller import ToolCaller
 from engine.tool_framework.tool_registry import ToolRegistry
 from memory.plan_memory.plan_memory import PlanContextMemory
 from metacognitive.stream.stream import output_stream
-from engine.flow.planner.tool_base_planner import tool_base_planner
+from engine.flow.planner.make_tool_base_plan_flow import tool_base_planner
 from memory.episodic_memory.episodic_memory import store_long_pass_memory
-from engine.flow.executor.tool_executor import verify_tool_execution
-from engine.flow.executor.transform_code import transform_code
+from engine.flow.executor.execute_tool_flow import verify_tool_execution
+from engine.flow.executor.get_transform_code_flow import transform_code
 import uuid
 import copy
 
@@ -43,6 +42,12 @@ def execute_intent_chain(
     output_stream(log=f"No experience for {user_intent}...", user_id=user_id, type="think", ch_id=ch_id)
     output_stream(log="Creating new execution plan ...", user_id=user_id, type="steps", ch_id=ch_id)
     plan = create_execution_plan(user_intent, user_id, ch_id)
+    messages = []
+    for step in plan:
+        messages.append(f"{step['step']}: {step['intent']}"),
+    
+    output_stream(log=["general plan",messages], user_id=user_id, type="think", ch_id=ch_id)
+    
     return process_tool_execution_plan(
         plan, messages_history, user_id, user_intent, ch_id
     )
@@ -79,7 +84,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
         return plan
     plan = plan["plan"]
     execution_steps = "\n".join([f"execution tool: {step['tool']}\nstep purpose: {step['step purpose']}" for step in plan])
-    output_stream(log=execution_steps, user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log=["Plan based on current tools",execution_steps], user_id=user_id, type="think", ch_id=ch_id)
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id, ch_id)
@@ -107,10 +112,8 @@ def get_unique_tools(found_tools):
 
 def process_plan_execution(messages_history, plan_steps, user_id: str, ch_id: str = ""):
     # tool_results = []
+    output_stream(log="Executing tools...", user_id=user_id, type="steps", ch_id=ch_id)
     for step_index, step in enumerate(plan_steps):
-        # if not step.get("tool_necessity", True):
-        output_stream(log=f"Executing step: {step['step purpose']}...", user_id=user_id, type="steps", ch_id=ch_id)
-        #     continue
         if step.get("executed", False):
             continue
             
@@ -132,11 +135,6 @@ def process_plan_execution(messages_history, plan_steps, user_id: str, ch_id: st
         else:
             step["executed"] = True
     # return tool_results
-    
-def validate_step_necessity(step, plan, messages_history, done_steps):
-    """Check if a step is necessary to execute"""
-    result = step_tool_check(plan, step, messages_history, done_steps)
-    return extract_json_from_str(result)
 
 def resolve_tool_for_step(step):
     """Find appropriate tool for a step from memory"""
@@ -159,10 +157,12 @@ def execute_step_tool(messages_history,step, plan_steps, user_id: str, ch_id: st
             tool_config,
             messages_history, 
             plan_steps,
-            step,
             user_id,
             ch_id
         )
+        # get transform code and update to reply_json
+        reply_json = transform_code(plan_steps, reply_json, user_id, ch_id)
+        print(f"reply_json: {reply_json}")
         
         if not reply_json["can_proceed"]:
             return {
@@ -215,15 +215,14 @@ def parse_tool_config(tool):
     tool_dict["tool"] = tool_name
     return tool_dict
 
-def validate_tool_parameters(tool_config, messages_history, plan_steps, step, user_id, ch_id):
+def validate_tool_parameters(tool_config, messages_history, plan_steps, user_id, ch_id):
     """Attempt to execute tool with current configuration"""
     print(f"plan_steps: {plan_steps}")
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]  
-    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0, "max_tokens": 4000}, user_id=user_id, ch_id=ch_id)
+    reply = chat_completion(prompt, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id)
     reply_json = extract_json_from_str(reply)
     print(f"reply_json: {reply_json}")
-    reply_json = transform_code(plan_steps, reply_json, user_id, ch_id)
     return reply_json
 
 def execute_tool_operation(tool_config, reply_json, user_id, ch_id):

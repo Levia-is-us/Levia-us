@@ -16,7 +16,7 @@ def execute_tool(
     tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict, user_id: str, ch_id: str
 ):
     """Execute tool and record results"""
-    output_stream(log=f"Running tool: {tool_name}...", user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log=[f"Running {tool_name}...",""], user_id=user_id, type="think", ch_id=ch_id)
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 

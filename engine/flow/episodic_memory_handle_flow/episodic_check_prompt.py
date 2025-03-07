@@ -18,7 +18,7 @@ Finally, here is the plan structure you need to analyze:
 {str(plan)}
 </plan>
 
-Note that the realworld time is {date_time}
+Note that the real-world time is {date_time}
 
 Please follow these steps to complete your task:
 
@@ -59,7 +59,7 @@ Please follow these steps to complete your task:
 3. Attempt to fill in the plan with information from the context:
    - value of "step" should be a step + space + number, not a step name
    - Focus on inputs where "source": "context"
-   - cerefuly read the description of the inputs for each step. How them achieving user intent by tool.
+   - Carefully read the description of the inputs for each step. How them achieving user intent by tool.
    - For each required input, explicitly state whether it is present in the context
    - If the information is available in the context, fill in the "value" field with the appropriate information
    - If the information can not found in the context, leave the "value" field empty
@@ -119,6 +119,6 @@ c) If you determine that the plan cannot achieve the user intent, output a JSON 
 Important: Only output the JSON object, no other text or comments outside the JSON object.
 Now, output the JSON object below:
 """
-    propmt = [{"role": "user", "content": episodic_check_prompt}]
-    return propmt
+    prompt = [{"role": "user", "content": episodic_check_prompt}]
+    return prompt
 

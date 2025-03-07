@@ -12,7 +12,7 @@ def handle_intent_flow(chat_messages: list, input_message: str, user_id: str="lo
     prompt = intents_system_prompt(input_message)
     messages = chat_messages + prompt
     reply_info = chat_completion(
-        messages, model=QUALITY_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id
+        messages, model=CHAT_MODEL_NAME, config={"temperature": 0}, user_id=user_id, ch_id=ch_id
     )
     result = extract_json_from_str(reply_info)
     # print(f"result: {result}")
