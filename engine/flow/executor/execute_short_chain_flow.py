@@ -42,9 +42,9 @@ def execute_intent_chain(
     output_stream(log=f"No experience for {user_intent}...", user_id=user_id, type="think", ch_id=ch_id)
     output_stream(log="Creating new execution plan ...", user_id=user_id, type="steps", ch_id=ch_id)
     plan = create_execution_plan(user_intent, user_id, ch_id)
-    messages = []
+    messages = ""
     for step in plan:
-        messages.append(f"{step['step']}: {step['intent']}"),
+        messages += f"{step['step']}: {step['intent']}\n"
     
     output_stream(log=["general plan",messages], user_id=user_id, type="think", ch_id=ch_id)
     
@@ -67,8 +67,9 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     """
     # Analyze each step and find appropriate tools
     found_tools = []
+    output_stream(log=f"Finding appropriate tools...", user_id=user_id, type="steps", ch_id=ch_id)
     for step in plan:
-        output_stream(log=f"Finding appropriate tool for step: {step['intent']}...", user_id=user_id, type="steps", ch_id=ch_id)
+        output_stream(log=f"Finding appropriate tool for step: {step['intent']}...", user_id=user_id, type="think", ch_id=ch_id)
         found_tools.extend(resolve_tool_for_step(step))
 
     #replan
