@@ -181,3 +181,6 @@ def get_all_content(links):
     if(len(results) == 0):
        raise Exception(error)
     return results
+
+
+['https://poocoin.app/tokens/0x375fc5fef3b22a4842811da633241beae9ea876b', 'https://web3.bitget.com/en/swap/bnb/0x375fC5Fef3B22A4842811DA633241bEaE9eA876b', 'https://www.livecoinwatch.com/price/LeviathanProtocol-LEVIA']

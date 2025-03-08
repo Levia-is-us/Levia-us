@@ -8,7 +8,7 @@ Here is the conversation input you need to analyze:
 {input_messages}
 </input_messages>
 
-Note that the realworld time is:
+Note that the real-world time is:
 <time_now>
 {time_now}
 </time_now>
@@ -17,20 +17,34 @@ Please follow these steps to process the input and generate an appropriate respo
 
 1. Analyze the Input:
    - Carefully read and understand the user's request or question.
-   - Identify the main topic, context, and any specific information needed to address the input.
+   - Identify the main topic, context, intent, and any specific information needed to address the input.
 
 2. Determine Response Type:
-   - Decide whether you can provide a direct answer based on your knowledge and capabilities.
-   - If the request is asking for information, chat, anything that can be answered directly, just help user to do it and provide a direct answer.
-   - If the request is asking for actions, tools, anything that can be acted upon by an external system, prepare to summarize the user's intent.
-   - If the request is asking for information, but you don't have the information, summarize the user's intent.
-   - If the request is unclear or requires actions beyond your abilities (e.g., physical tasks, making purchases), prepare to summarize the user's intent.
-   - If the user says something that is unclear and lacks context, you should durect answer and ask further questions.
+   - Evaluate whether the request falls within your knowledge boundaries and functional capabilities.
+   - Classify the request as either "Direct Answer" or "Intent Summary" based on the criteria below.
 
+3. Direct Answer Cases (respond with complete information):
+   - Information requests within your knowledge domain and temporal boundaries.
+   - Conversational exchanges, opinions, or creative content generation.
+   - Ambiguous requests where clarification is needed (provide a response and ask follow-up questions).
+
+4. Intent Summary Cases (summarize user's objective):
+   - Information requests when you don't have access to real-time news updates.
+   - Requests for actions requiring external tools, systems, or integrations.
+   - Tasks requiring physical capabilities, real-time data access, or restricted functionalities.
+   - Requests with clear intent but requiring execution by external services.
    
-4. Generate Response:
-   - For direct answers: Provide a clear, concise response to the user's query.
-   - For intent summaries: Summarize the user's goal or request in a way that can be acted upon by an external system.
+5. Generate Response:
+   - For direct answers: 
+      - Provide a clear, concise, and complete response addressing all aspects of the user's query.
+      - Include relevant context and necessary qualifications where appropriate.
+   - For intent summaries:
+      - Summarize the user's goal or request in a way that can be acted upon by an external system.
+      - Generate a normalized intent by removing specific entities, dates, or contextual details.
+         Example:
+         Original intent: "The user wants to know the latest news about Trump as of March 7, 2025."
+         Normalized intent: "The user wants to know the latest news."
+         This structure clearly explains what the normalization process should do - strip away specific entities (Trump), dates (March 7, 2025), and other contextual details while preserving the core action request.
 
 Before generating your final output, consider the following:
 - What is the main topic or request in the input? List out key elements.
@@ -38,9 +52,7 @@ Before generating your final output, consider the following:
 - If not, what key points should be included in an intent summary?
 - For each key point, note whether it's explicitly stated in the user's input or inferred.
 
-It's OK for this section to be quite long.
-
-After your analysis, generate the appropriate JSON response using one of these two structures:
+After your analysis, generate the appropriate JSON response using one of these two structures, do not include any other text or commentary outside the JSON structure:
 
 1. For direct answers:
 ```json
@@ -55,6 +67,7 @@ After your analysis, generate the appropriate JSON response using one of these t
 ```json
    {{
        "type": "call_tools",
+       "short-intent": "Summarized normalized intent here for calling tools",
        "intent": "Summarized intent here for calling tools",
        "response": "Make a goal for calling tools"
    }}
@@ -67,6 +80,11 @@ Ensure that your final output is strictly in the JSON format specified above, wi
 def intents_system_prompt(input_messages):
     time_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     prompt = [
-        {"role": "user", "content": intent_prompt.format(input_messages=input_messages, time_now=time_now)}
+        {
+            "role": "user",
+            "content": intent_prompt.format(
+                input_messages=input_messages, time_now=time_now
+            ),
+        }
     ]
     return prompt

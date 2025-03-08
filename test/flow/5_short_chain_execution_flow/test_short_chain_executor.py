@@ -14,8 +14,8 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from engine.flow.executor.short_chain_executor import process_tool_execution_plan
-from engine.flow.executor.short_chain_executor import process_plan_execution
+from engine.flow.executor.execute_short_chain_flow import process_tool_execution_plan
+from engine.flow.executor.execute_short_chain_flow import process_plan_execution
 
 @pytest.mark.parametrize("plan,messages", [
     (

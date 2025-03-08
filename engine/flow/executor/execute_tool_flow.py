@@ -16,7 +16,7 @@ def execute_tool(
     tool_caller: ToolCaller, tool_name: str, tool_method: str, tool_args: dict, user_id: str, ch_id: str
 ):
     """Execute tool and record results"""
-    output_stream(log=f"Running tool: {tool_name}...", user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log=[f"Running {tool_name}...",""], user_id=user_id, type="think", ch_id=ch_id)
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
 
@@ -28,7 +28,7 @@ def execute_tool(
         #     return {"status": "failure", "result": "tool execution result is invalid"}, None
         status = verify_tool_execution(execution_record, result, user_id, ch_id)
         record_tool_execution(tool_name, tool_method, tool_args, result)
-        output_stream(log=f"tool_execution_result: {result}", user_id=user_id, type="think", ch_id=ch_id)
+        output_stream(log=["tool execution result:", f"{result}"], user_id=user_id, type="think", ch_id=ch_id)
 
         return result, create_execution_record(
             tool_name, tool_method, tool_args, result, status

@@ -1,18 +1,15 @@
 import sys
 import os
 
-# Get absolute path of current file
-current_file_path = os.path.abspath(__file__)
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
-# Get project root path (2 levels up)
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+)
 
-# Add project root to Python path
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
-from engine.utils.json_util import extract_json_from_str
+from engine.flow.handle_intent_flow.analyze_intent_flow import handle_intent_flow
 
 def main():
     input_messages = "panda: Will BTC going up in the flowing days?"

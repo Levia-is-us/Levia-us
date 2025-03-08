@@ -16,7 +16,11 @@ if project_root not in sys.path:
 
 
 
-from engine.flow.planner.tool_base_planner import tool_base_planner
+from engine.flow.planner.make_tool_base_plan_flow import tool_base_planner
+
+context = [
+    {"role": "user", "content": "find the latest news about bitcoin"}
+]
 
 tool_list =[{'id': 'web_search_tool-web_search',
  'metadata': {'data': '{"method": "web_search", "inputs": [{"name": "intent", '
@@ -265,5 +269,5 @@ tool_list =[{'id': 'web_search_tool-web_search',
 if __name__ == "__main__":
     """put your intent, plan_intent, execution_records here"""
     intent = "find the latest news about bitcoin"
-    result = tool_base_planner(intent, tool_list)
+    result = tool_base_planner(intent, tool_list, context, "local", "ch_id")
     print(f"result: {result}")
