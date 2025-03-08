@@ -3,8 +3,8 @@ from memory.short_term_memory.short_term_memory import ShortTermMemory
 from engine.tool_framework.tool_caller import ToolCaller
 from engine.tool_framework.tool_registry import ToolRegistry
 from memory.plan_memory.plan_memory import PlanContextMemory
-from engine.flow.executor.short_chain_executor import execute_intent_chain
-from engine.flow.episodic_memory_handle_flow.episodic_memory_executor import episodic_memory_executor
+from engine.flow.executor.execute_short_chain_flow import execute_intent_chain
+from engine.flow.episodic_memory_handle_flow.execute_episodic_memory_flow import episodic_memory_executor
 from metacognitive.stream.stream import output_stream
 
 registry = ToolRegistry()

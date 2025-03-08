@@ -13,7 +13,7 @@ To assist in answering the user's query, you have used a tool. Here is the outpu
 {str(engine_output)}
 </tool_output>
 
-Note that the realworld time is {date_time}
+Note that the real-world time is {date_time}
 
 Please follow chain of thought to generate the final response:
 1. Carefully read the context and engine output.

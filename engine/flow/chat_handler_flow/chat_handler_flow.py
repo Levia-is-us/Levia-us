@@ -1,17 +1,17 @@
-from engine.flow.handle_intent_flow.handle_intent_flow import handle_intent_flow
-from engine.flow.handle_reply_flow.handle_reply_flow import handle_reply_flow
+from engine.flow.handle_intent_flow.analyze_intent_flow import handle_intent_flow
+from engine.flow.handle_reply_flow.generate_reply_flow import handle_reply_flow
 from engine.utils.chat_formatter import create_chat_message
 from engine.utils.json_util import (
     extract_code_breakdown_from_doc,
     extract_str_from_doc,
 )
 from memory.short_term_memory.short_term_memory import ShortTermMemory
-from engine.flow.executor.chat_executor import chat_executor
+from engine.flow.executor.chat_executor_flow import chat_executor
 import os
 
 from metacognitive.stream.stream import output_stream
 from memory.plan_memory.plan_memory import PlanContextMemory
-from engine.flow.executor.short_chain_executor import process_plan_execution
+from engine.flow.executor.execute_short_chain_flow import process_plan_execution
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
@@ -30,7 +30,7 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str =
         create_chat_message("user", user_input), user_id + session_id
     )
     chat_messages = short_term_memory.get_context(user_id + session_id)[-7:]
-    output_stream(log=f"{reply_info['intent']}", user_id=user_id, type="think", ch_id=chid)
+    output_stream(log=f"user intent: {reply_info['intent']}", user_id=user_id, type="think", ch_id=chid)
     
     final_reply = ""
     # Handle different response types
@@ -50,7 +50,7 @@ def handle_chat_flow(user_input: str, user_id: str, chid: str, session_id: str =
     short_term_memory.add_context(
         create_chat_message("assistant", f"{final_reply}"), user_id + session_id
     )
-    output_stream(log=f"Final reply: {final_reply}", user_id=user_id, type="think", ch_id=chid)
+    output_stream(log=["Final reply:",f"{final_reply}"], user_id=user_id, type="think", ch_id=chid)
     return final_reply
 
 

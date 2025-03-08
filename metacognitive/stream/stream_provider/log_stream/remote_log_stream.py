@@ -85,21 +85,21 @@ class RemoteLogStream(BaseStream):
 
     def output(self, log: str, user_id: str, type: str, ch_id: str):
         try:
-            if ENVIRONMENT == "local" or (not log or not log.strip() or "Initialized metacognitive stream." in log):
+            if ENVIRONMENT == "local" or (not log or (isinstance(log, str) and (not log.strip() or "Initialized metacognitive stream." in log)) or (isinstance(log, list) and len(log) == 0)):
                 return
-
-            # Replace - with /n
-            log = log.replace(" - ", "\n")
-            # Remove extra \n and spaces
-            log = log.strip()
-            # Replace multiple consecutive newlines with a single newline
-            while "\n\n" in log or "  " in log:
-                log = log.replace("\n\n", "\n")
-                log = log.replace("  ", " ")
-            log = log.strip()
-            
             if log == "":
                 return
+            if isinstance(log, str) and type == "think":
+                log = ["",log]
+            if isinstance(log, list):
+                for item in log:
+                    if isinstance(item, str):
+                        item = item.replace(" - ", "\n")
+                        item = item.strip()
+                        while "\n\n" in item or "  " in item:
+                            item = item.replace("\n\n", "\n")
+                            item = item.replace("  ", " ")
+                            item = item.strip()
             
             payload = {
                 "user_id": user_id,

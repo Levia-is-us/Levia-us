@@ -13,18 +13,14 @@ project_root = os.path.dirname(
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
     
-from engine.flow.planner.planner import create_execution_plan
-
-QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-PERFORMANCE_MODEL_NAME = os.getenv("PERFORMANCE_MODEL_NAME")
-
+from engine.flow.planner.make_general_plan_flow import create_execution_plan
 
 
 if __name__ == "__main__":
     """put your intent here"""
-    intent = input("Enter your intent: ")
+    intent = 'The user wants to know the current news headlines and stories from the United States as of March 7, 2025.'
     # plan = create_execution_plan(intent) + context
-    plan = create_execution_plan(intent, user_id="local")
+    plan = create_execution_plan(intent, user_id="local", ch_id="ch_id")
     print(f"plan: {plan}")
 
 

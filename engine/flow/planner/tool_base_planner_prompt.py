@@ -35,8 +35,9 @@ Your task is to analyze the user's intent, determine if the available tools are 
    c. Provide a concise description and reason for each step, emphasizing how the chosen tool will be used
    d. Make the plan as concise as possible, combining steps where logical
    e. Exclude any steps that can be performed by an AI language model
-   f. The pupos of plan should be only focus on the <user_intent>, but think about the context.
+   f. The purpose of plan should be only focus on the <user_intent>, but think about the context.
    g. If no tool from the <tool_list> can directly fetch the required data, but the information can be retrieved via a web search, then consider "web search" as an acceptable tool.
+   h. Analyze the information contained in the tool's output description and determine whether these outputs are sufficient to fulfill the <user_intent>.
 
 
 3. Format your output as a JSON object with the following structure:
