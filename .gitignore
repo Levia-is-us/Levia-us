@@ -48,3 +48,4 @@ wheels/
 
 #other
 .history/
+intent_test_results_*.json
