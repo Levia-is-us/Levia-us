@@ -83,30 +83,20 @@ class RemoteLogStream(BaseStream):
                     
                 print(f"Cleaned up {len(to_remove)} unused locks. Current locks: {len(self.locks)}")
 
-    def output(self, log: str, user_id: str, type: str, ch_id: str):
+    def output(self, log: str, user_id: str, type: str, ch_id: str, title: str = ""):
         try:
             if ENVIRONMENT == "local" or (not log or (isinstance(log, str) and (not log.strip() or "Initialized metacognitive stream." in log)) or (isinstance(log, list) and len(log) == 0)):
                 return
             if log == "":
                 return
-            if isinstance(log, str) and type == "think":
-                log = ["",log]
-            if isinstance(log, list):
-                for item in log:
-                    if isinstance(item, str):
-                        item = item.replace(" - ", "\n")
-                        item = item.strip()
-                        while "\n\n" in item or "  " in item:
-                            item = item.replace("\n\n", "\n")
-                            item = item.replace("  ", " ")
-                            item = item.strip()
             
             payload = {
                 "user_id": user_id,
                 "intent": log,
                 "type": type,
                 "visual": VISUAL,
-                "chid": ch_id
+                "chid": ch_id,
+                "title": title
             }
             
             # Submit task to thread pool instead of creating new thread

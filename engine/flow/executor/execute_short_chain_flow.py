@@ -46,7 +46,7 @@ def execute_intent_chain(
     for step in plan:
         messages += f"{step['step']}: {step['intent']}\n"
     
-    output_stream(log=["general plan",messages], user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log=messages, user_id=user_id, type="think", ch_id=ch_id, title="general plan")
     
     return process_tool_execution_plan(
         plan, messages_history, user_id, user_intent, ch_id
@@ -85,7 +85,7 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
         return plan
     plan = plan["plan"]
     execution_steps = "\n".join([f"execution tool: {step['tool']}\nstep purpose: {step['step purpose']}" for step in plan])
-    output_stream(log=["Plan based on current tools",execution_steps], user_id=user_id, type="think", ch_id=ch_id)
+    output_stream(log=execution_steps, user_id=user_id, type="think", ch_id=ch_id, title="Plan based on current tools")
 
     # Execute tools for each plan step
     process_plan_execution(messages_history, plan, user_id, ch_id)
