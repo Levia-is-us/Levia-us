@@ -90,6 +90,16 @@ class RemoteLogStream(BaseStream):
             if log == "":
                 return
             
+            # replace - to /n
+            log = log.replace(" - ", "\n")
+            # remove extra \n and space
+            log = log.strip()
+            # Replace multiple consecutive newlines with a single newline
+            while "\n\n" in log or "  " in log:
+                log = log.replace("\n\n", "\n")
+                log = log.replace("  ", " ")
+            log = log.strip()
+            
             payload = {
                 "user_id": user_id,
                 "intent": log,
