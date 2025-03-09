@@ -48,7 +48,7 @@ class ToolCaller:
         """Run method with timeout using thread"""
         def raise_timeout():
             self._cleanup_resources()  # Clean up before timeout
-            _thread.interrupt_main()
+            # _thread.interrupt_main()
 
         timer = threading.Timer(timeout, raise_timeout)
         timer.start()
@@ -80,7 +80,7 @@ class ToolCaller:
                 return {"error": f"Method '{method}' not found in tool '{tool_name}'"}
 
             # Get timeout value from tool instance
-            timeout = getattr(tool_instance, 'timeout', 60)  # Default 60 seconds
+            timeout = getattr(tool_instance, 'timeout', 180)  # Default 60 seconds
 
             try:
                 # Execute method with timeout

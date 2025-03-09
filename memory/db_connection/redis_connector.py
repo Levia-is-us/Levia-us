@@ -92,13 +92,14 @@ class RedisUtils:
     
     @retry_on_failure()
     def get_value(self, key: str) -> Optional[Any]:
-        value = self.client.get(key)
-        if value and (value.startswith('{') or value.startswith('[')):
-            try:
-                return json.loads(value)
-            except json.JSONDecodeError:
-                pass
-        return value
+        if ENVIRONMENT != "local":
+            value = self.client.get(key)
+            if value and (value.startswith('{') or value.startswith('[')):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    pass
+        return ""
 
     @retry_on_failure()
     def delete(self, key: str) -> int:
