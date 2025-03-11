@@ -49,3 +49,8 @@ wheels/
 #other
 .history/
 intent_test_results_*.json
+episodic_check_test_results_*.json
+create_plan_test_results_*.json
+toolbase_planner_test_results_*.json
+next_step_test_results_*.json
+transform_code_test_results_*.json

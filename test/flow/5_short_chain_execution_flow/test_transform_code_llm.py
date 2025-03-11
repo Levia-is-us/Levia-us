@@ -17,21 +17,21 @@ sys.path.append(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     )
 )
-from engine.flow.executor.execute_short_chain_flow import validate_tool_parameters
+from engine.flow.executor.transform_code_llm import transformation_code_llm
 
 
 models = [
     "claude-3-5-sonnet",
     # "claude-3-7-sonnet-20250219",
-    # "deepseek-v3",
+    "deepseek-v3",
     # "deepseek-r1",
     # "gpt-4o-mini",
-]
+] 
 
 
 def load_test_cases():
     """Load test case files"""
-    case_path = Path(__file__).parent / "next_step_llm_cases.yml"
+    case_path = Path(__file__).parent / "transform_code_llm_cases.yml"
     with open(case_path, "r") as f:
         data = yaml.safe_load(f)
     return data["test_cases"]
@@ -40,42 +40,12 @@ def load_test_cases():
 def run_single_test(model, test_case, idx):
     """Run a single test case and return the result"""
     os.environ["CHAT_MODEL_NAME"] = model
-    intent = test_case["intent"]
-    tool_config = {
-        "method": "web_search",
-        "inputs": [{...}],
-        "output": {
-            "description": "List of relevant URLs matching the intent, or error message if no results found",
-            "type": "Union[List[str], str]",
-        },
-        "tool": "WebSearchTool",
-    }
-
-    messages_history = [
-        {"role": "user", "content": test_case["input"]},
-    ]
-
-    plan_steps = [
-        {
-            "step": "step 1",
-            "tool": "WebSearchTool",
-            "data": '{"method": "web_search", "inputs": [{"name": "intent", "type": "str", "required": true, "description": "User\'s search purpose or information need that drives the web search"}], "output": {"description": "List of relevant URLs matching the intent, or error message if no results found", "type": "Union[List[str], str]"}}',
-            "step purpose": "Retrieve relevant information URLs",
-            "description": "Perform a web search using the intent '{intent}' to identify relevant information from credible sources. ",
-        },
-        {
-            "step": "step 2",
-            "tool": "WebsiteScanTool",
-            "data": '{"method": "website_scan", "inputs": [{"name": "url_list", "type": "list", "required": true, "description": "List of initial URLs to start website scanning from"}, {"name": "intent", "type": "str", "required": true, "description": "Guiding purpose for content filtering and summarization"}], "output": {"description": "Processed website content summary or timeout error message", "type": "str"}}',
-            "step purpose": "Extract and summarize news content",
-            "description": f"Scan the URLs obtained from Step 1 using the intent '{intent}' to extract relevant news content. This step filters out irrelevant information and summarizes the content for the user.",
-        },
-    ]
-
+    input_structure = test_case["input_structure"]
+    output_structure = test_case["output_structure"]
     start = int(time.time())
     try:
-        output = validate_tool_parameters(
-            tool_config, messages_history, plan_steps, f"user-{idx}", f"ch-{idx}"
+        output = transformation_code_llm(
+            input_structure, output_structure, user_id=f"user-{idx}", ch_id=f"ch-{idx}"
         )
     except Exception as e:
         output = f"Error in model [{model}] for input [{test_case['input']}: {str(e)}"
@@ -83,13 +53,13 @@ def run_single_test(model, test_case, idx):
     return output, end - start
 
 
-def print_test_result(model, content, intent, output, exec_time):
+def print_test_result(model, input_structure, output_structure, output, exec_time):
     """Format and print test result"""
 
     print(f"{'-'*100}")
     print(f"🤖  Model: {model}")
-    print(f"📝  Input: {content}")
-    print(f"📝  Intent: {intent}")
+    print(f"📝  InputStructure: {input_structure}")
+    print(f"📝  OutputStructure: {output_structure}")
     print(f"📊  Output: {output}")
     print(f"⏱️  Execution time: {exec_time} seconds")
 
@@ -137,7 +107,7 @@ def save_results_to_json(results):
         "test_results": results,
     }
 
-    save_path = Path(__file__).parent / f"next_step_test_results_{timestamp}.json"
+    save_path = Path(__file__).parent / f"transform_code_test_results_{timestamp}.json"
 
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(final_results, f, ensure_ascii=False, indent=2)
@@ -162,8 +132,8 @@ def linear_execute(cases: list):
             # Store result for JSON export
             result_entry = {
                 "model": model,
-                "user_input": test_case["input"],
-                "intent": test_case["intent"],
+                "input_structure": test_case["input_structure"],
+                "output_structure": test_case["output_structure"],
                 "output": output,
                 "execution_time": exec_time,
             }
@@ -208,8 +178,8 @@ def concurrent_execute(cases: list):
 
         # Print results as they are completed
         for future in as_completed(future_to_task):
-            model, input, intent, output, exec_time, _ = future.result()
-            print_test_result(model, input, intent, output, exec_time)
+            model, input_structure, output_structure, output, exec_time, _ = future.result()
+            print_test_result(model, input_structure, output_structure, output, exec_time)
 
     # Sort results by case index and model index
     sorted_results = sorted(results, key=lambda x: (x["case_idx"], x["model_idx"]))
@@ -226,25 +196,25 @@ def concurrent_execute(cases: list):
 def run_single_test_task(model, test_case, idx, result_lock, results, task_key):
     """Run a single test task in a thread and return the result"""
     output, exec_time = run_single_test(model, test_case, idx)
-    intent = test_case["intent"]
-    user_input = test_case["input"]
+    input_structure = test_case["input_structure"]
+    output_structure = test_case["output_structure"]
 
     # Store result for JSON export
     with result_lock:
         result_entry = {
             "model": model,
-            "user_input": user_input,
-            "intent": intent,
+            "input_structure": input_structure,
+            "output_structure": output_structure,
             "output": output,
             "execution_time": exec_time,
             "case_idx": task_key[0],
             "model_idx": task_key[1],
         }
         results.append(result_entry)
-    return model, user_input, intent, output, exec_time, task_key
+    return model, input_structure, output_structure, output, exec_time, task_key
 
 
-def test_next_step_llm(is_concurrent=True):
+def test_transformation_code_llm(is_concurrent=True):
     """Run test cases for episodic check LLM"""
     # Get all test cases
     cases = load_test_cases()
@@ -258,4 +228,4 @@ def test_next_step_llm(is_concurrent=True):
 
 
 if __name__ == "__main__":
-    test_next_step_llm()
+    test_transformation_code_llm()
