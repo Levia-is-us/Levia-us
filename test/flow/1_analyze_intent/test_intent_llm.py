@@ -23,10 +23,10 @@ from engine.flow.handle_intent_flow.analyze_intent_flow import handle_intent_flo
 
 models = [
     "claude-3-5-sonnet",
-    "claude-3-7-sonnet-20250219",
-    "deepseek-v3",
-    "deepseek-r1",
-    "gpt-4o-mini",
+    # "claude-3-7-sonnet-20250219",
+    # "deepseek-v3",
+    # "deepseek-r1",
+    # "gpt-4o-mini",
 ]
 
 
@@ -107,6 +107,7 @@ def calculate_model_statistics(results):
         print(f"Total Test Cases: {stats['total_cases']}")
         print(f"Failed Cases: {stats['failed_cases']}")
         print(f"Failed Rate: {stats['failed_rate']}")
+        print("\n" + "-" * 100)
 
     return model_stats
 
@@ -251,13 +252,13 @@ def concurrent_execute(cases: list):
             executor.submit(
                 run_single_test_task,
                 model,
-                user_input,
+                test_case,
                 task_idx,
                 result_lock,
                 results,
                 task_key,
-            ): (model, user_input, task_idx, task_key)
-            for model, user_input, task_idx, task_key in tasks
+            ): (model, test_case, task_idx, task_key)
+            for model, test_case, task_idx, task_key in tasks
         }
 
         # Print results as they are completed
