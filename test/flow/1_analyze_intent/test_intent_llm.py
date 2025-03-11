@@ -20,11 +20,12 @@ from engine.flow.handle_intent_flow.analyze_intent_flow import handle_intent_flo
 
 
 models = [
-    "claude-3-5-sonnet",
-    # "claude-3-7-sonnet-20250219",
+    #"claude-3-5-sonnet",
+    "claude-3-7-sonnet-20250219",
     "deepseek-r1",
     # "gpt-4.5-preview",
-    # "gpt-4o-mini",
+    "gpt-4o-mini",
+    "gpt-35-turbo-16k",
 ]
 
 
@@ -38,7 +39,7 @@ def load_test_cases():
 
 def run_single_test(model, user_input, idx):
     """Run a single test case and return the result"""
-    os.environ["QUALITY_MODEL_NAME"] = model
+    os.environ["CHAT_MODEL_NAME"] = model
     start = int(time.time())
     ret = handle_intent_flow(
         chat_messages=[], input_message=user_input, user_id=f"user-{idx}"
@@ -60,14 +61,51 @@ def print_test_result(model, user_input, output, exec_time):
     print(f"Execution time: {exec_time} seconds")
 
 
+def calculate_model_statistics(results):
+    """Calculate statistics for each model's execution times"""
+    model_stats = {}
+    
+    for model in models:
+        model_times = [r['execution_time'] for r in results if r['model'] == model]
+        if model_times:
+            model_stats[model] = {
+                'avg_time': sum(model_times) / len(model_times),
+                'min_time': min(model_times),
+                'max_time': max(model_times),
+                'total_cases': len(model_times)
+            }
+    
+    print("\n" + "="*50)
+    print("Model Performance Statistics:")
+    print("="*50)
+    for model, stats in model_stats.items():
+        print(f"\nModel: {model}")
+        print(f"Average Time: {stats['avg_time']:.2f} seconds")
+        print(f"Minimum Time: {stats['min_time']:.2f} seconds")
+        print(f"Maximum Time: {stats['max_time']:.2f} seconds")
+        print(f"Total Test Cases: {stats['total_cases']}")
+    print("\n" + "="*50)
+    
+    return model_stats
+
+
 def save_results_to_json(results):
-    """Save test results to a JSON file"""
+    """Save test results and statistics to a JSON file"""
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    
+    # Calculate statistics
+    model_stats = calculate_model_statistics(results)
+    
+    # Combine results and stats
+    final_results = {
+        'test_results': results,
+        'model_statistics': model_stats
+    }
 
     save_path = Path(__file__).parent / f"intent_test_results_{timestamp}.json"
 
     with open(save_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+        json.dump(final_results, f, ensure_ascii=False, indent=2)
 
     print(f"\nResults saved to: {save_path}")
 
