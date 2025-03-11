@@ -64,8 +64,8 @@ def run_single_test(model, test_case, idx):
                     "type": "Union[List[str], str]",
                 },
             },
-            "step purpose": "Retrieve current news URLs",
-            "description": "Perform a web search using the intent '{intent}' to identify recent news articles from credible sources. This addresses the user's need for real-time information beyond the AI's knowledge cutoff.",
+            "step purpose": "Retrieve relevant information URLs",
+            "description": "Perform a web search using the intent '{intent}' to identify relevant information from credible sources. ",
         },
         {
             "step": "step 2",
@@ -116,7 +116,7 @@ def print_test_result(model, content, intent, output, exec_time):
 
     print(f"{'-'*100}")
     print(f"🤖  Model: {model}")
-    print(f"📝  Content: {content}")
+    print(f"📝  Input: {content}")
     print(f"📝  Intent: {intent}")
     print(f"📊  Output: {output}")
     print(f"⏱️  Execution time: {exec_time} seconds")
