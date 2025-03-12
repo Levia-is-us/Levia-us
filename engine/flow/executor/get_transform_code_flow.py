@@ -1,9 +1,6 @@
 from engine.flow.executor.transform_code_llm import transformation_code_llm
 
 def transform_code(plan_steps,next_step_reply, user_id, ch_id):
-    print(next_step_reply['can_proceed'])
-    if next_step_reply["can_proceed"] != True:
-        return None
     if next_step_reply.get("extracted_arguments", {}).get("required_arguments", {}) == {}:
         return next_step_reply
     for arg_name, arg_info in next_step_reply["extracted_arguments"]["required_arguments"].items():
