@@ -108,7 +108,7 @@ def run_single_test(model, test_case, idx):
     except Exception as e:
         output = f"Error in model [{model}] for input [{test_case['input']}: {str(e)}"
     end = int(time.time())
-    return output, end - start
+    return output, round((end - start), 2)
 
 
 def print_test_result(model, content, intent, output, exec_time):

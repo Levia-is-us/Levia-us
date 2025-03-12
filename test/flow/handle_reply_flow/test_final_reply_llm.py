@@ -17,22 +17,23 @@ sys.path.append(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     )
 )
-from engine.flow.executor.transform_code_llm import transformation_code_llm
+
+from engine.flow.handle_reply_flow.generate_reply_flow import handle_reply_flow
 
 
 models = [
     "claude-3-5-sonnet",
     # "claude-3-7-sonnet-20250219",
-    "deepseek-v3",
+    # "deepseek-v3",
     # "deepseek-r1",
     # "gpt-4o-mini",
-] 
+]
 
 
 def load_test_cases():
     """Load test case files"""
-    case_path = Path(__file__).parent / "transform_code_llm_cases.yml"
-    with open(case_path, "r") as f:
+    case_path = Path(__file__).parent / "cases.yml"
+    with open(case_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return data["test_cases"]
 
@@ -40,26 +41,103 @@ def load_test_cases():
 def run_single_test(model, test_case, idx):
     """Run a single test case and return the result"""
     os.environ["CHAT_MODEL_NAME"] = model
-    input_structure = test_case["input_structure"]
-    output_structure = test_case["output_structure"]
-    start = int(time.time())
+    input = test_case["input"]
+    chat_messages = [
+        {"role": "user", "content": input},
+    ]
+    if "step1" in test_case:
+        step1 = test_case["step1"]
+        step1_input = step1["input"]
+        step1_output = step1["output"]
+        step2 = test_case["step2"]
+        step2_input_arg1 = step2["input"][0]["arg1"]
+        step2_input_arg2 = step2["input"][1]["arg2"]
+        step2_output = step2["output"]
+        engine_output = [
+            {
+                "step": "step 1",
+                "tool": "WebSearchTool",
+                "data": {
+                    "method": "web_search",
+                    "inputs": [
+                        {
+                            "name": "intent",
+                            "type": "str",
+                            "required": True,
+                            "description": "User's search purpose or information need that drives the web search",
+                            "source": "context",
+                            "method": "LLM",
+                            "value": step1_input,
+                        }
+                    ],
+                    "output": {
+                        "description": "List of relevant URLs matching the intent, or error message if no results found",
+                        "type": "Union[List[str], str]",
+                    },
+                    "tool": "WebSearchTool",
+                },
+                "step purpose": "Retrieve current news URLs",
+                "description": "Perform a web search using the intent 'Latest news headlines for March 8, 2025' to identify recent news articles from credible sources. This addresses the user's need for real-time information beyond the AI's knowledge cutoff.",
+                "tool_executed_result": step1_output,
+                "executed": True,
+            },
+            {
+                "step": "step 2",
+                "tool": "WebsiteScanTool",
+                "data": {
+                    "method": "website_scan",
+                    "inputs": [
+                        {
+                            "name": "url_list",
+                            "type": "list",
+                            "required": True,
+                            "description": "List of initial URLs to start website scanning from",
+                            "source": "step 1",
+                            "method": "direct",
+                            "value": step2_input_arg1,
+                        },
+                        {
+                            "name": "intent",
+                            "type": "str",
+                            "required": True,
+                            "description": "Guiding purpose for content filtering and summarization",
+                            "source": "context",
+                            "method": "LLM",
+                            "value": step2_input_arg2,
+                        },
+                    ],
+                    "output": {
+                        "description": "Processed website content summary or timeout error message",
+                        "type": "str",
+                    },
+                    "tool": "WebsiteScanTool",
+                },
+                "step purpose": "Extract news content",
+                "description": "Scan the URLs obtained from Step 1 using the intent 'Summarize key news developments from March 8, 2025' to filter and condense information into a coherent news summary, handling potential timeouts or inaccessible sources.",
+                "tool_executed_result": step2_output,
+                "executed": True,
+            }
+        ]
+    else:
+        engine_output = test_case["engine_output"]
+    start = time.time()
     try:
-        output = transformation_code_llm(
-            input_structure, output_structure, user_id=f"user-{idx}", ch_id=f"ch-{idx}"
+        output = handle_reply_flow(
+            chat_messages, engine_output, user_id=f"user-{idx}", ch_id=f"ch-{idx}"
         )
     except Exception as e:
         output = f"Error in model [{model}] for input [{test_case['input']}: {str(e)}"
-    end = int(time.time())
+    end = time.time()
     return output, round((end - start), 2)
 
 
-def print_test_result(model, input_structure, output_structure, output, exec_time):
+def print_test_result(model, content, intent, output, exec_time):
     """Format and print test result"""
 
     print(f"{'-'*100}")
     print(f"🤖  Model: {model}")
-    print(f"📝  InputStructure: {input_structure}")
-    print(f"📝  OutputStructure: {output_structure}")
+    print(f"📝  Input: {content}")
+    print(f"📝  Intent: {intent}")
     print(f"📊  Output: {output}")
     print(f"⏱️  Execution time: {exec_time} seconds")
 
@@ -107,7 +185,7 @@ def save_results_to_json(results):
         "test_results": results,
     }
 
-    save_path = Path(__file__).parent / f"transform_code_test_results_{timestamp}.json"
+    save_path = Path(__file__).parent / f"final_reply_test_results_{timestamp}.json"
 
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(final_results, f, ensure_ascii=False, indent=2)
@@ -132,8 +210,8 @@ def linear_execute(cases: list):
             # Store result for JSON export
             result_entry = {
                 "model": model,
-                "input_structure": test_case["input_structure"],
-                "output_structure": test_case["output_structure"],
+                "user_input": test_case["input"],
+                "intent": test_case["intent"],
                 "output": output,
                 "execution_time": exec_time,
             }
@@ -178,8 +256,8 @@ def concurrent_execute(cases: list):
 
         # Print results as they are completed
         for future in as_completed(future_to_task):
-            model, input_structure, output_structure, output, exec_time, _ = future.result()
-            print_test_result(model, input_structure, output_structure, output, exec_time)
+            model, input, intent, output, exec_time, _ = future.result()
+            print_test_result(model, input, intent, output, exec_time)
 
     # Sort results by case index and model index
     sorted_results = sorted(results, key=lambda x: (x["case_idx"], x["model_idx"]))
@@ -196,25 +274,25 @@ def concurrent_execute(cases: list):
 def run_single_test_task(model, test_case, idx, result_lock, results, task_key):
     """Run a single test task in a thread and return the result"""
     output, exec_time = run_single_test(model, test_case, idx)
-    input_structure = test_case["input_structure"]
-    output_structure = test_case["output_structure"]
+    intent = test_case["intent"]
+    user_input = test_case["input"]
 
     # Store result for JSON export
     with result_lock:
         result_entry = {
             "model": model,
-            "input_structure": input_structure,
-            "output_structure": output_structure,
+            "user_input": user_input,
+            "intent": intent,
             "output": output,
             "execution_time": exec_time,
             "case_idx": task_key[0],
             "model_idx": task_key[1],
         }
         results.append(result_entry)
-    return model, input_structure, output_structure, output, exec_time, task_key
+    return model, user_input, intent, output, exec_time, task_key
 
 
-def test_transformation_code_llm(is_concurrent=True):
+def test_final_reply_llm(is_concurrent=True):
     """Run test cases for episodic check LLM"""
     # Get all test cases
     cases = load_test_cases()
@@ -228,4 +306,4 @@ def test_transformation_code_llm(is_concurrent=True):
 
 
 if __name__ == "__main__":
-    test_transformation_code_llm()
+    test_final_reply_llm()
