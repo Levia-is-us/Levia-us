@@ -54,3 +54,5 @@ create_plan_test_results_*.json
 toolbase_planner_test_results_*.json
 next_step_test_results_*.json
 transform_code_test_results_*.json
+final_reply_test_results_*.json
+tool_result_test_results_*.json
