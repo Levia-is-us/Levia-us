@@ -21,11 +21,11 @@ from engine.flow.episodic_memory_handle_flow.check_episodic_flow import episodic
 
 
 models = [
-    "claude-3-5-sonnet",
-    # "claude-3-7-sonnet-20250219",
-    # "deepseek-v3",
+    # "claude-3-5-sonnet",
+    "claude-3-7-sonnet-20250219",
+    "deepseek-v3",
     # "deepseek-r1",
-    # "gpt-4o-mini",
+    "gpt-4o-mini",
 ]
 
 
