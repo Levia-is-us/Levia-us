@@ -8,6 +8,7 @@ CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 
 def tool_base_planner(intent: str, tool_list: list, user_id: str, ch_id: str, context: list):
+    tool_list = remove_id_from_tools(tool_list)
     tool_base_planner_prompt = get_tool_base_planner_prompt(intent, tool_list, context)
     prompt = [
         {"role": "user", "content": tool_base_planner_prompt},
@@ -16,3 +17,11 @@ def tool_base_planner(intent: str, tool_list: list, user_id: str, ch_id: str, co
     plan = extract_json_from_str(plan)
     print(f"plan: {plan}")
     return plan
+
+
+def remove_id_from_tools(tool_list: list):
+    if not tool_list:
+        return []
+    for tool in tool_list:
+        tool.pop("id")
+    return tool_list
