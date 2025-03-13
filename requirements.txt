@@ -22,3 +22,4 @@ redis
 python-redis-lock
 aipolabs==0.0.1b4
 pyyaml
+jsonschema
