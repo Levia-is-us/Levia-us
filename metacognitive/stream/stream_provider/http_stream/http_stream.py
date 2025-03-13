@@ -157,7 +157,7 @@ class HTTPStream(BaseStream):
                 # Check if there's a cached result
                 result_key = f"chat:result:{request_id}"
 
-                cached_result = redis_tool.get_value_v2(key=result_key)
+                cached_result = redis_tool.get_json_value(key=result_key)
                 if cached_result:
                     cached_result = cached_result if isinstance(cached_result, str) else cached_result.decode('utf-8')
                     yield f"data: {cached_result}\n\n"

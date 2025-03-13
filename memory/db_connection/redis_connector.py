@@ -91,7 +91,7 @@ class RedisUtils:
         return result
     
     @retry_on_failure()
-    def get_value_v2(self, key: str) -> Optional[Any]:
+    def get_json_value(self, key: str) -> Optional[Any]:
         if ENVIRONMENT != "local":
             value = self.client.get(key)
             if value and (value.startswith('{') or value.startswith('[')):
