@@ -6,6 +6,7 @@ import redis
 import time
 import uuid
 from memory.db_connection.redis_connector import RedisUtils
+from metacognitive.stream.stream_provider.http_stream.api_key_manager import require_api_key, api_key_manager
 redis_tool = RedisUtils()
 
 class HTTPStream(BaseStream):
@@ -41,6 +42,7 @@ class HTTPStream(BaseStream):
     def setup_routes(self):
 
         @self.app.route("/levia/chat/create", methods=["POST"])
+        @require_api_key
         def create_chat_session():
             try:
                 data = request.get_json()
@@ -79,6 +81,7 @@ class HTTPStream(BaseStream):
                 }), 500
         
         @self.app.route("/levia/chat", methods=["POST"])
+        @require_api_key
         def chat():
             from engine.intent_engine.intent_event import event_chat
             data = request.get_json()
@@ -152,6 +155,7 @@ class HTTPStream(BaseStream):
             }), 202
         
         @self.app.route("/levia/chat/stream/<request_id>", methods=["GET"])
+        @require_api_key
         def chat_stream(request_id):
             def generate():
                 # Check if there's a cached result
@@ -226,6 +230,7 @@ class HTTPStream(BaseStream):
         
         # New endpoint: Get current request ID by user ID
         @self.app.route("/levia/chat/request/<user_id>", methods=["GET"])
+        @require_api_key
         def get_user_request(user_id):
             user_request_key = f"user:request:{user_id}"
             request_id = redis_tool.get_value(user_request_key)
