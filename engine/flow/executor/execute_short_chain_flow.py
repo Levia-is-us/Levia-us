@@ -29,7 +29,6 @@ tool_caller_client = ToolCaller(registry)
 
 plan_context_memory = PlanContextMemory()
 short_term_memory = ShortTermMemory()
-QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 INTERACTION_MODE = os.environ.get("INTERACTION_MODE", "terminal")
 
@@ -218,6 +217,7 @@ def parse_tool_config(tool):
 
 def validate_tool_parameters(tool_config, messages_history, plan_steps, user_id, ch_id):
     """Attempt to execute tool with current configuration"""
+    QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
     print(f"plan_steps: {plan_steps}")
     next_step_content = next_step_prompt(plan_steps, tool_config, messages_history)
     prompt = [{"role": "user", "content": next_step_content}]  
