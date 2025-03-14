@@ -4,18 +4,20 @@ from engine.utils.json_util import extract_json_from_str
 from metacognitive.stream.stream import output_stream
 import os
 
-QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
-
 
 def create_execution_plan(intent: str, user_id: str, ch_id: str = "") -> str:
+    CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
     """Create execution plan for given intent summary"""
     plan_maker_prompt = get_plan_maker_prompt(intent)
     prompt = [
         {"role": "user", "content": plan_maker_prompt},
     ]
     plan = chat_completion(
-        prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.5, "max_tokens": 2000}, user_id=user_id, ch_id=ch_id
+        prompt,
+        model=CHAT_MODEL_NAME,
+        config={"temperature": 0.5, "max_tokens": 2000},
+        user_id=user_id,
+        ch_id=ch_id,
     )
     plan = extract_json_from_str(plan)
     log_str = ""
