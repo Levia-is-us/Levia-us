@@ -3,7 +3,6 @@ import threading
 import time
 from datetime import datetime, timedelta
 from memory.db_connection.mysql_connector import MySQLPool
-from metacognitive.stream.stream import output_stream
 
 db_pool = MySQLPool()
 
@@ -83,6 +82,7 @@ def require_api_key(f):
             
         # Validate API key
         if api_key and api_key_manager.validate_key(api_key):
+            from metacognitive.stream.stream import output_stream
             output_stream(f"API key : {api_key} request: {request.path}", api_key, "info", "", "Authorization")
             return f(*args, **kwargs)
         else:
