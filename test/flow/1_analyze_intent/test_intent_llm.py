@@ -77,7 +77,7 @@ def linear_execute(cases: list):
                 "model": model,
                 "user_input": user_input,
                 "output": output,
-                "exec_ret": exec_ret,
+                "execution_result": exec_ret,
                 "execution_time": exec_time,
             }
             results.append(result_entry)
@@ -151,7 +151,7 @@ def run_single_test_task(model, test_case, idx, result_lock, results, task_key):
             "model": model,
             "user_input": user_input,
             "output": output,
-            "exec_ret": exec_ret,
+            "execution_result": exec_ret,
             "execution_time": exec_time,
             "case_idx": task_key[0],
             "model_idx": task_key[1],
@@ -168,7 +168,7 @@ def calculate_model_statistics(results):
     for model in models:
         model_times = [r["execution_time"] for r in results if r["model"] == model]
         failed_count = len(
-            [r for r in results if r["model"] == model and "Failed" in r["exec_ret"]]
+            [r for r in results if r["model"] == model and "Failed" in r["execution_result"]]
         )
         if model_times:
             model_stats[model] = {
@@ -277,7 +277,7 @@ def save_results_to_json(results):
     failed_cases = {}
     for model in models:
         failed_cases[model] = [
-            r for r in results if r["model"] == model and "Failed" in r["exec_ret"]
+            r for r in results if r["model"] == model and "Failed" in r["execution_result"]
         ]
 
     # Group results by model
@@ -290,7 +290,7 @@ def save_results_to_json(results):
         "test_results": results,
     }
 
-    save_path = Path(__file__).parent / f"intent_test_results_{timestamp}.json"
+    save_path = Path(__file__).parent / f"intent_test_{timestamp}.json"
 
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(final_results, f, ensure_ascii=False, indent=2)

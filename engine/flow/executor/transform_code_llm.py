@@ -1,10 +1,10 @@
 from engine.llm_provider.llm import chat_completion
 import os
 
-CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+
 
 def transformation_code_llm(input_structure, output_structure, user_id, ch_id):
-    prompt = """You are an expert Python developer tasked with creating a function that transforms one data structure into another. Your goal is to create a well-packaged, reusable function that performs the required transformation efficiently and handles potential errors.
+   prompt = """You are an expert Python developer tasked with creating a function that transforms one data structure into another. Your goal is to create a well-packaged, reusable function that performs the required transformation efficiently and handles potential errors.
 
 Here are the input and output variable structures:
 
@@ -62,13 +62,14 @@ def transform(input_structure):
 
 Your final output should be ONLY the Python function, wrapped in <function> tags. Do not include any additional text, explanations, or tests outside of the function definition.
 """
-    prompt = prompt.format(INPUT_VARIABLE=input_structure, OUTPUT_VARIABLE=output_structure)
-    prompt = [{"role": "user", "content": prompt}]
-    response = chat_completion(prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.0}, user_id=user_id, ch_id=ch_id)
-    start_tag = '<function>'
-    end_tag = '</function>'
-    start_index = response.find(start_tag)
-    end_index = response.find(end_tag)
-    response = response[start_index + len(start_tag):end_index].strip() if start_index != -1 and end_index != -1 else response
-    return response
+   CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+   prompt = prompt.format(INPUT_VARIABLE=input_structure, OUTPUT_VARIABLE=output_structure)
+   prompt = [{"role": "user", "content": prompt}]
+   response = chat_completion(prompt, model=CHAT_MODEL_NAME, config={"temperature": 0.0}, user_id=user_id, ch_id=ch_id)
+   start_tag = '<function>'
+   end_tag = '</function>'
+   start_index = response.find(start_tag)
+   end_index = response.find(end_tag)
+   response = response[start_index + len(start_tag):end_index].strip() if start_index != -1 and end_index != -1 else response
+   return response
 

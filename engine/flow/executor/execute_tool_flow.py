@@ -7,7 +7,7 @@ from metacognitive.stream.stream import output_stream
 import os
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
-CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
+
 
 db_pool = MySQLPool()
 
@@ -42,6 +42,7 @@ def verify_tool_execution(execution_record: dict, result: dict, user_id: str, ch
     """Verify tool execution result using LLM"""
     # if result["status"] == "failure":
     #     return "failure"
+    CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
     llm_check_prompt = check_tools_result_prompt(
         tool_execution=str(execution_record), tool_output=result
     )

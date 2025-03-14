@@ -2,42 +2,70 @@ test_cases:
 
   - input: "Can you tell me the latest news about US President Trump?"
     intent: "The user is seeking the latest news about US President Trump."
+    expect:
+      status: success
     
   - input: "Please introduce the latest developments of AI tool Manus."
     intent: "The user is requesting information about the latest developments of the AI tool Manus."
+    expect:
+      status: success
     
   - input: "Compare the weather in New York and San Francisco today, which place is better for outdoor activities?"
     intent: "The user is seeking information on the weather conditions in New York and San Francisco today to determine which location is better for outdoor activities."
+    expect:
+      status: success
     
   - input: "Here is the sales data for the first quarter, can you tell me the trends and insights?"
     intent: "The user is requesting an analysis of sales data for the first quarter to identify trends and insights."
+    expect:
+      status: failed
     
   - input: "Compare the performance and cost features of Tesla Model Q and Audi Q5 e-tron."
     intent: "The user is seeking a comparison of the performance and cost features of Tesla Model Q and Audi Q5 e-tron."
+    expect:
+      status: success
     
   - input: "Please use Uber Eats to order a medium hot latte with less sugar and no foam from the nearest Starbucks, and have it delivered to the reception desk at 23 Times Square Building, New York."
     intent: "The user wants to order a medium hot latte with less sugar and no foam from the nearest Starbucks and have it delivered to the reception desk at 23 Times Square Building, New York."
+    expect:
+      status: failed
     
   - input: "I have 4 tasks due today: sales report, client email, meeting presentation, and next month's marketing plan. How should I prioritize them?"
     intent: "The user is seeking advice on how to prioritize their tasks for the day."
+    expect:
+      status: failed
     
   - input: "How much budget would be needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel?"
     intent: "User is inquiring about the budget needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel."
+    expect:
+      status: success
     
   - input: "We are furniture manufacturers based in Boston with annual revenue of $3 million. We want to enter the California high-end market targeting affluent families aged 35-45, with a budget of $50,000. Which local digital marketing platforms offer the highest ROI?"
     intent: "The user is seeking information on local digital marketing platforms that offer the highest ROI for entering the California high-end furniture market targeting affluent families."
+    expect:
+      status: success
     
   - input: "Our e-commerce platform has an average of 5,000 orders per month with a customer service team of 10 people. The average customer wait time for response exceeds 15 minutes. Please analyze the response time data of major industry competitors and provide optimization solutions."
     intent: "The user wants to analyze the response time data of major industry competitors and receive optimization solutions for their e-commerce platform's customer service."
+    expect:
+      status: success
     
   - input: "I want to buy a property in New York, preferably in an area with low crime rate. I have one child in middle school and another in kindergarten, so I'd like to consider their education. My wife and I have a combined monthly income of $50,000. Please help me find suitable properties."
     intent: "The user is looking to buy a property in New York with a low crime rate, considering education for their children, and has a combined monthly income of $50,000."
+    expect:
+      status: success
    
   - input: "Access the YC official website and organize all company information under the W25 B2B tag into a clear, well-structured table. Make sure to find all information."
     intent: "The user requests to access the YC official website and organize all company information under the W25 B2B tag into a clear, well-structured table."
+    expect:
+      status: failed
   
   - input: "Help me research the five projects that DeepSeek has open-sourced. Please read the GitHub repository source code, introduce each of the five projects one by one, and draw a system architecture diagram for each project."
     intent: "The user wants to research the five open-source projects by DeepSeek, including reading the GitHub repository source code, introducing each project, and drawing system architecture diagrams for each."
+    expect:
+      status: failed
     
   - input: "Conduct a thorough SEO audit of Karpathy's website (https://karpathy.ai/) and provide a detailed optimization report with actionable suggestions."
     intent: "The user wants a thorough SEO audit of Karpathy's website and a detailed optimization report with actionable suggestions."
+    expect:
+      status: success
