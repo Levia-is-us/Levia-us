@@ -6,6 +6,12 @@ import threading
 
 # Base URL for all API requests
 BASE_URL = 'http://127.0.0.1:7072/levia'
+API_KEY = "your_api_key_here"
+
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {API_KEY}"
+}
 
 def create_chat_session(user_id):
     """
@@ -21,7 +27,7 @@ def create_chat_session(user_id):
         response = requests.post(
             f"{BASE_URL}/chat/create",
             json={"user_id": user_id},
-            headers={"Content-Type": "application/json"}
+            headers=headers
         )
         
         data = response.json()
@@ -55,7 +61,7 @@ def send_chat_message(user_id, message, session_id):
                 "intent": message,
                 "session_id": session_id
             },
-            headers={"Content-Type": "application/json"}
+            headers=headers
         )
         
         data = response.json()
@@ -83,7 +89,7 @@ def connect_to_stream(request_id):
         """Background thread function to listen to the SSE stream"""
         try:
             url = f"{BASE_URL}/chat/stream/{request_id}"
-            headers = {'Accept': 'text/event-stream'}
+            headers = {'Accept': 'text/event-stream',"Authorization": f"Bearer {API_KEY}"}
             
             response = requests.get(url, headers=headers, stream=True)
             
@@ -140,7 +146,7 @@ def get_active_request(user_id):
         str or None: Request ID if active, None otherwise
     """
     try:
-        response = requests.get(f"{BASE_URL}/chat/request/{user_id}")
+        response = requests.get(f"{BASE_URL}/chat/request/{user_id}", headers=headers)
         
         if response.status_code == 200:
             data = response.json()
