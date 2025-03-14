@@ -82,6 +82,7 @@ def require_api_key(f):
             
         # Validate API key
         if api_key and api_key_manager.validate_key(api_key):
+            print(f"API key : {api_key} request: {request.path}")
             return f(*args, **kwargs)
         else:
             return jsonify({
