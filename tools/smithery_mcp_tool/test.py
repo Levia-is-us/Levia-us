@@ -6,14 +6,14 @@ project_root = os.path.dirname(
 )
 sys.path.append(project_root)
 
-from tools.mcp_tool.main import MCPTool
+from tools.smithery_mcp_tool.main import SmitheryMCPTool
 
 def main():
-    mcp_tool = MCPTool()
+    mcp_tool = SmitheryMCPTool()
 
     arguments = {
         "arguments": {
-            "symbol": "BTC"
+            "symbol": "ETH"
         }
     }
     result = mcp_tool.mcp_call_tool(serverId="@truss44/mcp-crypto-price", toolName="get-crypto-price", arguments=arguments)
