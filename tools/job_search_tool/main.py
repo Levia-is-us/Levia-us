@@ -1,4 +1,3 @@
-from tarta_api.job_search import JobSearchService, JobSearchRequest
 import requests
 from engine.tool_framework import run_tool, BaseTool
 import json

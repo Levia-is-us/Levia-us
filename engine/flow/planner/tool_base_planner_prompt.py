@@ -24,7 +24,9 @@ Your task is to analyze the user's intent, determine if the available tools are 
 
 1. After completing your analysis, determine if the tools listed in the <tool_list> are sufficient to accomplish the user's intent.
 
-2. If the tools are sufficient, create a task plan focusing only on tasks that require external tools or actions. Follow these guidelines:
+2. If defaultValue is provided in the input's metadata, count the input as satisfied.
+
+3. If the tools are sufficient, create a task plan focusing only on tasks that require external tools or actions. Follow these guidelines:
    a. Ensure each step is logically connected to the previous and next steps
    b. Assign exactly one specific external tool to each step, using only tools from the provided <tool_list>
    c. Provide a concise description and reason for each step, emphasizing how the chosen tool will be used
@@ -34,8 +36,7 @@ Your task is to analyze the user's intent, determine if the available tools are 
    g. If no tool from the <tool_list> can directly fetch the required data, but the information can be retrieved via a web search, then consider "web search" as an acceptable tool.
    h. Analyze the information contained in the tool's output description and determine whether these outputs are sufficient to fulfill the <user_intent>.
 
-
-3. Format your output as a JSON object with the following structure:
+4. Format your output as a JSON object with the following structure:
 
 If the tools are insufficient:
 {{
