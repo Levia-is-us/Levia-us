@@ -23,7 +23,7 @@ def chat_completion_openai(
     },
     config={},
     user_id="",
-    ch_id=""
+    ch_id="",
 ):
     """
     Generate chat completion using OpenAI API.
@@ -73,7 +73,7 @@ def chat_completion_openai(
         if model["type"] == "reasoning":
             if completion.choices[0].message.model_extra:
                 reasons = completion.choices[0].message.model_extra.reasoning_content
-                output_stream(log=reasons, user_id=user_id, type='think', ch_id=ch_id)
+                output_stream(log=reasons, user_id=user_id, type="think", ch_id=ch_id)
 
         # Extract the model reply
         return completion.choices[0].message.content
@@ -82,12 +82,7 @@ def chat_completion_openai(
         return None
 
 
-def generate_embeddings(text, model="text-embedding", version="2023-05-15"):
-    client = AzureOpenAI(
-        api_key=azure_api_key,
-        api_version=version,
-        azure_endpoint=azure_host,
-        max_retries=0,
-    )
+def generate_embeddings(text, model="text-embedding-3-large", version="2023-05-15"):
+    client = OpenAI(api_key=api_key, base_url=host)
     data = client.embeddings.create(input=[text], model=model)
     return data.data[0].embedding

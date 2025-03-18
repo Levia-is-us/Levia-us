@@ -47,7 +47,7 @@ def create_chat_completion(system_prompt, prompt, model=_default_model, config={
     return chat_completion(messages, model, config, user_id, ch_id)
 
 
-def create_embedding(text, model="text-embedding", config={}):
+def create_embedding(text, model="text-embedding-3-large", config={}):
     """
     Generate embeddings using the specified model.
 
@@ -61,7 +61,7 @@ def create_embedding(text, model="text-embedding", config={}):
     """
     models = _load_models()
 
-    if models[model]["source"] == "azure-openai":
+    if models[model]["source"] == "openai":
         return generate_embeddings(text, model=model, version=models[model]["version"])
 
     raise ValueError(f"Model {model} does not support embeddings")

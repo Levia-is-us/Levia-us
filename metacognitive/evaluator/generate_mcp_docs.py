@@ -52,7 +52,7 @@ def process_mcp_tool(server_id):
             detailed_description = function.pop("detailed_description")
             short_description = function.pop("short_description")
             metadata = {
-                "method": "mcp_call_tool", #function["method"],
+                "method": "mcp_call_tool",
                 "tool": "SmitheryMCPTool",
                 "data": json.dumps(function),
                 "short_description": short_description,
