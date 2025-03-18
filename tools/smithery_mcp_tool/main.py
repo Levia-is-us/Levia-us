@@ -25,6 +25,9 @@ class SmitheryMCPTool(BaseTool):
     def mcp_call_tool(self, serverId: str, toolName: str, arguments: dict, config: dict = None) -> dict: 
         """List all available abilities"""
         # /api/mcpCallTool?serverId=@truss44/mcp-crypto-price&toolName=get-crypto-price
+        arguments = {
+                "arguments": arguments
+        }
         url = f"{MCP_REPO_URL}/api/mcpCallTool?serverId={serverId}&toolName={toolName}&userId=levia"
         if config:
             config_base64 = base64.b64encode(json.dumps(config).encode('utf-8')).decode('utf-8')
@@ -36,6 +39,6 @@ class SmitheryMCPTool(BaseTool):
             data = response.json()
             return data
         else:
-            return {"error": "Failed to fetch MCP list"}
+            return {"error": "Failed to fetch MCP response; Details: " + response.text}
         
     
