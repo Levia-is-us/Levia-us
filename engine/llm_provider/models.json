@@ -60,10 +60,10 @@
     "source": "deepseek"
   },
   {
-    "model": "text-embedding",
+    "model": "text-embedding-3-large",
     "version": "2023-05-15",
     "type": "embeddings",
-    "source": "azure-openai"
+    "source": "openai"
   },
   {
     "model": "deepseek-r1",
