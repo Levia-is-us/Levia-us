@@ -73,6 +73,8 @@ Please follow these steps to complete your task:
    - Create a clear list of cons (arguments against the plan's feasibility)
    - Weigh the pros and cons to reach a conclusion
 
+important: if the input key named 'arguments', the value of this argument should be included all sources in it is description.
+
 After your analysis, provide your conclusion in one of the following formats:
 
 a) If the plan can be completed with available information and is sufficient to achieve the user intent, output the filled plan as a JSON array. Example:
