@@ -93,6 +93,12 @@ def run_single_test(model, test_case, idx):
         },
     ]
 
+    
+    is_mcp = test_case.get("is_mcp", False)
+    if is_mcp:
+        tool_config = test_case["tool_config"]
+        plan_steps = test_case["plan_steps"]
+
     start = time.time()
     try:
         output = validate_tool_parameters(
