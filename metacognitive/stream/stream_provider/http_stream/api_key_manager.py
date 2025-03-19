@@ -85,13 +85,14 @@ def require_api_key(f):
         # Also check for API key in query parameters
         if not api_key:
             api_key = request.args.get('api_key')
-            
+        
+        from metacognitive.stream.stream import output_stream
         # Validate API key
         if api_key and api_key_manager.validate_key(api_key):
-            from metacognitive.stream.stream import output_stream
             output_stream(f"API key : {api_key} request: {request.path}", user_id, "info", "", "Authorization", api_key, api_key_manager.api_keys[api_key]['uid'])
             return f(*args, **kwargs)
         else:
+            output_stream("Invalid or missing API key", user_id, "error", "", "Authorization", api_key, api_key_manager.api_keys[api_key]['uid'])
             return jsonify({
                 "status": "error",
                 "message": "Invalid or missing API key"
