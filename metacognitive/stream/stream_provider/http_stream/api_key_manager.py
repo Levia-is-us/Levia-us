@@ -92,7 +92,7 @@ def require_api_key(f):
             output_stream(f"API key : {api_key} request: {request.path}", user_id, "info", "", "Authorization", api_key, api_key_manager.api_keys[api_key]['uid'])
             return f(*args, **kwargs)
         else:
-            output_stream("Invalid or missing API key", user_id, "error", "", "Authorization", api_key, '')
+            output_stream(f"Invalid or missing API key,request: {request.path}", user_id, "error", "", "Authorization", api_key, '')
             return jsonify({
                 "status": "error",
                 "message": "Invalid or missing API key"
