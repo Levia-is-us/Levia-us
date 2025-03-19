@@ -25,7 +25,7 @@ def create_chat_session(user_id):
     """
     try:
         response = requests.post(
-            f"{BASE_URL}/chat/create",
+            f"{BASE_URL}/levia/chat/create",
             json={"user_id": user_id},
             headers=headers
         )
@@ -55,7 +55,7 @@ def send_chat_message(user_id, message, session_id):
     """
     try:
         response = requests.post(
-            f"{BASE_URL}/chat",
+            f"{BASE_URL}/levia/chat",
             json={
                 "user_id": user_id,
                 "intent": message,
@@ -88,7 +88,7 @@ def connect_to_stream(request_id):
     def stream_listener():
         """Background thread function to listen to the SSE stream"""
         try:
-            url = f"{BASE_URL}/chat/stream/{request_id}"
+            url = f"{BASE_URL}/levia/chat/stream/{request_id}"
             headers = {'Accept': 'text/event-stream',"Authorization": f"Bearer {API_KEY}"}
             
             response = requests.get(url, headers=headers, stream=True)
@@ -146,7 +146,7 @@ def get_active_request(user_id):
         str or None: Request ID if active, None otherwise
     """
     try:
-        response = requests.get(f"{BASE_URL}/chat/request/{user_id}", headers=headers)
+        response = requests.get(f"{BASE_URL}/levia/chat/request/{user_id}", headers=headers)
         
         if response.status_code == 200:
             data = response.json()
@@ -203,6 +203,21 @@ def main():
         print("\nAll steps completed. The stream will continue to receive messages until completion.")
         
         while stream_thread.is_alive():
+            time.sleep(0.1)
+
+        print("\n=== Step 5: Sending chat message ===")
+        request_id = send_chat_message(user_id, "What did I just ask?", session_id)
+        if not request_id:
+            raise Exception("Failed to send chat message")
+        print(f"Message sent successfully with request ID: {request_id}")
+        
+        # Step 3: Connect to the stream
+        print("\n=== Step 6: Connecting to response stream ===")
+        stream_thread_2 = connect_to_stream(request_id)
+        
+        # Wait a bit and then check active request status
+        time.sleep(5)
+        while stream_thread_2.is_alive():
             time.sleep(0.1)
             
     except Exception as e:
