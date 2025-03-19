@@ -12,11 +12,9 @@ def main():
     mcp_tool = SmitheryMCPTool()
 
     arguments = {
-        "arguments": {
-            "symbol": "ETH"
+        'to': 'armorn@outlook.com', 'subject': 'test email', 'content': 'hello!'
         }
-    }
-    result = mcp_tool.mcp_call_tool(serverId="@truss44/mcp-crypto-price", toolName="get-crypto-price", arguments=arguments)
+    result = mcp_tool.mcp_call_tool(serverId="@ykhli/mcp-send-emails", toolName="send-email", arguments=arguments)
     print(result)
 
 if __name__ == "__main__":

@@ -42,6 +42,7 @@ Please follow these steps to analyze the current situation:
 
   important: source and method are required and only have 4 types: 'context', 'LLM', 'direct', 'defaultValue' and 'dictionary of {{method_parameter : code}}'.
   important: the value should be the real value with correct type, can be used directly in the next step function, not a description or explanation.
+  important: the key tool in the plan is not the tool name in the argument, but the tool name in the plan.
   
 
 4. Prepare Response:

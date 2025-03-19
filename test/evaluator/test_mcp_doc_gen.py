@@ -23,31 +23,28 @@ from engine.flow.mcp_adaption_flow.mcp_adaption_flow import (
 
 
 def get_mcp_tools(server_id):
-    body = {
-        "resendApiToken": os.getenv("RESEND_API_KEY"),
-    }
-    base64_config = base64.b64encode(json.dumps(body).encode("utf-8")).decode("utf-8")
     response = requests.get(
-        f"https://levia-mcp-repo.azurewebsites.net/api/mcpTools?serverId={server_id}&config={base64_config}"
+        f"https://levia-mcp-repo.azurewebsites.net/api/mcpTools?serverId={server_id}&userId=levia"
     )
     return response.json()
 
 
-def call_mcp_tool(server_id, tool_name, arguments, config):
-    body = {
-        "arguments": arguments,
-    }
-    base64_config = base64.b64encode(json.dumps(config).encode("utf-8")).decode("utf-8")
-    response = requests.post(
-        f"https://levia-mcp-repo.azurewebsites.net/api/mcpCallTool?serverId={server_id}&toolName={tool_name}&config={base64_config}",
-        json=body,
-    )
-    return response.json()
+# def call_mcp_tool(server_id, tool_name, arguments, config):
+#     body = {
+#         "arguments": arguments,
+#     }
+#     base64_config = base64.b64encode(json.dumps(config).encode("utf-8")).decode("utf-8")
+#     response = requests.post(
+#         f"https://levia-mcp-repo.azurewebsites.net/api/mcpCallTool?serverId={server_id}&toolName={tool_name}",
+#         json=body,
+#     )
+#     return response.json()
 
 
 def process_mcp_tool(server_id):
     mcp_info = get_mcp_tools(server_id)
     for tool in mcp_info["tools"]:
+        print(tool)
         doc = mcp_adaption_flow(tool, server_id)
         print(doc)
 

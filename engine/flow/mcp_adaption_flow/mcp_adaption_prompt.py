@@ -18,6 +18,7 @@ Please follow these steps to analyze the code and generate the required output:
       - Data type
       - Whether it's required or optional
       - A brief explanation of the parameter's purpose or source
+      - The input parameter 'arguments' is a JSON object. Its description should clearly specify the names and explanations of all parameters contained within the JSON object.
    c. Output:
       - Description of the output
       - Data type of the output
