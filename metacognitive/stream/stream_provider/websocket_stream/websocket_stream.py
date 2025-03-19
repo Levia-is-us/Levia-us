@@ -74,7 +74,7 @@ class WebsocketStream(BaseStream):
             print(f"WebsocketStream server error: {e}")
             self.server = None
 
-    def output(self, log: str, user_id: str, type: str, child_id: str = "", title: str = ""):
+    def output(self, log: str, user_id: str, type: str, child_id: str = "", title: str = "", api_key: str = "", dev_id: str = ""):
         message = {
             "log": log,
             "user_id": user_id,
