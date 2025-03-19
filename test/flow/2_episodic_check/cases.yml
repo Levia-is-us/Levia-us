@@ -70,4 +70,70 @@ test_cases:
     expect:
       status: failed
 
-  # TODO: Add test cases for [missing input]
+  - input: "send a email for me: to test@outlook.com with title 'Test mail' and content 'hello!'"
+    intent: "The user wants to send an email to test@outlook.com with title 'Test mail' and content 'hello!'"
+    is_mcp: true
+    plan:
+    - step: step 1
+      tool: SmitheryMCPTool
+      data:
+        method: mcp_call_tool
+        inputs:
+        - name: serverId
+          type: string
+          required: true
+          description: Server configuration reference from MCP package
+          defaultValue: "@ykhli/mcp-send-emails"
+        - name: toolName
+          type: string
+          required: true
+          description: Fixed identifier for internal request routing
+          defaultValue: send-email
+        - name: arguments
+          type: object
+          required: true
+          description: Email parameters including recipient, subject, and content
+        output:
+          description: Result of email transmission attempt. Exact return type and content
+            not specified in profile.
+          type: undefined
+      step purpose: Send email via Resend service
+      description: Use Smithery's MCP email tool to deliver the message. The serverId and
+        toolName defaults are preconfigured, while arguments will include the user-provided
+        recipient (test@outlook.com), subject (test email), and content (hello!).
+    expect:
+      status: success
+      
+  - input: "send a email for me: to test@outlook.com with title 'Test mail' and content 'hello!'"
+    intent: "The user wants to send an email to test@outlook.com with title 'Test mail' and content 'hello!'"
+    is_mcp: true
+    plan:
+    - step: step 1
+      tool: SmitheryMCPTool
+      data:
+        method: mcp_call_tool
+        inputs:
+        - name: serverId
+          type: string
+          required: true
+          description: Server configuration reference from MCP package
+          defaultValue: "@ykhli/mcp-send-emails"
+        - name: toolName
+          type: string
+          required: true
+          description: Fixed identifier for internal request routing
+          defaultValue: send-email
+        - name: arguments
+          type: object
+          required: true
+          description: Email parameters including recipient, subject, and content
+        output:
+          description: Result of email transmission attempt. Exact return type and content
+            not specified in profile.
+          type: undefined
+      step purpose: Send email via Resend service
+      description: Use Smithery's MCP email tool to deliver the message. The serverId and
+        toolName defaults are preconfigured, while arguments will include the user-provided
+        recipient (test0@outlook.com), subject (test email), and content (hello!).
+    expect:
+      status: failed

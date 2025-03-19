@@ -45,7 +45,11 @@ def run_single_test(model, test_case, idx):
     intent = test_case["intent"]
     context = [{"role": "user", "content": test_case["input"]}]
     # Define the plan for episodic check
-    plan_data = [
+    is_mcp = test_case.get("is_mcp", False)
+    if is_mcp:
+        plan_data = test_case["plan"]
+    else:
+        plan_data = [
         {
             "step": "step 1",
             "tool": "WebSearchTool",

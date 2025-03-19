@@ -69,3 +69,62 @@ test_cases:
     intent: "The user wants a thorough SEO audit of Karpathy's website and a detailed optimization report with actionable suggestions."
     expect:
       can_proceed: fasle
+
+  - input: "send a email for me: to test@outlook.com with title 'Test mail' and content 'hello!'"
+    intent: "The user wants to send an email to test@outlook.com with title 'Test mail' and content 'hello!'"
+    is_mcp: true
+    tool_config:
+      method: mcp_call_tool
+      inputs:
+      - name: serverId
+        type: string
+        required: true
+        description: Server configuration reference from MCP package
+        defaultValue: '@ykhli/mcp-send-emails'
+      - name: toolName
+        type: string
+        required: true
+        description: Fixed identifier for internal request routing
+        defaultValue: send-email
+      - name: arguments
+        type: object
+        required: true
+        description: Email parameters including recipient, subject, and content
+      output:
+        description: Response from the email sending operation
+        type: object
+      tool: SmitheryMCPTool
+    plan_steps:
+      - step: step 1
+        tool: SmitheryMCPTool
+        data:
+          method: mcp_call_tool
+          inputs:
+          - name: serverId
+            type: string
+            required: true
+            description: Server configuration reference from MCP package
+            defaultValue: "@ykhli/mcp-send-emails"
+          - name: toolName
+            type: string
+            required: true
+            description: Fixed identifier for internal routing purposes
+            defaultValue: send-email
+          - name: arguments
+            type: object
+            required: true
+            description: "Object containing email details with properties: to (recipient email), subject (email subject line), and content (plain text email content)"
+          output:
+            description: Response from the email sending operation
+            type: object
+        step purpose: Send the email with provided details
+        description: Use the SmitheryMCPTool to send an email via MCP package. The tool's
+          default configuration for serverId and toolName is pre-satisfied, and the user-provided
+          arguments (to, subject, content) will be used to execute the email delivery.
+    expect:
+      can_proceed: true
+
+  - input: "send a email for me: to test@outlook.com with title 'Test mail' and content 'hello!'"
+    intent: "The user wants to send an email to test@outlook.com with title 'Test mail' and content 'hello!'"
+    expect:
+      can_proceed: false
