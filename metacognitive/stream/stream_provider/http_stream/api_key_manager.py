@@ -73,14 +73,24 @@ def require_api_key(f):
     """Decorator to require valid API key for routes"""
     def decorated(*args, **kwargs):
         api_key = None
+        user_id = None
         
         # Try to get API key from Authorization header
         auth_header = request.headers.get('Authorization')
         if auth_header and auth_header.startswith('Bearer '):
             api_key = auth_header[7:]  # Remove 'Bearer ' prefix
 
-        data = request.get_json()
-        user_id = data.get('user_id')
+        # 安全地处理 JSON 内容
+        if request.content_type and 'application/json' in request.content_type:
+            try:
+                data = request.get_json(silent=True) or {}
+                user_id = data.get('user_id')
+            except:
+                user_id = None
+        
+        # 如果从 JSON 中没有获取到 user_id，则从查询参数中获取
+        if not user_id:
+            user_id = request.args.get('user_id')
         
         # Also check for API key in query parameters
         if not api_key:
