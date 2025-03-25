@@ -80,7 +80,6 @@ def require_api_key(f):
         if auth_header and auth_header.startswith('Bearer '):
             api_key = auth_header[7:]  # Remove 'Bearer ' prefix
 
-        # 安全地处理 JSON 内容
         if request.content_type and 'application/json' in request.content_type:
             try:
                 data = request.get_json(silent=True) or {}
@@ -88,7 +87,6 @@ def require_api_key(f):
             except:
                 user_id = None
         
-        # 如果从 JSON 中没有获取到 user_id，则从查询参数中获取
         if not user_id:
             user_id = request.args.get('user_id')
         
