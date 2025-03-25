@@ -1,55 +1,80 @@
-class ContextStore:
-    def __init__(self, max_length=5):
+import json
+from engine.utils.tokenizer import num_tokens_from_messages
+from memory.short_term_memory.short_term_memory_provider.base_context import (
+    BaseContextStore,
+)
+
+
+class LocalContextStore(BaseContextStore):
+    def __init__(self, max_length=1000):
         """
         Initialize the context store.
         :param max_length: Maximum length of context history to maintain
         """
         self.max_length = max_length
-        self.history = []
+        self.contexts = {}
+        # todo: load local json file, TBD
+        # with open(
+        #     "memory/short_term_memory/short_term_memory_provider/local_context_store/local_context_store.json",
+        #     "r",
+        # ) as f:
+        #     self.contexts = json.load(f)
 
-    def add(self, user_input, model_output):
-        """
-        Add new conversation to history.
-        :param user_input: User input
-        :param model_output: Model output
-        """
-        self.history.append({"user": user_input, "model": model_output})
-        # If history exceeds max length, remove oldest entry
-        if len(self.history) > self.max_length:
-            self.history.pop(0)
-
-    def get_context(self):
+    def get_context(self, user_key: str = "local"):
         """
         Get current conversation context formatted as string.
+        :param user_key: Key to identify user's context
         :return: Current conversation context
         """
-        context = ""
-        for exchange in self.history:
-            context += f"User: {exchange['user']}\n"
-            context += f"Model: {exchange['model']}\n"
-        return context
+        if user_key not in self.contexts:
+            return []
 
-    def clear(self):
+        return self.contexts[user_key]
+
+    def add_context(self, context: dict, user_key: str = "local"):
         """
-        Clear all history.
+        Add new conversation to history.
+        :param context: Context string to add
+        :param user_key: Key to identify user's context
         """
-        self.history = []
+        if user_key not in self.contexts:
+            self.contexts[user_key] = []
 
-# Example: How to use this ContextStore class
-if __name__ == "__main__":
-    context_store = ContextStore(max_length=3)
+        if isinstance(context, list):
+            self.contexts[user_key].extend(context)
+        else:
+            self.contexts[user_key].append(context)
 
-    # Add conversations
-    context_store.add("Hello", "Hello! How can I help you?")
-    context_store.add("How's the weather today?", "The weather is nice today, sunny and bright.")
-    context_store.add("I want to learn about artificial intelligence", "Artificial intelligence is a branch of computer science that enables machines to perform human-like tasks.")
+        # If history exceeds max length, remove oldest entry
+        self.auto_delete_context(user_key)
+        # todo: write to a local json file
+        # with open(
+        #     "memory/short_term_memory/short_term_memory_provider/local_context_store/local_context_store.json",
+        #     "w",
+        # ) as f:
+        #     json.dump(self.contexts, f)
 
-    # Get current context
-    print("Current context:")
-    print(context_store.get_context())
+    def delete_context(self, context: str, user_key: str = "local"):
+        """
+        Delete specific context from history.
+        :param context: Context string to delete
+        :param user_key: Key to identify user's context
+        """
+        if user_key in self.contexts:
+            self.contexts[user_key] = [
+                h for h in self.contexts[user_key] if h["user"] != context
+            ]
 
-    # Add another conversation, oldest will be removed if exceeds max length
-    context_store.add("What is machine learning?", "Machine learning is an important branch of artificial intelligence that involves machines learning from data and making predictions.")
-    
-    print("\nUpdated context:")
-    print(context_store.get_context())
+    def auto_delete_context(self, user_key: str = "local"):
+        """
+        Delete all contexts for a user.
+        :param user_key: Key to identify user's context
+        """
+        context = self.get_context(user_key)
+        if not context:
+            return
+
+        while num_tokens_from_messages(context) > self.max_length:
+            context.pop(
+                1
+            )  # Pop the second element (index 1) instead of first element (index 0)

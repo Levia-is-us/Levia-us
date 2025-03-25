@@ -24,9 +24,9 @@ node_path = os.path.join(project_root, "tools")
 print(node_path)
 
 from memory.episodic_memory.episodic_memory import store_short_pass_memory
-from engine.flow.evaluator.evaluator_docgen_flow import (
-    evaluator_docgen_flow,
-    extract_json_from_doc,
+from engine.flow.evaluator.evaluator_docgen_flow import evaluator_docgen_flow
+from engine.utils.json_util import (
+    extract_json_from_str,
     extract_code_breakdown_from_doc,
 )
 
@@ -45,15 +45,23 @@ for folder in os.listdir(node_path):
                 with open(os.path.join(node_path, folder, "docs.md"), "w") as f:
                     f.write(doc)
 
-                json_data = extract_json_from_doc(doc)
+                json_data = extract_json_from_str(doc)
                 code_breakdown = extract_code_breakdown_from_doc(doc)
+
+                import ast
+                tree = ast.parse(content)
+                class_name = ""
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.ClassDef):
+                        class_name = node.name
+                        break
 
                 for function in json_data["functions"]:
                     detailed_description = function.pop("detailed_description")
                     short_description = function.pop("short_description")
                     metadata = {
                         "method": function["method"],
-                        "tool": function["method"] + "_tool",
+                        "tool": class_name,
                         "data": json.dumps(function),
                         "short_description": short_description,
                         "description": code_breakdown,

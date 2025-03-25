@@ -50,13 +50,13 @@ Levia's architecture mirrors human cognitive processes. Its shared memory and ca
 Levia is an Open Source AI Metacognition & Tooling infrastructure that enables agents to recursively self-learn and optimize execution pathways. The system is designed to execute tasks rather than just provide textual responses.
 
 ## Prerequisites
-- Python 3.8
+- Python 3.11 or higher
 - Virtual environment tool (venv, conda, etc.)
 
 ## Installation
 1. Clone the repository:
 ``` git clone https://github.com/your-username/levia-protocol.git
- cd levia-protocol
+ cd Levia-us
 ```
 
 2. Create and activate a virtual environment
@@ -189,12 +189,6 @@ class Stream:
         # Always add log stream as secondary output
         self.add_stream(LogStream())
 ```
-## Available Tools
-The repository currently includes the following tools:
-1. Website Scanner
-2. Web Search
-3. GitBook Documentation Generator
-4. Location Services
 
 The most updated tool list is found at https://levia.us
 
@@ -202,7 +196,7 @@ The most updated tool list is found at https://levia.us
 To create a new tool:
 1. Create a new directory in the `tools/` folder
 2. Create a `main.py` file with your tool implementation
-3. Use the `@simple_tool` decorator to register your tool
+3. Use the `@run_tool` decorator to register your tool
 4. Implement the required methods
 
 
@@ -210,17 +204,13 @@ Example tool structure:
 ```
 from engine.tool_framework import simple_tool
 
-@simple_tool("Your Tool Description")
-def your_tool_method(param1, param2):
-    # Tool implementation
-    return result
+@run_tool
+class Tool_name:
+    def your_tool_method(param1, param2):
+        # Tool implementation
+        return result
 ```
-
-## Testing
-Run tests using pytest:
-```
-pytest test/
-```
+More details about tool development can be found in [To_build_your_tool.md](To_build_your_tool.md).
 
 ## Contributing
 

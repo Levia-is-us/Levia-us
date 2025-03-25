@@ -1,0 +1,41 @@
+test_cases:
+
+- description: "Simple dictionary to list transformation"
+  input_structure: '{"a": "123", "b": "456"}'
+  output_structure: '["123", "456"]'
+
+- description: "Nested dictionary to flat list"
+  input_structure: '{"a": {"x": 1, "y": 2}, "b": {"z": 3}}'
+  output_structure: '[1, 2, 3]'
+
+- description: "List of dictionaries to list of values"
+  input_structure: '[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]'
+  output_structure: '[1, "Alice", 2, "Bob"]'
+
+- description: "Dictionary with mixed types to dictionary with string values"
+  input_structure: '{"a": 123, "b": true, "c": "hello"}'
+  output_structure: "{\"a\": \"123\", \"b\": \"true\", \"c\": \"hello\"}"
+
+- description: "Empty dictionary to empty list"
+  input_structure: '{}'
+  output_structure: '[]'
+
+- description: "List to dictionary with index as key"
+  input_structure: '[10, 20, 30]'
+  output_structure: '{"0": 10, "1": 20, "2": 30}'
+
+- description: "Nested list to flat list"
+  input_structure: '[[1, 2], [3, 4], [5, 6]]'
+  output_structure: '[1, 2, 3, 4, 5, 6]'
+
+- description: "Dictionary with None values to list excluding None"
+  input_structure: '{"a": "123", "b": null, "c": "456"}'
+  output_structure: '["123", "456"]'
+
+- description: "Complex nested structure to simplified structure"
+  input_structure: '{"data": [{"id": 1}, {"id": 2}], "meta": {"count": 2}}'
+  output_structure: '[1, 2]'
+
+- description: "String values with special characters to list"
+  input_structure: '{"a": "hello!", "b": "world@#"}'
+  output_structure: '["hello!", "world@#"]'

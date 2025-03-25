@@ -1,51 +1,40 @@
+
+
 <code_breakdown>
-**List of Functions Identified:**
-- `save_markdown_to_gitbook`
+The code contains one primary function exposed as a tool through the @run_tool class decorator:
 
-**Function: `save_markdown_to_gitbook`**
+1. save_markdown_to_gitbook (static method in SaveMarkdownToGitbook class)
 
-i. **Function Signature:**
-```python
-def save_markdown_to_gitbook(content, article_title, gitbook_api_key):
-```
+Function signature:
+def save_markdown_to_gitbook(content):
 
-ii. **Parameters:**
-- `content`
-  - **Type:** Inferred as `str` (string containing markdown or other textual content)
-  - **Required:** Yes
-  - **Description:** The markdown or string content to be saved to GitBook.
-  
-- `article_title`
-  - **Type:** Inferred as `str` (string representing the title of the article)
-  - **Required:** Yes
-  - **Description:** The title of the article to be created in GitBook.
-  
-- `gitbook_api_key`
-  - **Type:** Inferred as `str` (string representing the GitBook API key)
-  - **Required:** Yes
-  - **Description:** The API key used to authenticate with the GitBook API.
+Parameters:
+- content: No explicit type hint, but implied to be string (markdown content). Required. Used as input content to process.
 
-iii. **Return Value:**
-- **Description:** Returns a URL string pointing to the saved GitBook article upon successful execution. Returns error message strings if input validation fails or if certain operations fail.
-- **Type:** `str`
+Return value:
+- Returns string (URL or error message). Type not explicitly declared but observable from returns.
 
-iv. **Purpose:**
-The `save_markdown_to_gitbook` function uploads markdown content as an article to GitBook. It handles the conversion of markdown to HTML, uploads the content, interacts with the GitBook API to create and merge change requests, and ultimately returns the URL of the newly created GitBook article.
+Implementation summary:
+Processes markdown input by:
+1. Initializing GitBook and file management clients
+2. Validating input content
+3. Uploading markdown to Azure file storage
+4. Importing content to GitBook space
+5. Handling GitBook change requests
+6. Returning final URL or error messages
 
-v. **Notable Aspects of the Implementation:**
-- Utilizes a global instance of `GitBookAPI` to manage interactions with the GitBook service.
-- Performs input validation to ensure `content` and `article_title` are provided.
-- Converts markdown content to HTML using the `markdown` library before uploading.
-- Manages file operations such as uploading and deleting temporary files based on the operation's success.
-- Handles API interactions to retrieve organizations and spaces, import content, and manage change requests.
-- Implements exception handling for network-related errors and JSON decoding issues, ensuring that temporary files are cleaned up in case of failures.
+Notable aspects:
+- Uses global singleton instances for API clients
+- Implicit string type handling without validation
+- Complex error handling with file cleanup
+- Relies on environment variables for configuration
+- Returns different string formats for success vs error cases
 
-vi. **Edge Cases or Potential Issues:**
-- **Organization and Space Retrieval:** Assumes that at least one organization and one space exist. If `get_organizations` or `get_spaces` returns an empty list, the function will fail.
-- **Global Variable Usage:** Uses a global `_gitbook` instance, which may lead to issues in concurrent environments or if multiple instances are needed.
-- **Error Handling:** Returns error messages as strings, which might not be the best practice for error handling. Raising exceptions could provide more flexibility.
-- **Lack of Type Hints:** Parameters and return types are not explicitly typed, which can lead to ambiguities and make the code harder to maintain.
-- **File Management:** Relies on external functions `upload_file` and `delete_file` without checking for their success beyond the context provided.
+Edge cases:
+- Empty content input triggers immediate error
+- API call failures roll back file uploads
+- First organization/space selection might not be correct in multi-org accounts
+- File naming collisions from get_top_title_with_hash
 </code_breakdown>
 
 ```json
@@ -53,30 +42,18 @@ vi. **Edge Cases or Potential Issues:**
   "functions": [
     {
       "method": "save_markdown_to_gitbook",
-      "short_description": "Save markdown content to GitBook",
-      "detailed_description": "Uploads markdown or string content as an article to GitBook. It converts markdown to HTML, uploads the content, interacts with the GitBook API to create and merge change requests, and returns the URL of the newly created GitBook article. Handles input validation and manages temporary file operations to ensure consistency.",
+      "short_description": "Save markdown content to GitBook and return published URL",
+      "detailed_description": "Processes markdown input by uploading to Azure file storage, importing into GitBook's first available space/organization, handling change requests, and returning the final published URL. Automatically cleans up uploaded files on failure.",
       "inputs": [
         {
           "name": "content",
           "type": "str",
           "required": true,
-          "description": "The markdown or string content to be saved to GitBook."
-        },
-        {
-          "name": "article_title",
-          "type": "str",
-          "required": true,
-          "description": "The title of the article to be created in GitBook."
-        },
-        {
-          "name": "gitbook_api_key",
-          "type": "str",
-          "required": true,
-          "description": "The API key used to authenticate with the GitBook API."
+          "description": "Markdown text content to publish, must include at least one header for title extraction"
         }
       ],
       "output": {
-        "description": "Returns the URL of the saved GitBook article upon success or an error message string if the operation fails.",
+        "description": "Published URL string on success, error message string on failure",
         "type": "str"
       }
     }

@@ -12,8 +12,15 @@ pymysql>=1.0.2
 DBUtils>=3.0.2
 typing>=3.7.4
 websockets
-selenium
+selenium>=4.0
 webdriver_manager
 markdown
 azure.storage.blob
-aipolabs
+tiktoken
+Flask
+redis
+python-redis-lock
+aipolabs==0.0.1b4
+pyyaml
+jsonschema
+tarta_api

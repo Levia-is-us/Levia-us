@@ -1,0 +1,128 @@
+test_cases:
+  
+  - input: "Can you tell me the latest news about US President Trump?"
+    execution_record: 
+      tool: WebSearchTool
+      method: web_search
+      args:
+        intent: Can you tell me the latest news about US President Trump?
+    result: 
+      - https://www.bbc.com/news/articles/c5yrjg1d7z1o
+      - https://www.politico.com/news/donald-trump
+      - https://www.cnn.com/politics/president-donald-trump-47
+    expect: success
+
+  - input: "Can you tell me the latest news about US President Trump?"
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: Can you tell me the latest news about US President Trump?
+    result: "### Title: Latest News on US President Trump (2025/03/12)\n\n**Summary:** The recent developments regarding US President Donald Trump focus primarily on his upcoming meeting with Irish Taoiseach Micheál Martin at the White House. Scheduled during the traditional St. Patrick's Day events, this meeting is particularly significant due to the pressing global issues at hand, notably the conflicts in Gaza and Ukraine. \n\nTaoiseach Martin has expressed his intention to discuss how Ireland can collaborate with the Trump administration to promote peace and stability in these regions. This meeting marks him as the first EU leader to visit the Oval Office since the controversy surrounding President Trump’s interactions with Ukraine's President Volodymyr Zelensky. The discussions are expected to cover a wide array of topics, including the strong economic ties between the US and Ireland, highlighting Ireland's role as a major source of foreign direct investment in the US.\n\nAmidst rising economic tensions, particularly related to potential tariffs on EU imports which threaten to ignite a trade war, Martin aims to underline the mutual economic benefits of Irish-American relations. He is also set to address the current situation in Northern Ireland, acknowledging the US's crucial contribution to the peace process there.\n\nThe meeting comes at a time of heightened geopolitical uncertainty, and there are concerns about Trump's tariff policies, which have started to impact international relations and markets. The media's focus will also likely touch on Trump's hardline trade agenda, which has already raised alarm among allies and could exacerbate existing trade imbalances.\n\nOverall, the anticipation surrounding this meeting reflects a delicate balancing act for Martin, as he navigates domestic economic concerns and international diplomatic challenges while engaging with a controversial figure like Trump."
+    expect: success
+
+  - input: "Please introduce the latest developments of AI tool Manus."
+    execution_record: 
+      tool: WebSearchTool
+      method: web_search
+      args:
+        intent: The user is requesting information about the latest developments of the AI tool Manus.
+    result: 
+      - https://www.technologyreview.com/2025/03/11/1113133/manus-ai-review/
+      - https://www.rfi.fr/en/international-news/20250312-what-to-know-about-manus-china-s-latest-ai-assistant
+      - https://www.scmp.com/tech/tech-trends/article/3301969/less-structure-more-intelligence-ai-agent-manus-draws-upbeat-reviews-nascent-system
+    expect: success
+
+  - input: "Please introduce the latest developments of AI tool Manus."
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: The user is requesting information about the latest developments of the AI tool Manus.
+    result: '### Title: Latest Developments of AI Tool Manus (2025/03/12)\n\n**Summary:**  \nThe recent launch of Manus, an advanced AI assistant developed by the Chinese startup Butterfly Effect, has garnered significant attention and enthusiasm within the technology community. Positioned as a powerful tool that transcends traditional chatbots, Manus is designed to autonomously perform complex tasks, such as booking tickets, sorting resumes, and even generating custom web applications. \n\nIntroduced in early March 2025, Manus stands out for its intuitive interface and practical capabilities, leading many to compare it to the groundbreaking AI tool DeepSeek. Co-founder Yichao "Peak" Ji has described Manus as a potential paradigm shift in human-machine collaboration, offering a glimpse into the future of artificial general intelligence (AGI).\n\nCurrently available only through an invitation-only beta, Manus has rapidly gained traction, amassing over 170,000 members on its official Discord server. Early user feedback has been largely positive, with many praising its user experience and ability to efficiently execute tasks with minimal structure, which has been highlighted as a significant improvement over existing AI solutions. \n\nNotably, unlike other AI tools that operate within strict parameters, Manus has demonstrated a capacity for providing uncensored responses to sensitive topics, indicating a unique approach to information handling. This capability has led to discussions about its potential impact in areas requiring nuanced understanding, such as historical events and human rights issues.\n\nDespite its promise, experts caution that Manus success will depend on its ability to scale effectively while addressing technical stability and ethical concerns. The exclusivity of its current access model may hinder widespread adoption, potentially limiting its appeal compared to more open-source platforms like DeepSeek. The future of Manus as a major player in the enterprise automation space remains uncertain as it continues to evolve and improve.'
+    expect: success
+
+  - input: "Compare the weather in New York and San Francisco today, which place is better for outdoor activities?"
+    execution_record: 
+      tool: WebSearchTool
+      method: web_search
+      args:
+        intent: The user is seeking information on the weather conditions in New York and San Francisco today to determine which location is better for outdoor activities.
+    result: 
+      - "https://www.weather.com/wx/today/?lat=40.71&lon=-74.01&locale=en-JP&par=google"
+      - "https://www.accuweather.com/en/us/san-francisco/94103/weather-forecast/347629"
+      - "https://weather.com/weather/tenday/l/San+Francisco+CA+USCA0987:1:US"
+    expect: success
+
+  - input: "Compare the weather in New York and San Francisco today, which place is better for outdoor activities?"
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: The user is seeking information on the weather conditions in New York and San Francisco today to determine which location is better for outdoor activities.
+    result: '### Title: Weather Comparison Report (2025/03/12) **Summary:** This report consolidates weather forecasts for Manhattan, NY, and San Francisco, CA, focusing on key metrics such as temperature, precipitation, wind speed, and UV index. 1. **Temperature:** - **Manhattan, NY:** Todays high is expected to reach 61°F with a low of 42°F. The temperature throughout the day is projected to vary, starting at 45°F in the morning and peaking at 51°F in the afternoon before dropping to 44°F in the evening. - **San Francisco, CA:** The forecast indicates a high of 56°F and a low of 46°F for Tuesday. Rain is anticipated, particularly after midnight, with substantial cloud coverage throughout the day. 2. **Precipitation:** - In **Manhattan**, the chance of rain remains low, ranging from 0% to 4% throughout the day, suggesting a dry day ahead. - Conversely, **San Francisco** is expecting rain with a 100% chance of precipitation on Tuesday and significant rain on Wednesday as well. 3. **Wind Speed:** - **Manhattan** reports a gentle breeze with winds at 5 mph, while **San Francisco** will experience stronger winds from the south at approximately 25 mph, particularly affecting the overall comfort during rainy conditions. 4. **UV Index:** - The UV index for both locations is relatively low, with Manhattan reporting a value of 0 out of 11, indicating minimal risk for harm from unprotected sun exposure. San Francisco’s UV index is not explicitly stated but can be inferred to be low given the overcast conditions. Overall, this weather comparison highlights the stark differences between the two cities, with Manhattan enjoying a dry day while San Francisco braces for substantial rainfall. This summary serves as a useful guide for individuals planning activities in these urban areas.'
+    expect: success
+
+  - input: Compare the performance and cost features of Tesla Model Q and Audi Q5 e-tron.
+    execution_record: 
+    tool: WebSearchTool
+    method: web_search
+    args:
+      intent: The user is seeking a comparison of the performance and cost features of Tesla Model Q and Audi Q5 e-tron.
+    result: 
+      - "https://www.audibeverlyhills.com/audi-vs-tesla-electric-vehicle-comparison.htm"
+      - "https://qatar.ellamotors.com/new-cars/compare/audi-e-tron-vs-tesla-model-3-vs-audi-q5"
+    expect: success
+
+  - input: Compare the performance and cost features of Tesla Model Q and Audi Q5 e-tron.
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: The user is seeking a comparison of the performance and cost features of Tesla Model Q and Audi Q5 e-tron.
+    result: '### Title: Comparison of Audi e-tron and Tesla Model 3 and Q5 (2025/03/12) **Summary:** This collection of pages provides a comprehensive comparison of the Audi e-tron and Tesla vehicles, particularly focusing on the Tesla Model 3 and Audi Q5. The intent is to inform potential buyers about the performance, technological features, battery efficiency, and overall value of these electric vehicles. 1. **Performance and Power**: - The Audi e-tron boasts a powerful motor with 402 BHP and an impressive torque of 664 Nm, providing a swift acceleration time of 5.7 seconds to reach top speeds of 200 km/h. In contrast, the Tesla Model 3 has a slightly less powerful motor, generating 325 BHP and achieving a top speed of 225 km/h, but with a longer acceleration time of 6.1 seconds. The Audi Q5, a gasoline variant, offers 252 BHP with a 2-liter engine, further diversifying the options for buyers. 2. **Battery and Range**: - The Audi e-tron features a 95 kWh battery with an estimated range of 356 km, while the Tesla Model 3, equipped with a smaller 60 kWh battery, has a range of 356 km. This highlights that both vehicles are relatively competitive in terms of distance per charge, although the e-tron provides a more significant battery capacity. 3. **Charging Infrastructure**: - One of the advantages of the Audi e-tron is its compatibility with a broader range of public DC fast-charging stations, making it convenient for users compared to Tesla’s dependency on proprietary charging stations. This can be a crucial factor for users concerned about accessibility to charging facilities. 4. **Technological Features**: - Audi offers unique features such as the MMI® Touch Display Systems, Audi Virtual Cockpit Plus, and premium audio systems by Bang & Olufsen and Sonos. Additionally, Audi incorporates advanced safety features like Park Assist Plus and Adaptive Cruise Assist, which are not available in Tesla models, enhancing the overall driving experience. 5. **Interior and Design**: - The Audi e-tron is praised for its luxurious interior, featuring leather upholstery and customizable ambient lighting, providi6. **Cost Considerations**: or design of both brands is noted for its modern a - The pricing for the Audi e-tron is positioned at QAR 317,550, while the Teslable for different consumer preferences.a Model 3 starts at a lower price of QAR 209,400. This price difference may influence purchasing decisions based on budget and perceived value. a Model 3 starts at a lower price of QAR 209,400. In conclusion, the comparison between the Audi e-tron and Tesla vehicles reveals eived value. significant differences in performance, technology, and overall driving experience. Potential buyers are encouraged to consider these factors when choosing betweesignificant differences in performance, technologyn luxury electric vehicles, with Audi promoting a blend of performance, luxury, ase factors when choosing between luxury electric vnd advanced technology, while Tesla focuses on speed and innovation.'
+    expect: success
+
+  - input: How much budget would be needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel?
+    execution_record: 
+    tool: WebSearchTool
+    method: web_search
+    args:
+      intent: User is inquiring about the budget needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel.
+    result: 
+      - "https://www.budgetyourtrip.com/thailand/phuket/trip-cost-1151254"
+      - "https://www.budgetyourtrip.com/thailand/phuket"
+    expect: success
+
+  - input: How much budget would be needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel?
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: User is inquiring about the budget needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel.
+    result: '### Title: Detailed Travel Cost Overview for Phuket (2025) **Summary:** This comprehensive guide provides an extensive analysis of travel costs associated with visitin Phuket, Thailand, with a focus on accommodation, meal costs, local transportation fares, and popular activiy prices as of 2025. 1. **Accommodation Costs:** - The average nightly rate for 4-star hotels in Phuket ranges from $145 to $221 depending on the season ad specific location. Budget accommodations can start as low as $15, while luxury options may exceed $278 per night. 2. **Meal Costs:** - Average daily meal costs for travelers are approximately $41 per person. Meals can vary widely, with brakfast costing between $4 to $12, lunch ranging from $6 to $16, and dinner prices typically between $12 and 29. Street food options are available for around $6, making dining accessible for budget travelers. 3. **Local Transportation Fares:** - Local transportation costs average around $12 per day, with options including tuk-tuks, buses, and motobike taxis. Tuk-tuks are convenient but can be pricier than public buses, which offer a cost-effective way t 4. **Popular Activity Prices:** - The average cost for activities and sightseeing in Phuket is about $46 per person per day. Popular attractions include Karon Beach and Patong Beach (free), the Green Elephant Sanctuary Park (approximately $65), and other tours like the Phi Phi Islands Snorkeling Tour for around $139. This guide aims to equip potential visitors with realistic expectations regarding their travel budgets, ensuring a well-planned and enjoyable experience in Phuket. Prices may vary based on personal preferences and travel styles, but the information provided serves as a reliable baseline for budgeting.'
+    expect: success
+
+  - input: We are furniture manufacturers based in Boston with annual revenue of $3 million. We want to enter the California high-end market targeting affluent families aged 35-45, with a budget of $50,000. Which local digital marketing platforms offer the highest ROI?
+    execution_record: 
+      tool: WebSearchTool
+      method: web_search
+      args:
+        intent: The user is seeking information on local digital marketing platforms that offer the highest ROI for entering the California high-end furniture market targeting affluent families.
+    result: 100
+    expect: failure
+
+  - input: We are furniture manufacturers based in Boston with annual revenue of $3 million. We want to enter the California high-end market targeting affluent families aged 35-45, with a budget of $50,000. Which local digital marketing platforms offer the highest ROI?
+    execution_record: 
+      tool: WebsiteScanTool
+      method: website_scan
+      args:
+        url_list: []
+        intent: The user is seeking information on local digital marketing platforms that offer the highest ROI for entering the California high-end furniture market targeting affluent families.
+    result: 
+    expect: failure

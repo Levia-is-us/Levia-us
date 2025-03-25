@@ -1,81 +1,55 @@
-
-
 import os
 import sys
 
-from dotenv import load_dotenv
 
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env_path = os.path.join(project_root, '.env')
-load_dotenv(env_path)
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.append(project_root)
-
-from engine.tool_framework import ToolRegistry, ToolCaller
-from fileManage import get_top_title_with_hash
+from engine.tool_framework.tool_registry import ToolRegistry
+from engine.tool_framework.tool_caller import ToolCaller
 
 
 def main():
-    # print(project_root)
-    # Create and initialize ToolRegistry
     registry = ToolRegistry()
     
     # Use absolute path
-    tools_dir = os.path.join(os.path.dirname(__file__), "./")
+    tools_dir = os.path.join(project_root, "tools")
     registry.scan_directory(tools_dir)  # Scan tools directory
 
     # Create ToolCaller instance
     caller = ToolCaller(registry)
 
-    # List all available tools
-    tools = registry.list_tools()
-    print("Available tools:", len(tools))
-    for tool in tools:
-        print(f"Tool: {tool['name']}")
-        print(f"Description: {tool['description']}")
-        print("Methods:")
-        for method, info in tool['methods'].items():
-            print(f" - {method}{info['signature']}")
+    markdown_text =   """
+### Test SFAFSAFAS
+1. **Recent Physics Breakthroughs:**
+   - **Multipartite Entanglement:** Achieved on an optical chip, paving the way for scalable quantum information systems.
+1. **Recent Physics Breakthroughs:**
+   - **Multipartite Entanglement:** Achieved on an optical chip, paving the way for scalable quantum information systems.
+   - **Multipartite Entanglement:** Achieved on an optical chip, paving the way for scalable quantum information systems.
+   - **Quantum Properties Detection:** A new method inspired by Maxwell's demon uses heat flow to detect quantum properties without direct measurements.
+   - **Superconductivity Innovations:** Resilient superconducting fluctuations in atomically thin NbSe2 materials have been uncovered, enhancing our understanding of superconductivity.
+   - **Plasma Physics Advancement:** A deep-learning model enhances plasma predictions in nuclear fusion by 1,000 times, showcasing AI's role in accelerating complex research.
 
-    # Call tool and handle result
-    print("\nCalling location tool...")
+2. **Upcoming Events:**
+   - The **2025 APS Global Physics Summit** will be held from March 16-21 in Anaheim, California, expecting over 14,000 participants. The summit will feature presentations from students and professionals, with both in-person and virtual attendance options available.
 
+For more detailed insights, you can check out the compiled document here: [Key Physics Breakthroughs and Upcoming Events](https://hpps-organization.gitbook.io/cornjames/Key_Physics_Breakthroughs).
 
-    markdown_text = """
-      # TITLE
-
-      This is a **bold1111** text.
-
-      - List item 1
-      - List item 2
-      """
-    
-
-    article_title = get_top_title_with_hash(markdown_text)
-    print("Please input markdown or string content!",article_title, file=sys.stderr)
-    
-    # The article title must be a Markdown first-level heading
-    params={
-        "content":markdown_text,
-        "gitbook_api_key":'',
-        "azure_file_server_key":'',
-        "user_website_url":""
-    }
-
-    result = caller.call_tool(
-        "save_markdown_to_gitbook_tool", 
-        "save_markdown_to_gitbook", 
-        params
-    )
+Feel free to reach out if you need anything else or further information on specific topics!
+"""
+    result = caller.call_tool(tool_name="SaveMarkdownToGitbook", method="save_markdown_to_gitbook", kwargs={"content":markdown_text})
     
     if result:
-        if 'error' in result:
+        if "error" in result:
+
             print(f"Tool execution error: {result['error']}")
         else:
-            print(f"Location info: {result}")
+            print(f"response info: {result}")
     else:
         print("Tool call failed, no result returned")
 
+
 if __name__ == "__main__":
     main()
-
 

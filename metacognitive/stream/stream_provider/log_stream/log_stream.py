@@ -8,7 +8,7 @@ class LogStream(BaseStream):
         self.logs_dir = os.path.join("metacognitive", "stream", "logs")
         os.makedirs(self.logs_dir, exist_ok=True)
 
-    def output(self, log: str):
+    def output(self, log: str, user_id: str, type: str, child_id: str = "", title: str = "", api_key: str = "", dev_id: str = ""):
         try:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()

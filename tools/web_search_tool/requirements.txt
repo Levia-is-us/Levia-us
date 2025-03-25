@@ -1,0 +1,3 @@
+aipolabs==0.0.1b4
+selenium
+googlesearch-python

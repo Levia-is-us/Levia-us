@@ -1,0 +1,123 @@
+test_cases:
+  - category: Information Query
+    cases:
+      - input: "Can you tell me the latest news about US President Trump?"  # Real-time News
+        expect: 
+          type: "call_tools"
+      - input: "Please introduce the latest developments of AI tool Manus."  # Specific Field News
+        expect: 
+          type: "call_tools"
+      - input: "Compare the weather in New York and San Francisco today, which place is better for outdoor activities?"  # Real-time Weather
+        expect: 
+          type: "call_tools"
+
+  - category: Problem Solving
+    cases:
+      - input: "I want to upgrade my computer's memory. How do I know what type of memory my motherboard supports?"  # Technical Issues
+        expect:
+          type: "direct_answer"
+      - input: "I have $10,000 in savings. Should I invest all in Tesla stock and then diversify, or diversify now into five different stocks?"  # Decision Making (need market data)
+        expect:
+          type: "direct_answer"
+      - input: "How can I optimize my morning routine to complete washing up, meditation, exercise and breakfast within 45 minutes?"  # Process Optimization
+        expect:
+          type: "direct_answer"
+
+  - category: Recommendations
+    cases:
+      - input: "I need a laptop for gaming and video editing, what's the best option under $1,500?"  # Product Recommendations
+        expect:
+          type: "call_tools"
+      - input: "I'm traveling to Italy next summer. Which cities are worth visiting? Please help me plan the trip."  # Travel Advice
+        expect:
+          type: "direct_answer"
+      - input: "What are the best online courses for learning data science with no prior experience? Please help me create a three-month study plan."  # Learning Resources
+        expect:
+          type: "call_tools"
+
+  - category: Analysis Requests
+    cases:
+      - input: "Here is the sales data for the first quarter, can you tell me the trends and insights?"  # Data Interpretation (but not specific)
+        expect:
+          type: "direct_answer"
+      - input: "Compare the performance and cost features of Tesla Model Q and Audi Q5 e-tron."  # Comparative Analysis
+        expect:
+          type: "call_tools"
+      - input: "What are the potential risks and coping strategies for opening an online-offline coffee roasting small business in North America in the current market environment?"  # Risk Assessment
+        expect:
+          type: "call_tools"
+
+  - category: Creative Assistance
+    cases:
+      - input: "I need creative ideas for a sci-fi story about humans colonizing Mars in the future."  # Creative Generation
+        expect:
+          type: "direct_answer"
+      - input: "Here's my blog: https://medium.com/google-cloud/cybersecurity-best-practices-in-google-cloud-platform-0979e32fb241, how can I make it more appealing to readers?"  # Content Optimization
+        expect:
+          type: "call_tools"
+      - input: "How can I introduce innovative elements into a traditional food and beverage industry while not losing the existing customer base?" # Innovation Methods
+        expect:
+          type: "direct_answer"
+
+  - category: Personal Assistance
+    cases:
+      - input: "Please use Uber Eats to order a medium hot latte with less sugar and no foam from the nearest Starbucks, and have it delivered to the reception desk at 23 Times Square Building, New York."  # Life Assistant
+        expect:
+          type: "call_tools"
+      - input: "I have 4 tasks due today: sales report, client email, meeting presentation, and next month's marketing plan. How should I prioritize them?"  # Task Prioritization
+        expect:
+          type: "direct_answer"
+      - input: "How much budget would be needed for two people to vacation in Phuket, Thailand for a week, staying in a four-star hotel?"  # Budget Estimation
+        expect:
+          type: "call_tools"
+
+  - category: Educational Support
+    cases:
+      - input: "Can you explain what quantum computing is in simple language? How is it different from traditional computing?"  # Concept Explanation
+        expect:
+          type: "direct_answer"
+      - input: "I have an interview for an Ad Ops Manager position at Netflix next week. What advice can you give me to prepare?"  # Interview Preparation
+        expect:
+          type: "direct_answer"
+      - input: "Help me solve this algebra problem: 2x + 5 = 15, what are the steps?"  # Homework Help
+        expect:
+          type: "direct_answer"
+
+  - category: Business Strategy
+    cases:
+      - input: "We are furniture manufacturers based in Boston with annual revenue of $3 million. We want to enter the California high-end market targeting affluent families aged 35-45, with a budget of $50,000. Which local digital marketing platforms offer the highest ROI?"  # Market Strategy
+        expect:
+          type: "call_tools"
+      - input: "Our e-commerce platform has an average of 5,000 orders per month with a customer service team of 10 people. The average customer wait time for response exceeds 15 minutes. Please analyze the response time data of major industry competitors and provide optimization solutions."  # Operational Optimization
+        expect:
+          type: "call_tools"
+
+  - category: Complex Scenarios
+    cases:
+      - input: "I want to buy a property in New York, preferably in an area with low crime rate. I have one child in middle school and another in kindergarten, so I'd like to consider their education. My wife and I have a combined monthly income of $50,000. Please help me find suitable properties."  # Property Recommendation
+        expect:
+          type: "call_tools"
+      - input: "Please use maps and terrain visualization technology to explain in detail the Battle of Lexington and the 'shot heard around the world' in the American Revolutionary War. The focus should be on providing battle reports and specific map images to show and explain the battle process."  # Explaining Historical Events
+        expect:
+          type: "call_tools"
+      - input: "Design an interactive webpage that explains the Transformer architecture with clear visuals and engaging elements. Structure it as a progressive learning journey from basic to advanced concepts, and incorporate interactive demonstrations to showcase the functionality and elegance of Transformers."  # Web Design
+        expect:
+          type: "call_tools"
+      - input: "Access the YC official website and organize all company information under the W25 B2B tag into a clear, well-structured table. Make sure to find all information."  # Data Organization
+        expect:
+          type: "call_tools"
+      - input: "Help me research the five projects that DeepSeek has open-sourced. Please read the GitHub repository source code, introduce each of the five projects one by one, and draw a system architecture diagram for each project."  # Research Open Source Projects
+        expect:
+          type: "call_tools"
+      - input: "Conduct a thorough SEO audit of Karpathy's website (https://karpathy.ai/) and provide a detailed optimization report with actionable suggestions."  # SEO Audit
+        expect:
+          type: "call_tools"
+
+  - category: Other
+    cases:
+      - input: "Hello, Levia"  # Greeting
+        expect:
+          type: "direct_answer"
+      - input: "To be, or not to be, that is the question"  # Speech
+        expect:
+          type: "direct_answer"

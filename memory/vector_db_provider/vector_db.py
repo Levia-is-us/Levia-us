@@ -1,7 +1,9 @@
 from memory.vector_db_provider.pinecone.pinecone import PineconeDb
 from datetime import datetime
+import time
 
-vector_db = PineconeDb(index_name="levia")
+index_name = "levia"
+vector_db = PineconeDb(index_name=index_name)
 
 
 def save_memory(id: str, vector: list, metadata: dict, namespace: str):
@@ -12,12 +14,14 @@ def save_memory(id: str, vector: list, metadata: dict, namespace: str):
         "metadata": metadata,
     }
     try:
+        vector_db.set_index(index_name)
         vector_db.upsert([input_embedding], namespace)
     except Exception as e:
-        print(f"\033[91mError upserting memory: {str(e)}\033[0m")
+        raise Exception(f"Error saving memory: {str(e)}")
 
 
 def retrieve_memory(vector: list, namespace: str, top_k: int = 10):
+    vector_db.set_index(index_name)
     memories = vector_db.query(
         vector=vector,
         namespace=namespace,
@@ -26,3 +30,7 @@ def retrieve_memory(vector: list, namespace: str, top_k: int = 10):
         include_values=False,
     )
     return memories
+
+
+def delete_memory(ids: list[str], namespace: str):
+    vector_db.delete(ids=ids, namespace=namespace)

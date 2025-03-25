@@ -5,8 +5,8 @@ class LocalStream(BaseStream):
     def __init__(self):
         pass
 
-    def output(self, log: str):
+    def output(self, log: str, user_id: str, type: str, child_id: str = "", title: str = "", api_key: str = "", dev_id: str = ""):
         try:
-            print(log)
+            print(f"\033[95m{log}\033[0m")
         except Exception as e:
             print(f"LocalStream write log error: {e}")

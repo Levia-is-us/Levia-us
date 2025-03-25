@@ -48,3 +48,11 @@ wheels/
 
 #other
 .history/
+intent_test_*.json
+episodic_check_test_*.json
+create_plan_test_*.json
+toolbase_planner_test_*.json
+next_step_test_*.json
+transform_code_test_*.json
+final_reply_test_*.json
+tool_result_test_*.json

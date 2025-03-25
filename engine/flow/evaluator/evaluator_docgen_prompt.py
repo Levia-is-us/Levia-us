@@ -76,10 +76,3 @@ reasoning for the functions
 9. Ensure that the output json start with ```json and end with ```
 
 Begin your analysis now by breaking down the code inside the <code_breakdown> tags and providing the final JSON output."""
-
-
-def create_evaluator_docgen_prompt(code):
-    return [
-        {"role": "assistant", "content": system_prompt},
-        {"role": "user", "content": prompt.replace("{{PYTHON_CODE}}", code)},
-    ]

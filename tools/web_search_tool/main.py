@@ -1,68 +1,54 @@
 import sys
 import os
 
-from aipolabs import Aipolabs
-from aipolabs.types.functions import FunctionExecutionResult
+
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(project_root)
 
 from tools.web_search_tool.util import (
-    aipolabs_search,
     extract_relevance_url,
     generate_search_keywords,
+    search_non_visual,
+    search_visual,
 )
 
-from engine.tool_framework.tool_runner import ToolRunner
-from engine.tool_framework import simple_tool
+
+from engine.tool_framework import run_tool, BaseTool
 
 
-@simple_tool("Web Search Tool")
-def web_search(intent: str):
+@run_tool
+class WebSearchTool(BaseTool):
     """
     This tool is used to search the web for information.
     Args:
         intent (str): The intent of the user.
     Returns:
-        A list of URLs that match the intent.
+        A list of URLs.
     """
 
-    # Generate search keywords
-    keywords = generate_search_keywords(intent)
+    def web_search(self, intent: str):
+        # Generate search keywords
+        keywords = generate_search_keywords(intent)
 
-    # Initialize search engine
-    client = Aipolabs(api_key=os.environ.get("AIPOLABS_API_KEY"))
+        is_visual = os.getenv("VISUAL")
+        if is_visual == "True":
+            # Perform visual search
+            content_list = search_visual(keywords)
+            if not content_list:
+                # If no visual content found, perform non-visual web search
+                content_list = search_non_visual(keywords)
+        else:
+            # Perform web search
+            content_list = search_non_visual(keywords)
 
-    content_list = []
-    for keyword in keywords:
-        try:
-            # Search for each keyword
-            result: FunctionExecutionResult = aipolabs_search(client, keyword)
-            # Extract content from search results
-            contents = [
-                f'url: {result["url"]} content: {result["content"]}'
-                for result in result.data["results"]
-            ]
-            content_list.extend(contents)
-        except Exception as e:
-            print(f"Aipolabs search error: {str(e)}")
-
-    if not content_list:
-        return "No results found."
-    else:
-        # Extract relevance URLs
-        relevance_urls = extract_relevance_url(intent, content_list)
-        if not relevance_urls:
+        if not content_list:
             return "No results found."
-        return relevance_urls
-
-
-def main():
-    tool = web_search()
-    runner = ToolRunner(tool)
-    runner.run()
-
-
-if __name__ == "__main__":
-    main()
+        else:
+            # Extract relevance URLs
+            contents = " ".join(content_list)
+            relevance_urls = extract_relevance_url(intent, contents)
+            if not relevance_urls:
+                return "No results found."
+            return relevance_urls
