@@ -11,10 +11,8 @@ from tools.smithery_mcp_tool.main import SmitheryMCPTool
 def main():
     mcp_tool = SmitheryMCPTool()
 
-    arguments = {
-        'to': 'armorn@outlook.com', 'subject': 'test email', 'content': 'hello!'
-        }
-    result = mcp_tool.mcp_call_tool(serverId="@ykhli/mcp-send-emails", toolName="send-email", arguments=arguments)
+    arguments = {"lat": 37.7749, "lng": -122.4194, "adjacents": True, "responseType": "long"}
+    result = mcp_tool.mcp_call_tool(serverId="@blake365/macrostrat-mcp", toolName="find-columns", arguments=arguments)
     print(result)
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ from jsonschema import validators
 import yaml
 
 from schema import failed_output_schema, success_output_schema
+from tools import tools
 
 project_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,6 +22,7 @@ sys.path.append(
     )
 )
 from engine.flow.planner.make_tool_base_plan_flow import tool_base_planner
+
 
 
 models = [
@@ -308,7 +310,7 @@ def run_single_test(model, test_case, idx):
             "values": [],
         },
     ]
-
+    tool_list = tools
     start = time.time()
     try:
         output = tool_base_planner(
