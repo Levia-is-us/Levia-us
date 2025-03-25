@@ -255,7 +255,7 @@ class HTTPStream(BaseStream):
             self.server_thread = threading.Thread(target=run_server, daemon=True)
             self.server_thread.start()
 
-    def output(self, log: str, user_id: str, type: str, ch_id: str = "", title: str = ""):
+    def output(self, log: str, user_id: str, type: str, ch_id: str = "", title: str = "", api_key: str = "", dev_id: str = ""):
         if type == "end_time" or "Final reply" in log or "Final reply" in title:
             return
         try:
