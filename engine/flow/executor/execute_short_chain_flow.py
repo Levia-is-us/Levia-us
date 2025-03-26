@@ -74,8 +74,6 @@ def process_tool_execution_plan(plan, messages_history: list, user_id: str, user
     #replan
     found_tools = get_unique_tools(found_tools)
     # save found tools to a file
-    with open("found_tools.json", "w") as f:
-        json.dump(found_tools, f)
     if(len(found_tools) == 0):
         raise Exception("failed to find tools")
     output_stream(log="Making new plan based on current tools...", user_id=user_id, type="steps", ch_id=ch_id)

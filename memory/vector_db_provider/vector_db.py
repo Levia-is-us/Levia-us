@@ -20,7 +20,7 @@ def save_memory(id: str, vector: list, metadata: dict, namespace: str):
         raise Exception(f"Error saving memory: {str(e)}")
 
 
-def retrieve_memory(vector: list, namespace: str, top_k: int = 3):
+def retrieve_memory(vector: list, namespace: str, top_k: int = 30):
     vector_db.set_index(index_name)
     memories = vector_db.query(
         vector=vector,
