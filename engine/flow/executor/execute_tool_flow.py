@@ -5,6 +5,7 @@ from engine.utils.json_util import extract_json_from_str
 from engine.tool_framework.tool_caller import ToolCaller
 from metacognitive.stream.stream import output_stream
 import os
+import time
 
 QUALITY_MODEL_NAME = os.getenv("QUALITY_MODEL_NAME")
 
@@ -19,14 +20,18 @@ def execute_tool(
     output_stream(log=f"Running {tool_name}...", user_id=user_id, type="think", ch_id=ch_id)
 
     execution_record = {"tool": tool_name, "method": tool_method, "args": tool_args}
+    start_time = time.time()
 
     try:
         result = tool_caller.call_tool(
             tool_name=tool_name, method=tool_method, kwargs=tool_args
         )
-        # if isinstance(result, dict):
-        #     return {"status": "failure", "result": "tool execution result is invalid"}, None
+        execution_time = time.time() - start_time
+        
         status = verify_tool_execution(execution_record, result, user_id, ch_id)
+        if isinstance(result, dict):
+            result["execution_time"] = execution_time
+            result["status"] = status
         record_tool_execution(tool_name, tool_method, tool_args, result)
         output_stream(log=f"{result}", user_id=user_id, type="think", ch_id=ch_id, title="tool execution result")
 
@@ -60,11 +65,26 @@ def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: 
     """Record tool execution in database"""
     sql = """
         INSERT INTO levia_tool_executor_history 
-        (toolId, uid, tool_execute_args, tool_response, createTime) 
-        VALUES (%s, %s, %s, %s, now())
+        (toolId, uid, tool_execute_args, tool_response, execution_status, execution_time, serverId, createTime) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, now())
     """
     tool_id = tool_name + tool_method
-    db_pool.execute(sql, (tool_id, "123", str(args), str(result)))
+    
+    execution_status = "success" if result.get("status") != "failure" else "failure"
+    
+    execution_time = result.get("execution_time", 0)
+    
+    server_id = args.get("serverId", None)
+    
+    db_pool.execute(sql, (
+        tool_id, 
+        "123", 
+        str(args), 
+        str(result),
+        execution_status,
+        execution_time,
+        server_id
+    ))
 
 
 def create_execution_record(
