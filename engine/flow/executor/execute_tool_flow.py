@@ -29,10 +29,7 @@ def execute_tool(
         execution_time = time.time() - start_time
         
         status = verify_tool_execution(execution_record, result, user_id, ch_id)
-        if isinstance(result, dict):
-            result["execution_time"] = execution_time
-            result["status"] = status
-        record_tool_execution(tool_name, tool_method, tool_args, result)
+        record_tool_execution(tool_name, tool_method, tool_args, result, execution_time, status)
         output_stream(log=f"{result}", user_id=user_id, type="think", ch_id=ch_id, title="tool execution result")
 
         return result, create_execution_record(
@@ -61,7 +58,7 @@ def verify_tool_execution(execution_record: dict, result: dict, user_id: str, ch
     return "failure" if llm_confirmation["status"] == "failure" else "success"
 
 
-def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: dict):
+def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: dict, execution_time: float, status: str):
     """Record tool execution in database"""
     sql = """
         INSERT INTO levia_tool_executor_history 
@@ -70,10 +67,6 @@ def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: 
     """
     tool_id = tool_name + tool_method
     
-    execution_status = "success" if result.get("status") != "failure" else "failure"
-    
-    execution_time = result.get("execution_time", 0)
-    
     server_id = args.get("serverId", None)
     
     db_pool.execute(sql, (
@@ -81,7 +74,7 @@ def record_tool_execution(tool_name: str, tool_method: str, args: dict, result: 
         "123", 
         str(args), 
         str(result),
-        execution_status,
+        status,
         execution_time,
         server_id
     ))
