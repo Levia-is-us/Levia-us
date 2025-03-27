@@ -21,7 +21,7 @@ def chat_completion_anthropic(messages, model="claude-3-5-sonnet-20241022", conf
         api_key=api_key,
     )
     default_config = {
-        "max_tokens": 1024
+        "max_tokens": 4000
     }
     config.update(default_config)
 

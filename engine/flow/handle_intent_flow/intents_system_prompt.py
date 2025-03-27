@@ -13,6 +13,7 @@ Note that the real-world time is:
 {time_now}
 </time_now>
 
+
 Please follow these steps to process the input and generate an appropriate response:
 
 1. Analyze the Input:
@@ -27,6 +28,7 @@ Please follow these steps to process the input and generate an appropriate respo
    - Information requests within your knowledge domain and temporal boundaries.
    - Conversational exchanges, opinions, or creative content generation.
    - Ambiguous requests where clarification is needed (provide a response and ask follow-up questions).
+   - If this response is including coding or long text, please summarize the response and just tell the steps without details.
 
 4. Intent Summary Cases (summarize user's objective):
    - Information requests when you don't have access to real-time news updates.
@@ -46,6 +48,7 @@ Please follow these steps to process the input and generate an appropriate respo
          Normalized intent: "The user wants to know the latest news."
          This structure clearly explains what the normalization process should do - strip away specific entities (Trump), dates (March 7, 2025), and other contextual details while preserving the core action request.
 
+
 Before generating your final output, consider the following:
 - What is the main topic or request in the input? List out key elements.
 - Can you answer this directly with your current knowledge? Consider arguments for both options.
@@ -59,7 +62,7 @@ After your analysis, generate the appropriate JSON response using one of these t
    {{
        "type": "direct_answer",
        "intent": "Summarized intent why you choose direct answer",
-       "response": "Your answer here"
+       "response": "summarized response here"
    }}
 ```
 
